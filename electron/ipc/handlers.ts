@@ -50,7 +50,11 @@ import {
 	PROJECT_SAVE_FILTER_EXTENSIONS,
 } from "../projectFilePolicy";
 import { patchWebmDurationOnDisk } from "../recording/webm-duration";
-import { createRecordingBundle, SHOWHOW_RECORDINGS_ROOT } from "../showhow/bundle";
+import {
+	createRecordingBundle,
+	regenerateDocArtifacts,
+	SHOWHOW_RECORDINGS_ROOT,
+} from "../showhow/bundle";
 import { registerNativeBridgeHandlers } from "./nativeBridge";
 import { RecordingStreamRegistry, registerRecordingStreamHandlers } from "./recordingStream";
 
@@ -2298,6 +2302,17 @@ export function registerIpcHandlers(
 		}
 		try {
 			await fs.writeFile(path.join(resolved, "transcript.txt"), content, "utf-8");
+			// Re-run the deterministic doc engine now that transcript.txt is
+			// present. createRecordingBundle ran before the caption pipeline
+			// finished, so its steps.json/steps.md carry `Step N` fallback
+			// labels; this regenerates both artifacts from the stored cursor
+			// telemetry + the freshly written transcript. Never throws and
+			// never touches the video -- only rewrites steps.json/steps.md.
+			try {
+				await regenerateDocArtifacts(resolved);
+			} catch (error) {
+				console.error("showhow:write-transcript doc regeneration failed:", error);
+			}
 			return { success: true };
 		} catch (error) {
 			console.error("showhow:write-transcript failed:", error);
