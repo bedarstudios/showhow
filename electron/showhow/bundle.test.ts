@@ -630,6 +630,32 @@ describe("regenerateDocArtifacts", () => {
 		return { result, root };
 	}
 
+	it("serializes overlapping regenerations of the same bundle without spurious failures", async () => {
+		const { result } = await buildBundleWithClicks({
+			transcriptContent: "[0:01] Open the product catalog\n[0:03] Click the upload button\n",
+		});
+
+		// Fire several regenerations of the SAME bundle concurrently. With shared
+		// steps.*.tmp staging and no per-bundle serialization, an interleaved
+		// sibling renames a temp out from under another run (ENOENT). All must resolve.
+		const regens = await Promise.all([
+			regenerateDocArtifacts(result.bundleDir),
+			regenerateDocArtifacts(result.bundleDir),
+			regenerateDocArtifacts(result.bundleDir),
+			regenerateDocArtifacts(result.bundleDir),
+		]);
+		for (const regen of regens) expect(regen.success).toBe(true);
+
+		// Final artifacts are a matched pair, and no staging temp files leak.
+		const steps = JSON.parse(
+			await readFile(path.join(result.bundleDir, "steps.json"), "utf-8"),
+		) as Step[];
+		const md = await readFile(path.join(result.bundleDir, "steps.md"), "utf-8");
+		for (const step of steps) expect(md).toContain(step.label);
+		const entries = await readdir(result.bundleDir);
+		expect(entries.filter((e) => e.endsWith(".tmp"))).toEqual([]);
+	});
+
 	it("regenerates steps.json and steps.md from stored telemetry + newly written transcript (root-cause fix)", async () => {
 		// Bundle created with NO transcript -> labels are "Step N".
 		const { result } = await buildBundleWithClicks({});

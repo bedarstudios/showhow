@@ -609,23 +609,58 @@ async function writeDocArtifacts(
 
 	const write = seam?.writeFile ?? defaultWriteFile;
 
-	// Stage both artifacts to temp files first. If either fails, clean up any
-	// staged temp and leave the prior pair untouched.
-	await write(jsonTmp, jsonContent);
-	try {
-		await write(mdTmp, mdContent);
-	} catch (error) {
-		// Clean up the staged steps.json.tmp so no half-staged state remains.
-		await fs.rm(jsonTmp, { force: true });
-		throw error;
-	}
+	// Serialize the stage+promote per bundle. Overlapping regenerations of the
+	// SAME bundle share the fixed steps.*.tmp staging paths, so without this an
+	// interleaved sibling can rename a temp out from under this run (spurious
+	// ENOENT) or promote a mismatched pair. Distinct bundles never contend.
+	// (Addresses Greptile PR #31: shared regeneration temp paths.)
+	await serializePerBundle(bundleDir, async () => {
+		// Stage both artifacts to temp files first. If either fails, clean up any
+		// staged temp and leave the prior pair untouched.
+		await write(jsonTmp, jsonContent);
+		try {
+			await write(mdTmp, mdContent);
+		} catch (error) {
+			// Clean up the staged steps.json.tmp so no half-staged state remains.
+			await fs.rm(jsonTmp, { force: true });
+			throw error;
+		}
 
-	// Both staged successfully -> promote atomically (rename). If the second
-	// rename fails, attempt to restore the first so we don't leave a new
-	// artifact paired with a stale companion.
-	await promotePaired(jsonPath, jsonTmp, mdPath, mdTmp);
+		// Both staged successfully -> promote atomically (rename). If the second
+		// rename fails, attempt to restore the first so we don't leave a new
+		// artifact paired with a stale companion.
+		await promotePaired(jsonPath, jsonTmp, mdPath, mdTmp);
+	});
 
 	return { stepsWritten: steps.length, transcriptAvailable };
+}
+
+/**
+ * Per-bundle write serializer. Overlapping regeneration requests for the same
+ * bundleDir are chained so their stage+promote critical sections run one at a
+ * time; a rejected task never breaks the chain for the next caller, and distinct
+ * bundles proceed concurrently. In-process only: there is a single writer per
+ * recording on the desktop, so a cross-process lock is unnecessary.
+ */
+const bundleWriteQueue = new Map<string, Promise<unknown>>();
+
+function serializePerBundle<T>(bundleDir: string, task: () => Promise<T>): Promise<T> {
+	const prior = bundleWriteQueue.get(bundleDir) ?? Promise.resolve();
+	// Run task after prior settles either way, so one failure never stalls the queue.
+	const result = prior.then(task, task);
+	// Tail swallows rejections (chain stays alive) and drops the map entry once
+	// this task is the last one queued for the bundle.
+	const tail = result.then(
+		() => undefined,
+		() => undefined,
+	);
+	bundleWriteQueue.set(bundleDir, tail);
+	tail.then(() => {
+		if (bundleWriteQueue.get(bundleDir) === tail) {
+			bundleWriteQueue.delete(bundleDir);
+		}
+	});
+	return result;
 }
 
 async function defaultWriteFile(filePath: string, content: string): Promise<void> {
