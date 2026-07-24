@@ -96,11 +96,7 @@ describe("standalone package identity", () => {
 		expect(setup).toContain("cache-dependency-path: package-lock.json");
 
 		const workflow = read(".github/workflows/build.yml");
-		for (const artifact of [
-			"showhow-windows",
-			"showhow-mac-${{ matrix.arch }}",
-			"showhow-linux",
-		]) {
+		for (const artifact of ["showhow-windows", "showhow-mac-${{ matrix.arch }}", "showhow-linux"]) {
 			expect(workflow).toContain(`name: ${artifact}`);
 		}
 		expect(workflow).not.toContain("showhow-desktop");
