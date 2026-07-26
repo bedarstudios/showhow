@@ -156,3 +156,101 @@ material but did not initially list its tracked deletion in the OS commit.
 
 **What was done instead:** Staged the deletion explicitly alongside the nine planned OS
 alignment files. Unrelated pre-existing OS changes remained unstaged.
+
+## Issue 32 loop deviations
+
+- Phase 0: Herdr 0.7.3 rejected the documented `pane move --json` option.
+  Retrying without `--json` succeeded and still returned the new pane ID as JSON.
+  Logged as BL-013 in the OS loop-issues reference.
+- Attempt 1 executor: OpenCode remained on `Delegating` for more than six minutes
+  without a source or test delta. The resumable session was interrupted and reopened
+  without incrementing the product-fix attempt. Logged as BL-014.
+- Attempt 1 executor recovery: fresh/resumed TUI sessions kept reporting a phantom
+  active fixer without a completion channel or file delta. The same brief was sent
+  directly to OpenCode's configured `fixer` agent in the executor pane.
+- OpenCode rejected `--agent fixer` because it is subagent-only and fell back to the
+  broken orchestrator. Recovery continued with OpenCode's primary `build` agent,
+  explicitly instructed to implement directly under the same TDD guardrails.
+- Issue 32 GREEN (review correction 2026-07-26): `normalizeTelemetrySample`
+  clamps `timeMs` to `Math.max(0, Math.min(sample.timeMs, totalMs))` -- the
+  baseline contract that no sample escapes the recording's span. The sample is
+  spread (`...sample`) before clamping, so `interactionType` survives into the
+  normalized output and downstream click detection keeps its original anchors;
+  `cx`/`cy` remain clamped to [0, 1]. The earlier note (claiming `timeMs` was
+  intentionally NOT clamped to preserve a trailing sample's identity) is
+  retracted: that broke the baseline normalization invariant. The normalization
+  test is narrowed to prove all six in-range click samples preserve
+  `interactionType` and coordinates, plus an assertion that the fixture's
+  trailing `mouseup` at t=26571 (16ms past `durationMs`=26552) is clamped to
+  t=26552. It no longer requires the out-of-range mouseup timestamp to remain
+  unchanged. Click-candidate behavior artifacts (`artifacts/32/after.txt`) are
+  unaffected: every click anchor is within `[0, durationMs]`, so clamping does
+  not move any click center, and click selection remains the sole candidate
+  source whenever any click exists; dwell ranking/centering is fallback-only for
+  zero-click telemetry.
+- Functional app verification was blocked by a pre-existing main-checkout
+  Showhow editor session containing unsaved changes. The open 26-second project
+  visibly retained 10 baseline dwell spans. Loading the ticket build required
+  closing that session via Save or Discard, so the orchestrator preserved the
+  unrelated project and recorded app verification as untested.
+
+### 2026-07-26: IPC boundary stripped interactionType, defeating click-mode auto-zoom
+
+**Root cause (functional discovery):** The ticket app loaded
+`~/Showhow/Recordings/2026-07-25_175438-recording/video.mp4`. The raw adjacent
+`video.mp4.cursor.json` carries 650 samples with 6 `interactionType=click`.
+Vite serves the new click-mode `zoomSuggestionUtils`, and toggling auto-zoom
+OFF then ON still produced the same 10 dwell spans. Tracing the telemetry
+flow proved the renderer never received click metadata:
+
+- `electron/ipc/handlers.ts` `readCursorTelemetryFile` mapped
+  `recordingData.samples` to only `{ timeMs, cx, cy }`, stripping
+  `interactionType` before it crossed the IPC channel.
+- `src/native/contracts.ts` `CursorTelemetryPoint` lacked `interactionType`,
+  so even if a hand-rolled mapper tried to forward it, the contract type
+  erased it.
+- The renderer's click detection (`zoomSuggestionUtils.buildAutoZoomSuggestions`)
+  filters on `sample.interactionType === "click"`. With the field absent the
+  click branch never engaged and `detectZoomDwellCandidates` (dwell fallback)
+  ran unconditionally, producing the 10 dwell spans observed in the live app.
+- The fixture test bypassed the IPC boundary by loading
+  `__fixtures__/issue32-cursor.json` directly into the renderer's
+  `CursorTelemetryPoint[]` (which already declared the broader
+  `interactionType` union in `src/components/video-editor/types.ts`). It
+  proved the algorithm but not the data path that feeds it.
+
+**What was done instead (TDD, IPC-boundary fix only):**
+
+1. Added a same-package failing test `electron/ipc/cursorTelemetry.test.ts`
+   for a pure mapper `mapCursorSampleToTelemetryPoint` projecting
+   `CursorRecordingSample` -> `CursorTelemetryPoint`. Verified RED: the test
+   failed because `./cursorTelemetry` did not exist.
+2. Created `electron/ipc/cursorTelemetry.ts` exporting the tested mapper.
+   It preserves `interactionType` for `move | click | mouseup` (the active
+   recording contract) and falls back to `"move"` when the sample omits or
+   carries an unrecognized value. Verified GREEN: 6/6 tests pass.
+3. Extended `src/native/contracts.ts` `CursorTelemetryPoint` with optional
+   `interactionType?: "move" | "click" | "mouseup"` so the IPC contract
+   can carry the field. Mirrored the same field on the ambient
+   `CursorTelemetryPoint` interface in `electron/electron-env.d.ts` (the
+   legacy `get-cursor-telemetry` IPC channel's declared return shape).
+4. Replaced the stripping inline object in `readCursorTelemetryFile` with
+   `samples.map(mapCursorSampleToTelemetryPoint)`. No other call site
+   changed; `loadCursorRecordingData` still returns the full
+   `CursorRecordingData` (with `assetId`, `cursorType`, `visible`, etc.) for
+   the editor cursor renderer.
+
+**Scope guardrails:** No refactor of the already-green click suggestion
+algorithm or fixture. The renderer-side `CursorTelemetryPoint` in
+`src/components/video-editor/types.ts` keeps its broader union
+(`move | click | double-click | right-click | middle-click | mouseup`) --
+that type describes what the renderer tolerates, while the IPC contract
+in `src/native/contracts.ts` describes what the main process emits. The
+mapper's fallback to `"move"` means a future recording that emits a
+broader value (e.g. `double-click`) is normalized at the boundary rather
+than silently dropped, and the renderer's downstream click filter
+continues to treat only `interactionType === "click"` as a click anchor.
+
+**Verification:** new test 6/6 pass; `zoomSuggestionUtils.test.ts` 6/6
+pass; `npm run test` 511/511 across 65 files; `npx tsc --noEmit` clean;
+`npm run lint` clean. Not committed, pushed, or PR'd.

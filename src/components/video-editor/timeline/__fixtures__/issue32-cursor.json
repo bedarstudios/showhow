@@ -1,0 +1,3906 @@
+{
+	"source": "2026-07-25_175438-recording (issue #32 acceptance recording)",
+	"durationMs": 26552,
+	"samples": [
+		{
+			"timeMs": 0,
+			"cx": 0.610417,
+			"cy": 0.621296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.565104,
+			"cy": 0.559259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 0,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 53,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 91,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 127,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 166,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 206,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 247,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 285,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 330,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 372,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 414,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 456,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 497,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 534,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 576,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 614,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 657,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 700,
+			"cx": 0.548438,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 742,
+			"cx": 0.55625,
+			"cy": 0.552778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 786,
+			"cx": 0.561458,
+			"cy": 0.569444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 831,
+			"cx": 0.561979,
+			"cy": 0.572222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 874,
+			"cx": 0.561979,
+			"cy": 0.572222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 911,
+			"cx": 0.561979,
+			"cy": 0.564815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 955,
+			"cx": 0.557813,
+			"cy": 0.544444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 995,
+			"cx": 0.557292,
+			"cy": 0.539815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1033,
+			"cx": 0.558333,
+			"cy": 0.535185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1075,
+			"cx": 0.559375,
+			"cy": 0.534259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1117,
+			"cx": 0.559375,
+			"cy": 0.534259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1157,
+			"cx": 0.559375,
+			"cy": 0.534259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1199,
+			"cx": 0.559375,
+			"cy": 0.534259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1244,
+			"cx": 0.559375,
+			"cy": 0.534259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1289,
+			"cx": 0.559375,
+			"cy": 0.534259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1329,
+			"cx": 0.559375,
+			"cy": 0.527778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1370,
+			"cx": 0.543229,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1408,
+			"cx": 0.469792,
+			"cy": 0.44537,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1450,
+			"cx": 0.272396,
+			"cy": 0.405556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1492,
+			"cx": 0.114062,
+			"cy": 0.414815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1540,
+			"cx": 0.066146,
+			"cy": 0.42963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1606,
+			"cx": 0.107813,
+			"cy": 0.440741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1651,
+			"cx": 0.198437,
+			"cy": 0.452778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1691,
+			"cx": 0.235417,
+			"cy": 0.436111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1730,
+			"cx": 0.239063,
+			"cy": 0.42963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1770,
+			"cx": 0.239063,
+			"cy": 0.424074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1810,
+			"cx": 0.242188,
+			"cy": 0.407407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1852,
+			"cx": 0.266146,
+			"cy": 0.386111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1895,
+			"cx": 0.357812,
+			"cy": 0.387963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1934,
+			"cx": 0.441146,
+			"cy": 0.401852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 1974,
+			"cx": 0.570833,
+			"cy": 0.425,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2016,
+			"cx": 0.655208,
+			"cy": 0.438889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2060,
+			"cx": 0.676562,
+			"cy": 0.443519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2102,
+			"cx": 0.677083,
+			"cy": 0.444444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2147,
+			"cx": 0.677604,
+			"cy": 0.44537,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2189,
+			"cx": 0.677604,
+			"cy": 0.448148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2228,
+			"cx": 0.676562,
+			"cy": 0.449074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2272,
+			"cx": 0.675,
+			"cy": 0.450926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2313,
+			"cx": 0.674479,
+			"cy": 0.451852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2357,
+			"cx": 0.674479,
+			"cy": 0.451852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2396,
+			"cx": 0.679167,
+			"cy": 0.455556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2441,
+			"cx": 0.697917,
+			"cy": 0.461111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2484,
+			"cx": 0.716667,
+			"cy": 0.459259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2526,
+			"cx": 0.719792,
+			"cy": 0.456481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2567,
+			"cx": 0.719792,
+			"cy": 0.456481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2610,
+			"cx": 0.717708,
+			"cy": 0.45463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2651,
+			"cx": 0.707292,
+			"cy": 0.449074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2693,
+			"cx": 0.703646,
+			"cy": 0.446296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2730,
+			"cx": 0.679688,
+			"cy": 0.437963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2770,
+			"cx": 0.678646,
+			"cy": 0.437963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2812,
+			"cx": 0.678646,
+			"cy": 0.437037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2854,
+			"cx": 0.678646,
+			"cy": 0.437037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2891,
+			"cx": 0.682292,
+			"cy": 0.431481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2932,
+			"cx": 0.704688,
+			"cy": 0.391667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 2971,
+			"cx": 0.739583,
+			"cy": 0.347222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3010,
+			"cx": 0.779167,
+			"cy": 0.342593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3052,
+			"cx": 0.802083,
+			"cy": 0.378704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3100,
+			"cx": 0.814583,
+			"cy": 0.407407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3143,
+			"cx": 0.819792,
+			"cy": 0.421296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3185,
+			"cx": 0.819792,
+			"cy": 0.421296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3229,
+			"cx": 0.819792,
+			"cy": 0.421296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3268,
+			"cx": 0.819792,
+			"cy": 0.421296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3313,
+			"cx": 0.819792,
+			"cy": 0.421296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3352,
+			"cx": 0.819792,
+			"cy": 0.421296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3396,
+			"cx": 0.823438,
+			"cy": 0.337963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3440,
+			"cx": 0.818229,
+			"cy": 0.261111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3484,
+			"cx": 0.814583,
+			"cy": 0.223148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3526,
+			"cx": 0.814063,
+			"cy": 0.216667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3567,
+			"cx": 0.814063,
+			"cy": 0.214815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3610,
+			"cx": 0.814063,
+			"cy": 0.201852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3650,
+			"cx": 0.814063,
+			"cy": 0.183333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3692,
+			"cx": 0.815104,
+			"cy": 0.159259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3735,
+			"cx": 0.816667,
+			"cy": 0.14537,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3780,
+			"cx": 0.817187,
+			"cy": 0.138889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3822,
+			"cx": 0.817187,
+			"cy": 0.138889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3861,
+			"cx": 0.817187,
+			"cy": 0.138889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3906,
+			"cx": 0.817187,
+			"cy": 0.138889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3949,
+			"cx": 0.817187,
+			"cy": 0.138889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 3991,
+			"cx": 0.817187,
+			"cy": 0.148148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4029,
+			"cx": 0.817187,
+			"cy": 0.15,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4082,
+			"cx": 0.817708,
+			"cy": 0.15,
+			"interactionType": "click"
+		},
+		{
+			"timeMs": 4172,
+			"cx": 0.81875,
+			"cy": 0.152778,
+			"interactionType": "mouseup"
+		},
+		{
+			"timeMs": 4240,
+			"cx": 0.819792,
+			"cy": 0.15463,
+			"interactionType": "mouseup"
+		},
+		{
+			"timeMs": 4277,
+			"cx": 0.820312,
+			"cy": 0.155556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4315,
+			"cx": 0.820833,
+			"cy": 0.156481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4351,
+			"cx": 0.820833,
+			"cy": 0.156481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4391,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4431,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4468,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "click"
+		},
+		{
+			"timeMs": 4509,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4550,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4591,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "mouseup"
+		},
+		{
+			"timeMs": 4640,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4680,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4720,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4763,
+			"cx": 0.820833,
+			"cy": 0.157407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4806,
+			"cx": 0.79375,
+			"cy": 0.234259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4847,
+			"cx": 0.727083,
+			"cy": 0.364815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4885,
+			"cx": 0.655208,
+			"cy": 0.473148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4930,
+			"cx": 0.61875,
+			"cy": 0.517593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 4972,
+			"cx": 0.590625,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5013,
+			"cx": 0.584896,
+			"cy": 0.544444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5055,
+			"cx": 0.565625,
+			"cy": 0.55463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5096,
+			"cx": 0.535937,
+			"cy": 0.572222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5134,
+			"cx": 0.524479,
+			"cy": 0.57963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5176,
+			"cx": 0.518229,
+			"cy": 0.587037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5217,
+			"cx": 0.514062,
+			"cy": 0.596296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5254,
+			"cx": 0.511458,
+			"cy": 0.603704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5293,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5334,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5375,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5417,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5459,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5500,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "click"
+		},
+		{
+			"timeMs": 5540,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5586,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "mouseup"
+		},
+		{
+			"timeMs": 5625,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5664,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5702,
+			"cx": 0.510938,
+			"cy": 0.60463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5741,
+			"cx": 0.523958,
+			"cy": 0.616667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5782,
+			"cx": 0.570833,
+			"cy": 0.641667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5823,
+			"cx": 0.592187,
+			"cy": 0.646296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5865,
+			"cx": 0.601042,
+			"cy": 0.644444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5906,
+			"cx": 0.602083,
+			"cy": 0.642593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5947,
+			"cx": 0.602604,
+			"cy": 0.638889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 5987,
+			"cx": 0.602604,
+			"cy": 0.637037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6029,
+			"cx": 0.602604,
+			"cy": 0.636111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6072,
+			"cx": 0.602083,
+			"cy": 0.631481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6114,
+			"cx": 0.601562,
+			"cy": 0.625,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6154,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6193,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6236,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "click"
+		},
+		{
+			"timeMs": 6277,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6317,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "mouseup"
+		},
+		{
+			"timeMs": 6374,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6412,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6452,
+			"cx": 0.601562,
+			"cy": 0.621296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6493,
+			"cx": 0.604688,
+			"cy": 0.624074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6536,
+			"cx": 0.633854,
+			"cy": 0.656481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6580,
+			"cx": 0.646354,
+			"cy": 0.667593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6623,
+			"cx": 0.646875,
+			"cy": 0.668519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6664,
+			"cx": 0.646875,
+			"cy": 0.668519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6706,
+			"cx": 0.646354,
+			"cy": 0.669444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6748,
+			"cx": 0.64375,
+			"cy": 0.672222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6789,
+			"cx": 0.642708,
+			"cy": 0.672222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6831,
+			"cx": 0.642188,
+			"cy": 0.673148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6874,
+			"cx": 0.642188,
+			"cy": 0.673148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6914,
+			"cx": 0.642188,
+			"cy": 0.673148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6956,
+			"cx": 0.642188,
+			"cy": 0.673148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 6998,
+			"cx": 0.645312,
+			"cy": 0.663889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7039,
+			"cx": 0.646354,
+			"cy": 0.662037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7077,
+			"cx": 0.646354,
+			"cy": 0.658333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7117,
+			"cx": 0.646354,
+			"cy": 0.656481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7158,
+			"cx": 0.645833,
+			"cy": 0.650926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7197,
+			"cx": 0.645312,
+			"cy": 0.642593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7240,
+			"cx": 0.645312,
+			"cy": 0.635185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7281,
+			"cx": 0.646875,
+			"cy": 0.62037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7322,
+			"cx": 0.651042,
+			"cy": 0.599074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7364,
+			"cx": 0.653125,
+			"cy": 0.576852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7403,
+			"cx": 0.652083,
+			"cy": 0.560185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7447,
+			"cx": 0.644271,
+			"cy": 0.540741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7489,
+			"cx": 0.631771,
+			"cy": 0.526852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7531,
+			"cx": 0.623437,
+			"cy": 0.52037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7572,
+			"cx": 0.622396,
+			"cy": 0.519444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7615,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7655,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7697,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7741,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7783,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7825,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7867,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7909,
+			"cx": 0.622396,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7950,
+			"cx": 0.619271,
+			"cy": 0.521296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 7991,
+			"cx": 0.619271,
+			"cy": 0.521296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8033,
+			"cx": 0.619271,
+			"cy": 0.521296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8075,
+			"cx": 0.619271,
+			"cy": 0.521296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8117,
+			"cx": 0.618229,
+			"cy": 0.517593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8159,
+			"cx": 0.616146,
+			"cy": 0.505556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8200,
+			"cx": 0.611979,
+			"cy": 0.491667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8240,
+			"cx": 0.605208,
+			"cy": 0.476852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8281,
+			"cx": 0.596354,
+			"cy": 0.466667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8323,
+			"cx": 0.594271,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8365,
+			"cx": 0.593229,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8406,
+			"cx": 0.592708,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8447,
+			"cx": 0.592708,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8486,
+			"cx": 0.592708,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8527,
+			"cx": 0.592708,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8567,
+			"cx": 0.592708,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8608,
+			"cx": 0.592708,
+			"cy": 0.465741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8650,
+			"cx": 0.592708,
+			"cy": 0.464815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8692,
+			"cx": 0.590625,
+			"cy": 0.461111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8734,
+			"cx": 0.584375,
+			"cy": 0.451852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8775,
+			"cx": 0.563021,
+			"cy": 0.437963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8813,
+			"cx": 0.538021,
+			"cy": 0.427778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8852,
+			"cx": 0.504687,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8894,
+			"cx": 0.476042,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8938,
+			"cx": 0.475,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 8981,
+			"cx": 0.475,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9023,
+			"cx": 0.475,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9064,
+			"cx": 0.478646,
+			"cy": 0.426852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9106,
+			"cx": 0.48125,
+			"cy": 0.428704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9147,
+			"cx": 0.48125,
+			"cy": 0.428704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9189,
+			"cx": 0.48125,
+			"cy": 0.428704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9230,
+			"cx": 0.48125,
+			"cy": 0.428704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9272,
+			"cx": 0.48125,
+			"cy": 0.428704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9316,
+			"cx": 0.472396,
+			"cy": 0.417593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9356,
+			"cx": 0.451562,
+			"cy": 0.407407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9397,
+			"cx": 0.421354,
+			"cy": 0.4,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9438,
+			"cx": 0.401562,
+			"cy": 0.397222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9481,
+			"cx": 0.392188,
+			"cy": 0.400926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9522,
+			"cx": 0.385937,
+			"cy": 0.411111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9564,
+			"cx": 0.386458,
+			"cy": 0.44537,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9607,
+			"cx": 0.428646,
+			"cy": 0.517593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9649,
+			"cx": 0.489583,
+			"cy": 0.567593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9690,
+			"cx": 0.536458,
+			"cy": 0.581481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9731,
+			"cx": 0.538021,
+			"cy": 0.577778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9772,
+			"cx": 0.538021,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9814,
+			"cx": 0.540104,
+			"cy": 0.516667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9855,
+			"cx": 0.543229,
+			"cy": 0.509259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9897,
+			"cx": 0.546354,
+			"cy": 0.490741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9938,
+			"cx": 0.546354,
+			"cy": 0.452778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 9977,
+			"cx": 0.526563,
+			"cy": 0.405556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10020,
+			"cx": 0.488021,
+			"cy": 0.360185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10060,
+			"cx": 0.460938,
+			"cy": 0.338889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10100,
+			"cx": 0.446875,
+			"cy": 0.332407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10142,
+			"cx": 0.445312,
+			"cy": 0.332407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10185,
+			"cx": 0.44375,
+			"cy": 0.335185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10232,
+			"cx": 0.438021,
+			"cy": 0.351852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10273,
+			"cx": 0.430729,
+			"cy": 0.393519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10315,
+			"cx": 0.422396,
+			"cy": 0.446296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10352,
+			"cx": 0.419271,
+			"cy": 0.475926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10393,
+			"cx": 0.418229,
+			"cy": 0.512037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10436,
+			"cx": 0.428125,
+			"cy": 0.555556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10481,
+			"cx": 0.456771,
+			"cy": 0.591667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10521,
+			"cx": 0.497917,
+			"cy": 0.597222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10564,
+			"cx": 0.528125,
+			"cy": 0.572222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10605,
+			"cx": 0.552604,
+			"cy": 0.544444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10647,
+			"cx": 0.554688,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10689,
+			"cx": 0.555208,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10732,
+			"cx": 0.555208,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10773,
+			"cx": 0.555208,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10815,
+			"cx": 0.555208,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10854,
+			"cx": 0.555208,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10891,
+			"cx": 0.555208,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10932,
+			"cx": 0.555208,
+			"cy": 0.541667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 10971,
+			"cx": 0.564583,
+			"cy": 0.534259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11009,
+			"cx": 0.61875,
+			"cy": 0.492593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11050,
+			"cx": 0.679688,
+			"cy": 0.444444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11090,
+			"cx": 0.717708,
+			"cy": 0.425,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11130,
+			"cx": 0.73125,
+			"cy": 0.423148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11170,
+			"cx": 0.735417,
+			"cy": 0.427778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11209,
+			"cx": 0.7375,
+			"cy": 0.431481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11250,
+			"cx": 0.733854,
+			"cy": 0.439815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11291,
+			"cx": 0.708333,
+			"cy": 0.453704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11332,
+			"cx": 0.679688,
+			"cy": 0.471296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11373,
+			"cx": 0.667708,
+			"cy": 0.483333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11414,
+			"cx": 0.667188,
+			"cy": 0.484259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11456,
+			"cx": 0.667188,
+			"cy": 0.484259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11497,
+			"cx": 0.664583,
+			"cy": 0.481481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11533,
+			"cx": 0.65625,
+			"cy": 0.475,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11575,
+			"cx": 0.625521,
+			"cy": 0.460185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11617,
+			"cx": 0.60625,
+			"cy": 0.457407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11657,
+			"cx": 0.604688,
+			"cy": 0.458333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11697,
+			"cx": 0.604167,
+			"cy": 0.459259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11735,
+			"cx": 0.604167,
+			"cy": 0.461111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11775,
+			"cx": 0.604167,
+			"cy": 0.462037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11813,
+			"cx": 0.607812,
+			"cy": 0.462963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11854,
+			"cx": 0.634375,
+			"cy": 0.459259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11894,
+			"cx": 0.693229,
+			"cy": 0.444444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11937,
+			"cx": 0.716667,
+			"cy": 0.433333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 11978,
+			"cx": 0.717708,
+			"cy": 0.431481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12021,
+			"cx": 0.715625,
+			"cy": 0.433333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12062,
+			"cx": 0.694271,
+			"cy": 0.443519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12101,
+			"cx": 0.668229,
+			"cy": 0.446296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12140,
+			"cx": 0.617188,
+			"cy": 0.446296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12181,
+			"cx": 0.588542,
+			"cy": 0.442593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12223,
+			"cx": 0.588021,
+			"cy": 0.442593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12261,
+			"cx": 0.588021,
+			"cy": 0.442593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12307,
+			"cx": 0.588021,
+			"cy": 0.442593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12348,
+			"cx": 0.584896,
+			"cy": 0.443519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12390,
+			"cx": 0.554167,
+			"cy": 0.458333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12431,
+			"cx": 0.509375,
+			"cy": 0.475,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12471,
+			"cx": 0.440625,
+			"cy": 0.494444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12508,
+			"cx": 0.433854,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12549,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12592,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12633,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12671,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12708,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12748,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12791,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12831,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12872,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12913,
+			"cx": 0.433333,
+			"cy": 0.496296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12956,
+			"cx": 0.419271,
+			"cy": 0.50463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 12997,
+			"cx": 0.367708,
+			"cy": 0.536111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13035,
+			"cx": 0.315104,
+			"cy": 0.571296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13080,
+			"cx": 0.307812,
+			"cy": 0.583333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13117,
+			"cx": 0.31875,
+			"cy": 0.601852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13158,
+			"cx": 0.3625,
+			"cy": 0.627778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13198,
+			"cx": 0.533333,
+			"cy": 0.673148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13237,
+			"cx": 0.6625,
+			"cy": 0.669444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13280,
+			"cx": 0.689063,
+			"cy": 0.653704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13321,
+			"cx": 0.688021,
+			"cy": 0.650926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13360,
+			"cx": 0.667188,
+			"cy": 0.636111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13402,
+			"cx": 0.568229,
+			"cy": 0.613889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13442,
+			"cx": 0.506771,
+			"cy": 0.611111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13483,
+			"cx": 0.48125,
+			"cy": 0.612963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13525,
+			"cx": 0.48125,
+			"cy": 0.613889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13566,
+			"cx": 0.510938,
+			"cy": 0.624074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13607,
+			"cx": 0.578125,
+			"cy": 0.637963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13648,
+			"cx": 0.632292,
+			"cy": 0.647222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13689,
+			"cx": 0.632292,
+			"cy": 0.647222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13730,
+			"cx": 0.579688,
+			"cy": 0.646296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13769,
+			"cx": 0.501563,
+			"cy": 0.653704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13808,
+			"cx": 0.445312,
+			"cy": 0.676852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13848,
+			"cx": 0.426042,
+			"cy": 0.70463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13890,
+			"cx": 0.425,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13931,
+			"cx": 0.435937,
+			"cy": 0.790741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 13972,
+			"cx": 0.460938,
+			"cy": 0.827778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14015,
+			"cx": 0.516146,
+			"cy": 0.837963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14056,
+			"cx": 0.581771,
+			"cy": 0.792593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14093,
+			"cx": 0.611458,
+			"cy": 0.751852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14139,
+			"cx": 0.614062,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14180,
+			"cx": 0.614062,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14222,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14264,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14306,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14347,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14388,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14431,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14472,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14515,
+			"cx": 0.614583,
+			"cy": 0.746296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14556,
+			"cx": 0.626042,
+			"cy": 0.686111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14596,
+			"cx": 0.653646,
+			"cy": 0.59537,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14636,
+			"cx": 0.677604,
+			"cy": 0.518519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14677,
+			"cx": 0.684375,
+			"cy": 0.443519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14721,
+			"cx": 0.638542,
+			"cy": 0.380556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14758,
+			"cx": 0.560417,
+			"cy": 0.347222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14800,
+			"cx": 0.396354,
+			"cy": 0.332407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14837,
+			"cx": 0.329167,
+			"cy": 0.347222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14880,
+			"cx": 0.313021,
+			"cy": 0.377778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14921,
+			"cx": 0.332292,
+			"cy": 0.432407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 14964,
+			"cx": 0.4,
+			"cy": 0.507407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15006,
+			"cx": 0.505208,
+			"cy": 0.562963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15047,
+			"cx": 0.569792,
+			"cy": 0.559259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15089,
+			"cx": 0.589583,
+			"cy": 0.510185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15131,
+			"cx": 0.571875,
+			"cy": 0.437963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15172,
+			"cx": 0.538542,
+			"cy": 0.376852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15214,
+			"cx": 0.510938,
+			"cy": 0.355556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15256,
+			"cx": 0.510938,
+			"cy": 0.355556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15299,
+			"cx": 0.517188,
+			"cy": 0.377778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15337,
+			"cx": 0.534896,
+			"cy": 0.400926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15375,
+			"cx": 0.541667,
+			"cy": 0.403704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15414,
+			"cx": 0.541667,
+			"cy": 0.403704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15455,
+			"cx": 0.541667,
+			"cy": 0.403704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15497,
+			"cx": 0.540104,
+			"cy": 0.400926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15536,
+			"cx": 0.523438,
+			"cy": 0.386111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15575,
+			"cx": 0.490104,
+			"cy": 0.375,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15615,
+			"cx": 0.468229,
+			"cy": 0.371296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15655,
+			"cx": 0.467708,
+			"cy": 0.371296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15697,
+			"cx": 0.467708,
+			"cy": 0.372222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15733,
+			"cx": 0.467708,
+			"cy": 0.377778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15773,
+			"cx": 0.491146,
+			"cy": 0.40463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15816,
+			"cx": 0.546354,
+			"cy": 0.425,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15858,
+			"cx": 0.610417,
+			"cy": 0.427778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15901,
+			"cx": 0.642708,
+			"cy": 0.411111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15940,
+			"cx": 0.64375,
+			"cy": 0.408333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 15982,
+			"cx": 0.640104,
+			"cy": 0.403704,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16022,
+			"cx": 0.610417,
+			"cy": 0.394444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16064,
+			"cx": 0.532813,
+			"cy": 0.39537,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16106,
+			"cx": 0.485938,
+			"cy": 0.4,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16148,
+			"cx": 0.482292,
+			"cy": 0.4,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16189,
+			"cx": 0.477083,
+			"cy": 0.402778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16231,
+			"cx": 0.477604,
+			"cy": 0.40463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16272,
+			"cx": 0.486458,
+			"cy": 0.405556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16313,
+			"cx": 0.504687,
+			"cy": 0.405556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16350,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16392,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16434,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16476,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16517,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16558,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16596,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16635,
+			"cx": 0.554167,
+			"cy": 0.390741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16675,
+			"cx": 0.559375,
+			"cy": 0.388889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16716,
+			"cx": 0.588542,
+			"cy": 0.387963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16756,
+			"cx": 0.609375,
+			"cy": 0.385185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16797,
+			"cx": 0.610938,
+			"cy": 0.384259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16835,
+			"cx": 0.611458,
+			"cy": 0.383333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16875,
+			"cx": 0.611458,
+			"cy": 0.383333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16921,
+			"cx": 0.611458,
+			"cy": 0.383333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 16965,
+			"cx": 0.611458,
+			"cy": 0.383333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17006,
+			"cx": 0.611979,
+			"cy": 0.388889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17048,
+			"cx": 0.6375,
+			"cy": 0.517593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17088,
+			"cx": 0.673958,
+			"cy": 0.616667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17132,
+			"cx": 0.69375,
+			"cy": 0.680556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17173,
+			"cx": 0.693229,
+			"cy": 0.688889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17215,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17257,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17300,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17342,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17383,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17425,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17467,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17508,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17550,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17599,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17641,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17683,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17724,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17764,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17807,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17846,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17889,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17930,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 17973,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18013,
+			"cx": 0.693229,
+			"cy": 0.689815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18055,
+			"cx": 0.691667,
+			"cy": 0.709259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18097,
+			"cx": 0.692187,
+			"cy": 0.732407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18139,
+			"cx": 0.692187,
+			"cy": 0.740741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18180,
+			"cx": 0.692187,
+			"cy": 0.752778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18223,
+			"cx": 0.692187,
+			"cy": 0.769444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18265,
+			"cx": 0.691667,
+			"cy": 0.773148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18306,
+			"cx": 0.691667,
+			"cy": 0.773148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18348,
+			"cx": 0.691667,
+			"cy": 0.773148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18388,
+			"cx": 0.691667,
+			"cy": 0.773148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18429,
+			"cx": 0.691667,
+			"cy": 0.773148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18466,
+			"cx": 0.691667,
+			"cy": 0.773148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18508,
+			"cx": 0.686458,
+			"cy": 0.767593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18549,
+			"cx": 0.685937,
+			"cy": 0.767593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18589,
+			"cx": 0.685937,
+			"cy": 0.767593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18629,
+			"cx": 0.685937,
+			"cy": 0.767593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18671,
+			"cx": 0.685937,
+			"cy": 0.767593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18713,
+			"cx": 0.683333,
+			"cy": 0.769444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18756,
+			"cx": 0.628646,
+			"cy": 0.789815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18798,
+			"cx": 0.53125,
+			"cy": 0.799074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18838,
+			"cx": 0.439063,
+			"cy": 0.799074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18882,
+			"cx": 0.417708,
+			"cy": 0.797222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18925,
+			"cx": 0.430729,
+			"cy": 0.788889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 18965,
+			"cx": 0.507292,
+			"cy": 0.751852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19006,
+			"cx": 0.569792,
+			"cy": 0.724074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19047,
+			"cx": 0.604167,
+			"cy": 0.712037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19089,
+			"cx": 0.605208,
+			"cy": 0.712037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19129,
+			"cx": 0.605208,
+			"cy": 0.712037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19167,
+			"cx": 0.605208,
+			"cy": 0.725,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19206,
+			"cx": 0.604688,
+			"cy": 0.72963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19247,
+			"cx": 0.604688,
+			"cy": 0.730556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19289,
+			"cx": 0.604688,
+			"cy": 0.730556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19331,
+			"cx": 0.604688,
+			"cy": 0.730556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19373,
+			"cx": 0.604688,
+			"cy": 0.730556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19413,
+			"cx": 0.604688,
+			"cy": 0.730556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19457,
+			"cx": 0.604688,
+			"cy": 0.730556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19500,
+			"cx": 0.604688,
+			"cy": 0.730556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19541,
+			"cx": 0.600521,
+			"cy": 0.715741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19582,
+			"cx": 0.578646,
+			"cy": 0.641667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19623,
+			"cx": 0.550521,
+			"cy": 0.551852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19663,
+			"cx": 0.519271,
+			"cy": 0.455556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19701,
+			"cx": 0.511458,
+			"cy": 0.425,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19742,
+			"cx": 0.511458,
+			"cy": 0.423148,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19784,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19827,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19871,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19915,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19956,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 19997,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20039,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20081,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20124,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20167,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20209,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20248,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20288,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20332,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20374,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20416,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20459,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20501,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20543,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20586,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20630,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20672,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20716,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20758,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20800,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20843,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20888,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20930,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 20972,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21014,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21056,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21097,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21139,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21181,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21225,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21264,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21303,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21344,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21389,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21431,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21473,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21515,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21554,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21593,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21633,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21675,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21718,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21760,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21802,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21843,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21881,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21920,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 21964,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22006,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22048,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22090,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22132,
+			"cx": 0.510938,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22176,
+			"cx": 0.516667,
+			"cy": 0.422222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22218,
+			"cx": 0.522917,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22260,
+			"cx": 0.506771,
+			"cy": 0.352778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22314,
+			"cx": 0.498437,
+			"cy": 0.337037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22356,
+			"cx": 0.495312,
+			"cy": 0.337037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22398,
+			"cx": 0.491667,
+			"cy": 0.341667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22438,
+			"cx": 0.491667,
+			"cy": 0.342593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22476,
+			"cx": 0.491667,
+			"cy": 0.342593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22523,
+			"cx": 0.496875,
+			"cy": 0.356481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22564,
+			"cx": 0.497917,
+			"cy": 0.359259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22601,
+			"cx": 0.498958,
+			"cy": 0.360185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22640,
+			"cx": 0.500521,
+			"cy": 0.362037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22681,
+			"cx": 0.502604,
+			"cy": 0.362963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22722,
+			"cx": 0.519271,
+			"cy": 0.35463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22763,
+			"cx": 0.570312,
+			"cy": 0.332407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22804,
+			"cx": 0.625521,
+			"cy": 0.32037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22846,
+			"cx": 0.672396,
+			"cy": 0.325,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22889,
+			"cx": 0.673958,
+			"cy": 0.325926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22932,
+			"cx": 0.673958,
+			"cy": 0.325926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 22973,
+			"cx": 0.673958,
+			"cy": 0.326852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23015,
+			"cx": 0.673958,
+			"cy": 0.326852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23058,
+			"cx": 0.673958,
+			"cy": 0.326852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23100,
+			"cx": 0.672396,
+			"cy": 0.342593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23142,
+			"cx": 0.66875,
+			"cy": 0.385185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23183,
+			"cx": 0.655208,
+			"cy": 0.452778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23223,
+			"cx": 0.638542,
+			"cy": 0.501852,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23265,
+			"cx": 0.630729,
+			"cy": 0.512963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23304,
+			"cx": 0.630208,
+			"cy": 0.512037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23344,
+			"cx": 0.628125,
+			"cy": 0.510185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23383,
+			"cx": 0.627604,
+			"cy": 0.508333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23422,
+			"cx": 0.627083,
+			"cy": 0.507407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23464,
+			"cx": 0.626563,
+			"cy": 0.507407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23503,
+			"cx": 0.626563,
+			"cy": 0.507407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23546,
+			"cx": 0.626563,
+			"cy": 0.506481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23587,
+			"cx": 0.623437,
+			"cy": 0.499074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23630,
+			"cx": 0.591667,
+			"cy": 0.461111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23670,
+			"cx": 0.555729,
+			"cy": 0.425926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23713,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23755,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23798,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23841,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23883,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23924,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 23967,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24010,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24052,
+			"cx": 0.53125,
+			"cy": 0.399074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24093,
+			"cx": 0.53125,
+			"cy": 0.392593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24136,
+			"cx": 0.53125,
+			"cy": 0.389815,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24177,
+			"cx": 0.53125,
+			"cy": 0.388889,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24221,
+			"cx": 0.529687,
+			"cy": 0.385185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24264,
+			"cx": 0.523958,
+			"cy": 0.369444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24302,
+			"cx": 0.519271,
+			"cy": 0.358333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24341,
+			"cx": 0.515625,
+			"cy": 0.350926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24381,
+			"cx": 0.513542,
+			"cy": 0.347222,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24421,
+			"cx": 0.513021,
+			"cy": 0.346296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24460,
+			"cx": 0.513021,
+			"cy": 0.346296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24504,
+			"cx": 0.513021,
+			"cy": 0.346296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24547,
+			"cx": 0.513542,
+			"cy": 0.352778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24587,
+			"cx": 0.515625,
+			"cy": 0.362037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24630,
+			"cx": 0.516667,
+			"cy": 0.365741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24670,
+			"cx": 0.517188,
+			"cy": 0.366667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24713,
+			"cx": 0.527604,
+			"cy": 0.362963,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24759,
+			"cx": 0.579688,
+			"cy": 0.352778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24800,
+			"cx": 0.596875,
+			"cy": 0.355556,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24840,
+			"cx": 0.598437,
+			"cy": 0.356481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24880,
+			"cx": 0.598437,
+			"cy": 0.356481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24921,
+			"cx": 0.599479,
+			"cy": 0.362037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 24960,
+			"cx": 0.600521,
+			"cy": 0.368519,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25002,
+			"cx": 0.604167,
+			"cy": 0.384259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25046,
+			"cx": 0.607292,
+			"cy": 0.394444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25088,
+			"cx": 0.607812,
+			"cy": 0.396296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25129,
+			"cx": 0.607812,
+			"cy": 0.396296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25171,
+			"cx": 0.607812,
+			"cy": 0.396296,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25213,
+			"cx": 0.590625,
+			"cy": 0.409259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25252,
+			"cx": 0.51875,
+			"cy": 0.461111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25289,
+			"cx": 0.438021,
+			"cy": 0.537037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25330,
+			"cx": 0.388542,
+			"cy": 0.600926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25372,
+			"cx": 0.366667,
+			"cy": 0.656481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25414,
+			"cx": 0.359375,
+			"cy": 0.681481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25453,
+			"cx": 0.35625,
+			"cy": 0.690741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25498,
+			"cx": 0.354167,
+			"cy": 0.699074,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25536,
+			"cx": 0.352083,
+			"cy": 0.716667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25575,
+			"cx": 0.353125,
+			"cy": 0.725926,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25613,
+			"cx": 0.357292,
+			"cy": 0.740741,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25656,
+			"cx": 0.359375,
+			"cy": 0.752778,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25698,
+			"cx": 0.360417,
+			"cy": 0.75463,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25738,
+			"cx": 0.361979,
+			"cy": 0.761111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25781,
+			"cx": 0.364063,
+			"cy": 0.767593,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25821,
+			"cx": 0.365104,
+			"cy": 0.769444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25860,
+			"cx": 0.365104,
+			"cy": 0.769444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 25899,
+			"cx": 0.365104,
+			"cy": 0.769444,
+			"interactionType": "click"
+		},
+		{
+			"timeMs": 25940,
+			"cx": 0.38125,
+			"cy": 0.794444,
+			"interactionType": "mouseup"
+		},
+		{
+			"timeMs": 25982,
+			"cx": 0.424479,
+			"cy": 0.841667,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26021,
+			"cx": 0.45625,
+			"cy": 0.869444,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26064,
+			"cx": 0.471875,
+			"cy": 0.883333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26122,
+			"cx": 0.473438,
+			"cy": 0.884259,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26165,
+			"cx": 0.479687,
+			"cy": 0.887037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26207,
+			"cx": 0.480729,
+			"cy": 0.887037,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26247,
+			"cx": 0.480729,
+			"cy": 0.886111,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26287,
+			"cx": 0.483333,
+			"cy": 0.885185,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26325,
+			"cx": 0.488021,
+			"cy": 0.883333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26366,
+			"cx": 0.490625,
+			"cy": 0.883333,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26404,
+			"cx": 0.495833,
+			"cy": 0.882407,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26443,
+			"cx": 0.497396,
+			"cy": 0.881481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26491,
+			"cx": 0.497396,
+			"cy": 0.881481,
+			"interactionType": "click"
+		},
+		{
+			"timeMs": 26531,
+			"cx": 0.497396,
+			"cy": 0.881481,
+			"interactionType": "move"
+		},
+		{
+			"timeMs": 26571,
+			"cx": 0.497396,
+			"cy": 0.881481,
+			"interactionType": "mouseup"
+		}
+	]
+}
