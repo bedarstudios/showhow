@@ -112,7 +112,24 @@ describe("buildAutoZoomSuggestions (early clicks)", () => {
 			{
 				span: { start: 0, end: 1_333 },
 				focus: { cx: 0.4, cy: 0.6 },
+				startsSettled: true,
 			},
 		]);
+	});
+
+	it("does not mark an early dwell suggestion as settled", () => {
+		const suggestions = buildAutoZoomSuggestions({
+			cursorTelemetry: [
+				{ timeMs: 0, cx: 0.4, cy: 0.6, interactionType: "move" },
+				{ timeMs: 500, cx: 0.4, cy: 0.6, interactionType: "move" },
+			],
+			totalMs: 5_000,
+			existingRegions: [],
+			defaultDurationMs: 1_333,
+		});
+
+		expect(suggestions).toHaveLength(1);
+		expect(suggestions[0].span.start).toBe(0);
+		expect(suggestions[0].startsSettled).toBeUndefined();
 	});
 });

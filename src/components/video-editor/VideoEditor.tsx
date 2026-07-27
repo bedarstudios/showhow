@@ -1093,6 +1093,7 @@ export default function VideoEditor() {
 				focus: clampFocusToDepth(suggestion.focus, DEFAULT_ZOOM_DEPTH),
 				focusMode: autoFocusAll ? ("auto" as const) : undefined,
 				source: "auto" as const,
+				startsSettled: suggestion.startsSettled,
 			}));
 		},
 		[cursorTelemetry, duration, autoFocusAll],

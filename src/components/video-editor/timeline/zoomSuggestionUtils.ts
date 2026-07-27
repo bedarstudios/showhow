@@ -99,6 +99,7 @@ export function detectZoomDwellCandidates(samples: CursorTelemetryPoint[]): Zoom
 export interface AutoZoomSuggestion {
 	span: { start: number; end: number };
 	focus: ZoomFocus;
+	startsSettled?: boolean;
 }
 
 /**
@@ -192,6 +193,9 @@ export function buildAutoZoomSuggestions(options: {
 		suggestions.push({
 			span: { start: candidateStart, end: candidateEnd },
 			focus: candidate.focus,
+			...(isClickMode && candidate.centerTimeMs < ZOOM_IN_OVERLAP_MS
+				? { startsSettled: true }
+				: {}),
 		});
 	}
 

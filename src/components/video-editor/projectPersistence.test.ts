@@ -76,6 +76,24 @@ describe("projectPersistence media compatibility", () => {
 		expect(normalizeProjectEditor({ webcamMirrored: "yes" as never }).webcamMirrored).toBe(false);
 	});
 
+	it("preserves the settled-start marker for an auto zoom region", () => {
+		const editor = normalizeProjectEditor({
+			zoomRegions: [
+				{
+					id: "early-click",
+					startMs: 0,
+					endMs: 1_333,
+					depth: "medium",
+					focus: { cx: 0.4, cy: 0.6 },
+					source: "auto",
+					startsSettled: true,
+				},
+			],
+		});
+
+		expect(editor.zoomRegions[0].startsSettled).toBe(true);
+	});
+
 	it("normalizes blur region type and mosaic block size safely", () => {
 		const editor = normalizeProjectEditor({
 			annotationRegions: [

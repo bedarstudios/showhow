@@ -44,7 +44,8 @@ function easeConnectedPan(value: number) {
 }
 
 export function computeRegionStrength(region: ZoomRegion, timeMs: number) {
-	const startsAtVideoBoundary = region.source === "auto" && region.startMs === 0;
+	const startsAtVideoBoundary =
+		region.source === "auto" && region.startsSettled === true && region.startMs === 0;
 	const zoomInEnd = startsAtVideoBoundary ? 0 : region.startMs + ZOOM_IN_OVERLAP_MS;
 	const leadInStart = zoomInEnd - ZOOM_IN_TRANSITION_WINDOW_MS;
 	const leadOutEnd = region.endMs + TRANSITION_WINDOW_MS;
