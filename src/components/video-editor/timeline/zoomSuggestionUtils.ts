@@ -1,10 +1,15 @@
 import type { CursorTelemetryPoint, ZoomFocus } from "../types";
+import { ZOOM_IN_OVERLAP_MS } from "../videoPlayback/zoomRegionUtils";
 
 export const MIN_DWELL_DURATION_MS = 450;
 export const MAX_DWELL_DURATION_MS = 2600;
 export const DWELL_MOVE_THRESHOLD = 0.02;
 /** Minimum spacing between two accepted suggestion centres. */
 export const SUGGESTION_SPACING_MS = 1800;
+/** Playhead overlap at full zoom strength — see zoomRegionUtils.ZOOM_IN_OVERLAP_MS. */
+export { ZOOM_IN_OVERLAP_MS as PLAYBACK_FULL_STRENGTH_OVERLAP_MS };
+
+const CLICK_INTERACTION_TYPE = "click";
 
 export interface ZoomDwellCandidate {
 	centerTimeMs: number;
@@ -12,14 +17,23 @@ export interface ZoomDwellCandidate {
 	strength: number;
 }
 
+function clamp01(value: number) {
+	return Math.max(0, Math.min(value, 1));
+}
+
+// Normalization preserves every sample field (interactionType included) --
+// via the spread -- so downstream click detection sees the original anchors.
+// `timeMs` is clamped to [0, totalMs] (baseline contract: no sample escapes the
+// recording's span), and `cx`/`cy` are clamped to [0, 1].
 function normalizeTelemetrySample(
 	sample: CursorTelemetryPoint,
 	totalMs: number,
 ): CursorTelemetryPoint {
 	return {
+		...sample,
 		timeMs: Math.max(0, Math.min(sample.timeMs, totalMs)),
-		cx: Math.max(0, Math.min(sample.cx, 1)),
-		cy: Math.max(0, Math.min(sample.cy, 1)),
+		cx: clamp01(sample.cx),
+		cy: clamp01(sample.cy),
 	};
 }
 
@@ -85,6 +99,7 @@ export function detectZoomDwellCandidates(samples: CursorTelemetryPoint[]): Zoom
 export interface AutoZoomSuggestion {
 	span: { start: number; end: number };
 	focus: ZoomFocus;
+	startsSettled?: boolean;
 }
 
 /**
@@ -113,8 +128,28 @@ export function buildAutoZoomSuggestions(options: {
 		return [];
 	}
 
-	const dwellCandidates = detectZoomDwellCandidates(normalizedSamples);
-	if (dwellCandidates.length === 0) {
+	// Click anchors are preferred over dwell: a click marks an intentional
+	// interaction point, so when any click exists the candidate list is built
+	// from clicks only. Dwell is a fallback for telemetry with zero clicks.
+	const clickSamples = normalizedSamples.filter(
+		(sample) => sample.interactionType === CLICK_INTERACTION_TYPE,
+	);
+
+	const isClickMode = clickSamples.length > 0;
+	let candidates: ZoomDwellCandidate[];
+	if (isClickMode) {
+		candidates = clickSamples
+			.slice()
+			.sort((a, b) => a.timeMs - b.timeMs)
+			.map((sample) => ({
+				centerTimeMs: sample.timeMs,
+				focus: { cx: sample.cx, cy: sample.cy },
+				strength: sample.timeMs,
+			}));
+	} else {
+		candidates = detectZoomDwellCandidates(normalizedSamples);
+	}
+	if (candidates.length === 0) {
 		return [];
 	}
 
@@ -122,7 +157,12 @@ export function buildAutoZoomSuggestions(options: {
 		.map((region) => ({ start: region.startMs, end: region.endMs }))
 		.sort((a, b) => a.start - b.start);
 
-	const sortedCandidates = [...dwellCandidates].sort((a, b) => b.strength - a.strength);
+	// Clicks are processed chronologically (earliest first) so SUGGESTION_SPACING_MS
+	// accepts the earliest click of each cluster. Dwell candidates keep the
+	// existing duration-descending rank.
+	const sortedCandidates = isClickMode
+		? [...candidates].sort((a, b) => a.centerTimeMs - b.centerTimeMs)
+		: [...candidates].sort((a, b) => b.strength - a.strength);
 	const acceptedCenters: number[] = [];
 	const suggestions: AutoZoomSuggestion[] = [];
 
@@ -134,7 +174,11 @@ export function buildAutoZoomSuggestions(options: {
 			continue;
 		}
 
-		const centeredStart = Math.round(candidate.centerTimeMs - defaultDuration / 2);
+		// Click spans lead in by ZOOM_IN_OVERLAP_MS so the zoom is fully settled
+		// at or before the click frame; dwell spans keep the centered layout.
+		const centeredStart = isClickMode
+			? Math.round(candidate.centerTimeMs - ZOOM_IN_OVERLAP_MS)
+			: Math.round(candidate.centerTimeMs - defaultDuration / 2);
 		const candidateStart = Math.max(0, Math.min(centeredStart, totalMs - defaultDuration));
 		const candidateEnd = candidateStart + defaultDuration;
 		const hasOverlap = reservedSpans.some(
@@ -149,6 +193,9 @@ export function buildAutoZoomSuggestions(options: {
 		suggestions.push({
 			span: { start: candidateStart, end: candidateEnd },
 			focus: candidate.focus,
+			...(isClickMode && candidate.centerTimeMs < ZOOM_IN_OVERLAP_MS
+				? { startsSettled: true }
+				: {}),
 		});
 	}
 

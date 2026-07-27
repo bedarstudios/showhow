@@ -55,6 +55,7 @@ import {
 	regenerateDocArtifacts,
 	SHOWHOW_RECORDINGS_ROOT,
 } from "../showhow/bundle";
+import { mapCursorSampleToTelemetryPoint } from "./cursorTelemetry";
 import { registerNativeBridgeHandlers } from "./nativeBridge";
 import { RecordingStreamRegistry, registerRecordingStreamHandlers } from "./recordingStream";
 
@@ -555,11 +556,7 @@ async function readCursorTelemetryFile(targetVideoPath: string) {
 		const recordingData = await readCursorRecordingFile(targetVideoPath);
 		return {
 			success: true,
-			samples: recordingData.samples.map((sample) => ({
-				timeMs: sample.timeMs,
-				cx: sample.cx,
-				cy: sample.cy,
-			})),
+			samples: recordingData.samples.map(mapCursorSampleToTelemetryPoint),
 		};
 	} catch (error) {
 		console.error("Failed to load cursor telemetry:", error);

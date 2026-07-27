@@ -7,7 +7,12 @@ import { clamp01, cubicBezier, easeOutScreenStudio } from "./mathUtils";
 
 const CHAINED_ZOOM_PAN_GAP_MS = 1500;
 const CONNECTED_ZOOM_PAN_DURATION_MS = 1000;
-const ZOOM_IN_OVERLAP_MS = 500;
+/**
+ * Time after `region.startMs` during which the zoom-in transition reaches full
+ * strength. Auto-zoom click regions start this many ms before their anchor so
+ * the zoom is fully settled at or before the click frame.
+ */
+export const ZOOM_IN_OVERLAP_MS = 500;
 
 type DominantRegionOptions = {
 	connectZooms?: boolean;
@@ -39,7 +44,9 @@ function easeConnectedPan(value: number) {
 }
 
 export function computeRegionStrength(region: ZoomRegion, timeMs: number) {
-	const zoomInEnd = region.startMs + ZOOM_IN_OVERLAP_MS;
+	const startsAtVideoBoundary =
+		region.source === "auto" && region.startsSettled === true && region.startMs === 0;
+	const zoomInEnd = startsAtVideoBoundary ? 0 : region.startMs + ZOOM_IN_OVERLAP_MS;
 	const leadInStart = zoomInEnd - ZOOM_IN_TRANSITION_WINDOW_MS;
 	const leadOutEnd = region.endMs + TRANSITION_WINDOW_MS;
 

@@ -79,6 +79,8 @@ export interface ZoomRegion {
 	/** Custom scale overriding the preset depth (1.0-5.0, two decimal precision). */
 	customScale?: number;
 	source?: ZoomRegionSource;
+	/** Start at full strength when a click lead-in is clipped by the video boundary. */
+	startsSettled?: boolean;
 }
 
 export function getRotation3D(region: Pick<ZoomRegion, "rotationPreset">): Rotation3D {

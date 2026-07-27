@@ -266,6 +266,7 @@ export function normalizeProjectEditor(editor: Partial<ProjectEditorState>): Pro
 						},
 						focusMode: region.focusMode === "auto" ? "auto" : "manual",
 						source: region.source === "auto" ? "auto" : "manual",
+						...(region.startsSettled === true ? { startsSettled: true } : {}),
 						...(validPreset ? { rotationPreset: validPreset } : {}),
 					};
 				})
