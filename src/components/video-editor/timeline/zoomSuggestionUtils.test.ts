@@ -97,7 +97,7 @@ describe("buildAutoZoomSuggestions (issue32 fixture)", () => {
 });
 
 describe("buildAutoZoomSuggestions (early clicks)", () => {
-	it("omits a click before the full-strength lead-in can fit", () => {
+	it("keeps a click before the full-strength lead-in can fit", () => {
 		const suggestions = buildAutoZoomSuggestions({
 			cursorTelemetry: [
 				{ timeMs: 0, cx: 0.3, cy: 0.5, interactionType: "move" },
@@ -108,6 +108,11 @@ describe("buildAutoZoomSuggestions (early clicks)", () => {
 			defaultDurationMs: 1_333,
 		});
 
-		expect(suggestions).toEqual([]);
+		expect(suggestions).toEqual([
+			{
+				span: { start: 0, end: 1_333 },
+				focus: { cx: 0.4, cy: 0.6 },
+			},
+		]);
 	});
 });

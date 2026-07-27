@@ -140,7 +140,6 @@ export function buildAutoZoomSuggestions(options: {
 		candidates = clickSamples
 			.slice()
 			.sort((a, b) => a.timeMs - b.timeMs)
-			.filter((sample) => sample.timeMs >= ZOOM_IN_OVERLAP_MS)
 			.map((sample) => ({
 				centerTimeMs: sample.timeMs,
 				focus: { cx: sample.cx, cy: sample.cy },
