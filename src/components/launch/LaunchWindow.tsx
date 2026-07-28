@@ -1114,7 +1114,7 @@ export function LaunchWindow() {
 							data-testid="launch-open-studio-button"
 							disabled={saving}
 							className={`${hudIconBtnClasses} ${styles.electronNoDrag} ${saving ? "opacity-30 cursor-not-allowed pointer-events-none" : ""}`}
-							onClick={() => !saving && window.electronAPI.switchToEditor()}
+							onClick={() => !saving && window.electronAPI.switchToLibrary()}
 						>
 							<Clapperboard size={ICON_SIZE} className="text-white/60" />
 						</button>

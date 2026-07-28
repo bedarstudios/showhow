@@ -1278,6 +1278,7 @@ async function loadRecordedSessionForVideoPath(
 
 export function registerIpcHandlers(
 	createEditorWindow: () => void,
+	createLibraryWindow: () => void,
 	createSourceSelectorWindow: () => BrowserWindow,
 	createCountdownOverlayWindow: () => BrowserWindow,
 	createNotesWindowWrapper: () => BrowserWindow,
@@ -1497,6 +1498,10 @@ export function registerIpcHandlers(
 		// opening the editor. Closing it here too double-closes, leaving ghost
 		// transparent windows and compounding the HUD shadow each cycle.
 		createEditorWindow();
+	});
+
+	ipcMain.handle("switch-to-library", () => {
+		createLibraryWindow();
 	});
 
 	ipcMain.handle("switch-to-hud", () => {

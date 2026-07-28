@@ -175,6 +175,7 @@ function stubElectronAPI(getSelectedSource: Window["electronAPI"]["getSelectedSo
 		hudOverlayHide: vi.fn(),
 		hudOverlayClose: vi.fn(),
 		switchToEditor: vi.fn(async () => undefined),
+		switchToLibrary: vi.fn(async () => undefined),
 		onSelectedSourceChanged: vi.fn((callback) => {
 			selectedSourceChangedListeners.push(callback);
 			return () => {
@@ -366,6 +367,15 @@ describe("LaunchWindow record button", () => {
 		await waitFor(() => {
 			expect(window.electronAPI.setHudOverlayIgnoreMouseEvents).toHaveBeenLastCalledWith(false);
 		});
+	});
+
+	it("opens the recording library from the idle HUD Studio control", async () => {
+		renderLaunchWindow();
+
+		fireEvent.click(await screen.findByTestId("launch-open-studio-button"));
+
+		expect(window.electronAPI.switchToLibrary).toHaveBeenCalledTimes(1);
+		expect(window.electronAPI.switchToEditor).not.toHaveBeenCalled();
 	});
 });
 
