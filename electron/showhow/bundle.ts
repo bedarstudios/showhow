@@ -12,7 +12,11 @@ export const SHOWHOW_RECORDINGS_ROOT = path.join(os.homedir(), "Showhow", "Recor
 export interface ShowhowMeta {
 	schemaVersion: 1;
 	title: string;
-	source: "desktop";
+	/**
+	 * Bundle creator currently writes `"desktop"`.
+	 * `"browser"` is accepted for forward-compatible readers/importers.
+	 */
+	source: "desktop" | "browser";
 	createdAt: number;
 	durationMs?: number;
 	video: "video.webm" | "video.mp4";

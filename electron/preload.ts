@@ -38,6 +38,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	switchToEditor: () => {
 		return ipcRenderer.invoke("switch-to-editor");
 	},
+	switchToLibrary: () => {
+		return ipcRenderer.invoke("switch-to-library");
+	},
 	switchToHud: () => {
 		return ipcRenderer.invoke("switch-to-hud");
 	},
@@ -81,6 +84,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	storeRecordedSession: (payload: StoreRecordedSessionInput) => {
 		return ipcRenderer.invoke("store-recorded-session", payload);
 	},
+	showhowListRecordings: () =>
+		ipcRenderer.invoke("showhow:list-recordings") as Promise<
+			import("../src/lib/showhow/recordingLibrary").RecordingLibraryEntry[]
+		>,
 	showhowWriteTranscript: (bundleDir: string, content: string) =>
 		ipcRenderer.invoke("showhow:write-transcript", bundleDir, content),
 	openRecordingStream: (fileName: string) => {

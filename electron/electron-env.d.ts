@@ -29,6 +29,7 @@ interface Window {
 		) => Promise<import("../src/native/contracts").NativeBridgeResponse<TData>>;
 		getSources: (opts: Electron.SourcesOptions) => Promise<ProcessedDesktopSource[]>;
 		switchToEditor: () => Promise<void>;
+		switchToLibrary: () => Promise<void>;
 		switchToHud: () => Promise<void>;
 		startNewRecording: () => Promise<{ success: boolean; error?: string }>;
 		openSourceSelector: () => Promise<{
@@ -89,6 +90,9 @@ interface Window {
 			bundleDir?: string;
 			videoFileUrl?: string;
 		}>;
+		showhowListRecordings: () => Promise<
+			import("../src/lib/showhow/recordingLibrary").RecordingLibraryEntry[]
+		>;
 		showhowWriteTranscript: (bundleDir: string, content: string) => Promise<{ success: boolean }>;
 		openRecordingStream: (fileName: string) => Promise<{ success: boolean; error?: string }>;
 		appendRecordingChunk: (

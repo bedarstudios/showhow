@@ -426,6 +426,17 @@ function createEditorWindowWrapper() {
 	});
 }
 
+function createLibraryWindowWrapper() {
+	if (mainWindow) {
+		isForceClosing = true;
+		mainWindow.close();
+		isForceClosing = false;
+		mainWindow = null;
+	}
+	mainWindow = createEditorWindow("library");
+	editorHasUnsavedChanges = false;
+}
+
 function createSourceSelectorWindowWrapper() {
 	sourceSelectorWindow = createSourceSelectorWindow();
 	sourceSelectorWindow.on("closed", () => {
@@ -577,6 +588,7 @@ appReady?.then(async () => {
 
 	registerIpcHandlers(
 		createEditorWindowWrapper,
+		createLibraryWindowWrapper,
 		createSourceSelectorWindowWrapper,
 		createCountdownOverlayWindowWrapper,
 		createNotesWindowWrapper,
