@@ -49,27 +49,44 @@ jobs:
             // Resolve the project and its Status options at runtime. Editing the
             // field's options regenerates every option id, so hardcoding them
             // would break silently the next time the columns are touched.
-            const projectQuery = await github.graphql(`
-              query($owner:String!, $number:Int!) {
-                user(login:$owner) {
-                  projectV2(number:$number) {
-                    id
-                    field(name:"Status") {
-                      ... on ProjectV2SingleSelectField {
-                        id
-                        options { id name }
+            // graphql() THROWS when the response carries an errors array, so a
+            // scope problem arrives as a stack trace rather than as the null node
+            // you would expect. Catch it and say what actually needs fixing.
+            let projectQuery;
+            try {
+              projectQuery = await github.graphql(`
+                query($owner:String!, $number:Int!) {
+                  user(login:$owner) {
+                    projectV2(number:$number) {
+                      id
+                      field(name:"Status") {
+                        ... on ProjectV2SingleSelectField {
+                          id
+                          options { id name }
+                        }
                       }
                     }
                   }
-                }
-              }`, { owner, number });
+                }`, { owner, number });
+            } catch (error) {
+              const forbidden = /not accessible by personal access token|FORBIDDEN/i.test(
+                error.message ?? ""
+              );
+              core.setFailed(
+                forbidden
+                  ? `BEDAR_LOOP_PAT cannot read user-level Projects. Regenerate it as a ` +
+                    `classic PAT with the 'project' scope (repo + workflow + project) and ` +
+                    `re-set the secret. Original error: ${error.message}`
+                  : `Failed to resolve project ${owner}/#${number}: ${error.message}`
+              );
+              return;
+            }
 
             const project = projectQuery.user?.projectV2;
             if (!project?.field) {
               core.setFailed(
-                `Project ${owner}/#${number} or its Status field is not visible. ` +
-                `This is almost always BEDAR_LOOP_PAT missing the 'project' scope, ` +
-                `not a bad node id.`
+                `Project ${owner}/#${number} or its Status field is not visible to this ` +
+                `token, but the query did not error. Check the project number.`
               );
               return;
             }
