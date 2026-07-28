@@ -1,7 +1,17 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, session, Tray } from "electron";
+import {
+	app,
+	BrowserWindow,
+	ipcMain,
+	Menu,
+	nativeImage,
+	net,
+	protocol,
+	session,
+	Tray,
+} from "electron";
 import { ShortcutBinding } from "../src/lib/shortcuts";
 import { createAppWindowReadinessGate } from "./appWindowReadiness";
 import { isDiagnosticModeEnabled, mainLogBuffer } from "./diagnostics/main-log-buffer";
@@ -12,6 +22,7 @@ import {
 } from "./globalShortcut";
 import { mainT, setMainLocale } from "./i18n";
 import { getSelectedDesktopSource, registerIpcHandlers } from "./ipc/handlers";
+import { fetchShowhowMedia, SHOWHOW_MEDIA_SCHEME } from "./showhow/mediaProtocol";
 import { acquireStableInstanceLock } from "./singleInstanceLock";
 import {
 	createCountdownOverlayWindow,
@@ -20,6 +31,19 @@ import {
 	createNotesWindow,
 	createSourceSelectorWindow,
 } from "./windows";
+
+protocol.registerSchemesAsPrivileged([
+	{
+		scheme: SHOWHOW_MEDIA_SCHEME,
+		privileges: {
+			standard: true,
+			secure: true,
+			supportFetchAPI: true,
+			stream: true,
+			corsEnabled: true,
+		},
+	},
+]);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -503,6 +527,13 @@ app.on("will-quit", () => {
 const appReady = hasSingleInstanceLock ? app.whenReady() : null;
 
 appReady?.then(async () => {
+	protocol.handle(SHOWHOW_MEDIA_SCHEME, (request) => {
+		return fetchShowhowMedia(
+			path.join(app.getPath("home"), "Showhow", "Recordings"),
+			request,
+			(input, init) => net.fetch(input, init),
+		);
+	});
 	if (isDiagnosticModeEnabled()) {
 		mainLogBuffer.install();
 		console.info("[diagnostic] OPENSCREEN_DIAGNOSTIC=1, capturing console.* into ring buffer");

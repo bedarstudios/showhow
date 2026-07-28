@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RecordingLibraryEntry } from "@/lib/showhow/recordingLibrary";
 
 // ---- helpers -----------------------------------------------------------------
@@ -13,6 +13,10 @@ function formatDuration(ms: number): string {
 function formatWhen(createdAt: number): string {
 	const d = new Date(createdAt);
 	return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function fallbackBundleUrl(bundleDir: string, relativePath: string): string {
+	return `file://${bundleDir.replace(/\\/g, "/")}/${relativePath}`;
 }
 
 // ---- icons -------------------------------------------------------------------
@@ -231,6 +235,8 @@ function ErrorLibraryState() {
 // ---- main panel (active recording detail) -----------------------------------
 
 function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const [pendingSeekMs, setPendingSeekMs] = useState<number | null>(null);
 	const isDesktop = entry.source === "desktop";
 	const sourceLabel = isDesktop ? "Desktop" : "Browser";
 	const sourceTagStyle: React.CSSProperties = {
@@ -240,6 +246,27 @@ function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
 		background: isDesktop ? "var(--sh-color-accent-2-100)" : "var(--sh-color-accent-100)",
 		padding: "3px 10px",
 		borderRadius: "999px",
+	};
+	const videoSrc =
+		entry.videoUrl ?? (entry.video ? fallbackBundleUrl(entry.bundleDir, entry.video) : undefined);
+	const copyPath = () => {
+		void window.electronAPI.showhowCopyPath(entry.bundleDir);
+	};
+	const seekToStep = (timestampMs: number) => {
+		if (videoRef.current) {
+			videoRef.current.currentTime = timestampMs / 1000;
+			setPendingSeekMs(
+				videoRef.current.readyState < HTMLMediaElement.HAVE_METADATA ? timestampMs : null,
+			);
+			return;
+		}
+		setPendingSeekMs(timestampMs);
+	};
+	const applyPendingSeek = () => {
+		if (videoRef.current && pendingSeekMs !== null) {
+			videoRef.current.currentTime = pendingSeekMs / 1000;
+			setPendingSeekMs(null);
+		}
 	};
 
 	return (
@@ -320,7 +347,134 @@ function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
 				>
 					{entry.bundleDir}
 				</div>
+				<button
+					type="button"
+					onClick={copyPath}
+					style={{
+						border: "1px solid var(--sh-color-divider)",
+						borderRadius: "8px",
+						background: "transparent",
+						color: "var(--sh-color-text)",
+						padding: "6px 9px",
+						fontSize: "12px",
+						fontWeight: 600,
+						cursor: "pointer",
+						whiteSpace: "nowrap",
+					}}
+				>
+					Copy path
+				</button>
 			</div>
+
+			{videoSrc && (
+				<video
+					ref={videoRef}
+					src={videoSrc}
+					controls
+					preload="metadata"
+					onLoadedMetadata={applyPendingSeek}
+					style={{
+						width: "100%",
+						marginTop: "28px",
+						borderRadius: "var(--sh-radius-lg)",
+						background: "#171916",
+						display: "block",
+					}}
+				>
+					<track kind="captions" />
+				</video>
+			)}
+
+			{entry.steps && entry.steps.length > 0 && (
+				<section style={{ marginTop: "40px" }} aria-label="Workflow steps">
+					<h2 style={{ fontSize: "20px", margin: "0 0 18px", color: "var(--sh-color-text)" }}>
+						Steps
+					</h2>
+					<ol
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							gap: "20px",
+							margin: 0,
+							padding: 0,
+							listStyle: "none",
+						}}
+					>
+						{entry.steps.map((step, index) => {
+							const screenshotSrc =
+								step.screenshotUrl ??
+								fallbackBundleUrl(entry.bundleDir, `screenshots/${step.screenshot}`);
+							return (
+								<li
+									key={`${step.ts}-${step.screenshot}`}
+									style={{
+										display: "grid",
+										gridTemplateColumns: "36px minmax(0, 1fr)",
+										gap: "14px",
+										padding: "18px",
+										borderRadius: "var(--sh-radius-lg)",
+										background: "var(--sh-card-bg)",
+									}}
+								>
+									<span
+										style={{
+											width: "28px",
+											height: "28px",
+											borderRadius: "50%",
+											background: "var(--sh-color-accent-100)",
+											color: "var(--sh-color-accent-700)",
+											display: "grid",
+											placeItems: "center",
+											fontWeight: 700,
+											fontSize: "13px",
+										}}
+									>
+										{index + 1}
+									</span>
+									<div style={{ minWidth: 0 }}>
+										<img
+											src={screenshotSrc}
+											alt={`Step ${index + 1}: ${step.label}`}
+											style={{
+												width: "100%",
+												display: "block",
+												borderRadius: "var(--sh-radius-md)",
+												marginBottom: "12px",
+											}}
+										/>
+										<div
+											style={{
+												display: "flex",
+												alignItems: "center",
+												justifyContent: "space-between",
+												gap: "12px",
+											}}
+										>
+											<p style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>{step.label}</p>
+											<button
+												type="button"
+												onClick={() => seekToStep(step.ts)}
+												style={{
+													border: "none",
+													borderRadius: "999px",
+													background: "var(--sh-color-accent-100)",
+													color: "var(--sh-color-accent-700)",
+													padding: "5px 9px",
+													fontWeight: 700,
+													fontSize: "12px",
+													cursor: "pointer",
+												}}
+											>
+												{formatDuration(step.ts)}
+											</button>
+										</div>
+									</div>
+								</li>
+							);
+						})}
+					</ol>
+				</section>
+			)}
 		</div>
 	);
 }

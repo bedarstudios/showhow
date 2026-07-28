@@ -9,6 +9,7 @@ import type { DesktopCapturerSource, Rectangle } from "electron";
 import {
 	app,
 	BrowserWindow,
+	clipboard,
 	desktopCapturer,
 	dialog,
 	ipcMain,
@@ -59,6 +60,7 @@ import { listRecordings } from "../showhow/recordingLibrary";
 import { mapCursorSampleToTelemetryPoint } from "./cursorTelemetry";
 import { registerNativeBridgeHandlers } from "./nativeBridge";
 import { RecordingStreamRegistry, registerRecordingStreamHandlers } from "./recordingStream";
+import { copyShowhowBundlePath } from "./showhowLibrary";
 
 export const SHORTCUTS_FILE = path.join(app.getPath("userData"), "shortcuts.json");
 const RECORDING_FILE_PREFIX = "recording-";
@@ -2296,6 +2298,18 @@ export function registerIpcHandlers(
 
 	ipcMain.handle("showhow:list-recordings", async () => {
 		return listRecordings();
+	});
+
+	ipcMain.handle("showhow:copy-path", (_, bundleDir: unknown) => {
+		if (typeof bundleDir !== "string") {
+			return { success: false };
+		}
+		const resolved = path.resolve(bundleDir);
+		if (!resolved.startsWith(`${SHOWHOW_RECORDINGS_ROOT}${path.sep}`)) {
+			console.error("showhow:copy-path rejected path outside recordings root:", resolved);
+			return { success: false };
+		}
+		return copyShowhowBundlePath(clipboard, resolved);
 	});
 
 	ipcMain.handle("showhow:write-transcript", async (_, bundleDir: unknown, content: unknown) => {
