@@ -124,12 +124,14 @@ describe("RecordingLibrary", () => {
 		});
 	});
 
-	it("gracefully handles a rejected IPC call", async () => {
+	it("shows a distinct error state when the IPC load fails", async () => {
 		mockShowhowListRecordings.mockRejectedValue(new Error("IPC error"));
 		render(<RecordingLibrary />);
 		await waitFor(() => {
-			expect(screen.getByTestId("empty-library-state")).toBeInTheDocument();
+			expect(screen.getByTestId("recording-library-error-state")).toBeInTheDocument();
 		});
+		expect(screen.queryByTestId("empty-library-state")).not.toBeInTheDocument();
+		expect(screen.queryByText("No recordings yet")).not.toBeInTheDocument();
 	});
 
 	it("renders the Library section heading in the sidebar", async () => {

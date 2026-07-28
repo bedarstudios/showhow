@@ -195,6 +195,39 @@ function EmptyLibraryState() {
 	);
 }
 
+function ErrorLibraryState() {
+	return (
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				textAlign: "center",
+				gap: "16px",
+				padding: "120px 40px",
+				borderRadius: "var(--sh-radius-lg)",
+				background: "var(--sh-card-bg)",
+			}}
+			data-testid="recording-library-error-state"
+		>
+			<h3 style={{ margin: 0, fontSize: "23px", color: "var(--sh-color-text)" }}>
+				Couldn&apos;t load recordings
+			</h3>
+			<p
+				style={{
+					margin: 0,
+					maxWidth: "360px",
+					fontSize: "14.5px",
+					color: "var(--sh-muted)",
+					lineHeight: 1.6,
+				}}
+			>
+				Check folder permissions or disk access, then reopen the library.
+			</p>
+		</div>
+	);
+}
+
 // ---- main panel (active recording detail) -----------------------------------
 
 function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
@@ -306,6 +339,7 @@ export function RecordingLibrary() {
 	const [entries, setEntries] = useState<RecordingLibraryEntry[]>([]);
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
+	const [loadError, setLoadError] = useState(false);
 
 	useEffect(() => {
 		window.electronAPI
@@ -313,10 +347,12 @@ export function RecordingLibrary() {
 			.then((result) => {
 				setEntries(result);
 				setActiveIndex(0);
+				setLoadError(false);
 			})
 			.catch((err: unknown) => {
 				console.error("[RecordingLibrary] failed to load recordings:", err);
 				setEntries([]);
+				setLoadError(true);
 			})
 			.finally(() => {
 				setLoading(false);
@@ -410,7 +446,20 @@ export function RecordingLibrary() {
 							/>
 						))}
 
-					{!loading && !hasRecordings && (
+					{!loading && loadError && (
+						<div
+							style={{
+								padding: "14px 8px",
+								fontSize: "12.5px",
+								color: "var(--sh-muted)",
+								lineHeight: 1.6,
+							}}
+						>
+							Couldn&apos;t load recordings.
+						</div>
+					)}
+
+					{!loading && !loadError && !hasRecordings && (
 						<div
 							style={{
 								padding: "14px 8px",
@@ -428,8 +477,9 @@ export function RecordingLibrary() {
 			{/* ---- main panel ---- */}
 			<div style={{ flex: 1, height: "100vh", overflowY: "auto" }}>
 				<div style={{ maxWidth: "820px", margin: "0 auto", padding: "60px 40px 120px" }}>
-					{!loading && !hasRecordings && <EmptyLibraryState />}
-					{!loading && activeEntry && <RecordingDetail entry={activeEntry} />}
+					{!loading && loadError && <ErrorLibraryState />}
+					{!loading && !loadError && !hasRecordings && <EmptyLibraryState />}
+					{!loading && !loadError && activeEntry && <RecordingDetail entry={activeEntry} />}
 				</div>
 			</div>
 		</div>
