@@ -329,3 +329,42 @@
 		-ms-overflow-style: none;
 	}
 }
+
+/* Showhow design-system tokens — library and doc-view surfaces.
+   Light values are the default; the [data-sh-theme="dark"] selector overrides. */
+:root {
+	--sh-color-bg: #fffcf7;
+	--sh-color-text: #2f2f2f;
+	--sh-color-accent: #82b09a;
+	--sh-color-accent-100: #e7f1ec;
+	--sh-color-accent-200: #cfe4da;
+	--sh-color-accent-700: #33564a;
+	--sh-color-accent-2-100: #e1e8e0;
+	--sh-color-accent-2-700: #1f3b22;
+	--sh-color-divider: rgba(47, 47, 47, 0.14);
+	--sh-sidebar-bg: #f7f2e8;
+	--sh-card-bg: #f9f5ec;
+	--sh-muted: rgba(47, 47, 47, 0.55);
+	--sh-on-accent: #16281f;
+	--sh-forest: #142f18;
+	--sh-signal: #6bff7e;
+	--sh-radius-md: 8px;
+	--sh-radius-lg: 14px;
+	--sh-font-heading: "Instrument Serif", Georgia, serif;
+}
+
+[data-sh-theme="dark"] {
+	--sh-color-bg: #201f1c;
+	--sh-color-text: #f5f1e8;
+	--sh-color-accent: #6bff7e;
+	--sh-color-accent-100: rgba(107, 255, 126, 0.16);
+	--sh-color-accent-200: rgba(107, 255, 126, 0.26);
+	--sh-color-accent-700: #9dffa9;
+	--sh-color-accent-2-100: rgba(143, 227, 157, 0.14);
+	--sh-color-accent-2-700: #8fe39d;
+	--sh-color-divider: rgba(245, 241, 232, 0.14);
+	--sh-sidebar-bg: #171613;
+	--sh-card-bg: #2c2a26;
+	--sh-muted: rgba(245, 241, 232, 0.56);
+	--sh-on-accent: #12261a;
+}

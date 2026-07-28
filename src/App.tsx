@@ -3,6 +3,7 @@ import { CountdownOverlay } from "./components/launch/CountdownOverlay.tsx";
 import { LaunchWindow } from "./components/launch/LaunchWindow";
 import { NotesWindow } from "./components/launch/NotesWindow.tsx";
 import { SourceSelector } from "./components/launch/SourceSelector";
+import { RecordingLibrary } from "./components/library/RecordingLibrary";
 import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { useScopedT } from "./contexts/I18nContext";
@@ -103,6 +104,8 @@ export default function App() {
 						</Suspense>
 					</ShortcutsProvider>
 				);
+			case "library":
+				return <RecordingLibrary />;
 			default:
 				return (
 					<div>

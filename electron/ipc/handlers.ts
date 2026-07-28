@@ -55,6 +55,7 @@ import {
 	regenerateDocArtifacts,
 	SHOWHOW_RECORDINGS_ROOT,
 } from "../showhow/bundle";
+import { listRecordings } from "../showhow/recordingLibrary";
 import { mapCursorSampleToTelemetryPoint } from "./cursorTelemetry";
 import { registerNativeBridgeHandlers } from "./nativeBridge";
 import { RecordingStreamRegistry, registerRecordingStreamHandlers } from "./recordingStream";
@@ -2287,6 +2288,10 @@ export function registerIpcHandlers(
 	// Chunks append as they arrive so the renderer never buffers the full video (#616).
 	const recordingStreams = new RecordingStreamRegistry();
 	registerRecordingStreamHandlers(ipcMain, recordingStreams, resolveRecordingOutputPath);
+
+	ipcMain.handle("showhow:list-recordings", async () => {
+		return listRecordings();
+	});
 
 	ipcMain.handle("showhow:write-transcript", async (_, bundleDir: unknown, content: unknown) => {
 		if (typeof bundleDir !== "string" || typeof content !== "string") {
