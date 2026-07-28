@@ -7,6 +7,13 @@ name: Board Sync
 on:
   issues:
     types: [opened, reopened, closed, labeled, unlabeled]
+  # Hourly reconcile. The board LOOKS draggable, and dragging a card is the
+  # obvious thing to try -- but it writes nothing back to the labels, so the
+  # card silently disagrees with reality until the next label event on that
+  # issue happens to recompute it. This snaps every card back within the hour,
+  # so a drag fails visibly and soon rather than quietly and much later.
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       issue:
