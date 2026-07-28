@@ -254,3 +254,24 @@ continues to treat only `interactionType === "click"` as a click anchor.
 **Verification:** new test 6/6 pass; `zoomSuggestionUtils.test.ts` 6/6
 pass; `npm run test` 511/511 across 65 files; `npx tsc --noEmit` clean;
 `npm run lint` clean. Not committed, pushed, or PR'd.
+## Label-driven pull loop -- 2026-07-28
+
+### Deviations
+
+**Test runner and file extensions.** The plan specified
+`.github/scripts/derive-status.js` verified with `node --test .github/scripts/`.
+The repo is `"type": "module"`, runs vitest, and already carries four
+`.github/scripts/*.test.mjs` files that `vitest.config.ts` picks up via its
+`{src,electron,.github}/**` include. Used `.mjs` and vitest instead so the new
+test runs under `npm test` with everything else. `node --test` would have left
+it orphaned from CI.
+
+**Formatting.** Biome reformatted the test file's long `expect(...)` lines onto
+multiple lines. Accepted its output rather than fighting the shared config.
+
+### Not a deviation, worth recording
+
+`deriveStatus` accepts both bare label strings and the `{name}` objects the REST
+API returns. The workflow in Task 3 passes API objects straight through; tests
+use strings. One coercion in the function beats remembering which shape a caller
+holds.
