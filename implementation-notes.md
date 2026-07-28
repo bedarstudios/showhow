@@ -5,6 +5,18 @@ logged as they're discovered mid-build. Nothing is deleted from this file.
 
 ## Deviations
 
+### 2026-07-28: Acceptance audit output retains JSON in a `.txt` artifact
+
+**What changed:** Issue 21 writes its stable JSON audit observation to
+`artifacts/21/bundle-audit.txt` instead of a `.json` file.
+
+**Why:** Biome reformats JSON array layout differently from `JSON.stringify`; rerunning the audit
+would otherwise recreate a tracked artifact that fails the repository-wide lint check.
+
+**What was done instead (conservative option):** The CLI still emits structured JSON and the artifact
+contains that exact output, but its `.txt` extension keeps the repeatable evidence outside Biome's JSON
+formatter. The acceptance report records the generation command and artifact path.
+
 ### 2026-07-22: Frame extraction uses an optional system ffmpeg
 
 **What changed:** Desktop click frames are extracted with `ffmpeg`, which is available
