@@ -25,14 +25,14 @@ const RULES = [
 export const DEFAULT_STATUS = "Todo";
 export const CLOSED_STATUS = "Done";
 
+/** Housekeeping issues (the poller heartbeat, for one) are not work. */
+export const EXCLUDED_LABEL = "meta";
+
 /**
  * @param {{ state?: string, labels?: Array<string|{name:string}>|null }} issue
  * @returns {string} one of the seven Status option names
  */
 export function deriveStatus(issue) {
-	// A closed issue is finished, whatever it was carrying on the way out.
-	if (issue?.state === "closed") return CLOSED_STATUS;
-
 	// Accept both the bare strings a caller might build and the label objects
 	// the REST API actually returns, so callers never have to remember which.
 	const names = new Set(
@@ -40,6 +40,13 @@ export function deriveStatus(issue) {
 			.map((label) => (typeof label === "string" ? label : label?.name))
 			.filter(Boolean),
 	);
+
+	// Checked before `closed` so a housekeeping issue never lands in Done
+	// either. Null means "not board work at all" -- the caller skips it.
+	if (names.has(EXCLUDED_LABEL)) return null;
+
+	// A closed issue is finished, whatever it was carrying on the way out.
+	if (issue?.state === "closed") return CLOSED_STATUS;
 
 	for (const rule of RULES) {
 		const wanted = Array.isArray(rule.label) ? rule.label : [rule.label];

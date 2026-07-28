@@ -10,6 +10,55 @@ permissions:
   issues: write
 
 jobs:
+  # The poller runs on Mohamed's Mac. When that machine dies, sleeps through the
+  # night, or the launchd job silently stops, nothing local can report it --
+  # which is the whole point of checking from the cloud.
+  check-poller-liveness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment when the poller heartbeat is stale
+        uses: actions/github-script@v7
+        env:
+          STALE_MINUTES: "60"
+        with:
+          github-token: ${{ secrets.BEDAR_LOOP_PAT }}
+          script: |
+            const title = 'Bedar Loop poller heartbeat';
+            const { data: found } = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open in:title "${title}"`,
+            });
+            const issue = found.items.find((i) => i.title === title);
+            if (!issue) {
+              core.warning('No heartbeat issue found. The poller has never run, or it was closed.');
+              return;
+            }
+
+            const match = /Last poll:\s*(\S+)/.exec(issue.body ?? '');
+            const last = match ? Date.parse(match[1]) : NaN;
+            if (Number.isNaN(last)) {
+              core.warning(`Heartbeat issue #${issue.number} has no parseable timestamp.`);
+              return;
+            }
+
+            const staleMinutes = Number(process.env.STALE_MINUTES);
+            const ageMinutes = Math.round((Date.now() - last) / 60000);
+            if (ageMinutes <= staleMinutes) {
+              core.info(`Poller alive: last beat ${ageMinutes}m ago.`);
+              return;
+            }
+
+            // Comment rather than reopen or relabel: this issue is the sensor,
+            // and a sensor that changes state is one more thing to reset by hand.
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: issue.number,
+              body: `Poller looks dead. Last beat \`${match[1]}\` -- ${ageMinutes} minutes ago, ` +
+                    `threshold ${staleMinutes}m.\n\nCheck:\n` +
+                    '```\nlaunchctl list | grep bedarstudios.loop.poller\n' +
+                    'tail -20 ~/.local/state/bedar-loop/poller.log\n```',
+            });
+            core.warning(`Poller heartbeat is ${ageMinutes}m old; commented on #${issue.number}.`);
+
   dispatch-cold-reviewers:
     runs-on: ubuntu-latest
     steps:

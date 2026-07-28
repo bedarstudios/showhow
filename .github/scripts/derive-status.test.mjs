@@ -59,6 +59,14 @@ describe("deriveStatus", () => {
 		);
 	});
 
+	// The poller's heartbeat issue is updated every ten minutes forever. On the
+	// board it would be a permanent card in Todo that nobody can ever close.
+	it("returns null for housekeeping issues, open or closed", () => {
+		expect(deriveStatus({ state: "open", labels: ["meta"] })).toBeNull();
+		expect(deriveStatus({ state: "closed", labels: ["meta"] })).toBeNull();
+		expect(deriveStatus({ state: "open", labels: ["meta", "needs-human"] })).toBeNull();
+	});
+
 	it("tolerates a missing or malformed label list", () => {
 		expect(deriveStatus({ state: "open" })).toBe("Todo");
 		expect(deriveStatus({ state: "open", labels: null })).toBe("Todo");

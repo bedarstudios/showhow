@@ -116,6 +116,11 @@ jobs:
               });
 
               const status = deriveStatus({ state: issue.state, labels: issue.labels });
+              if (status === null) {
+                core.info(`#${issue_number} is housekeeping; not board work.`);
+                continue;
+              }
+
               const optionId = optionByName.get(status);
               if (!optionId) {
                 core.setFailed(`No Status option named "${status}" on the board.`);
