@@ -72,8 +72,11 @@ export async function listRecordings(
 	let entries: Dirent[];
 	try {
 		entries = await readdir(recordingsRoot, { withFileTypes: true });
-	} catch {
-		return [];
+	} catch (error: unknown) {
+		if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") {
+			return [];
+		}
+		throw error;
 	}
 	const results = await Promise.all(
 		entries

@@ -21,6 +21,13 @@ describe("listRecordings", () => {
 		expect(entries).toEqual([]);
 	});
 
+	it("throws when the recordings root fails to read with a non-ENOENT error", async () => {
+		const root = await makeTempRoot();
+		const notADirectoryPath = path.join(root, "not-a-directory");
+		await writeFile(notADirectoryPath, "plain file");
+		await expect(listRecordings(notADirectoryPath)).rejects.toMatchObject({ code: "ENOTDIR" });
+	});
+
 	it("skips directories whose meta.json is missing", async () => {
 		const root = await makeTempRoot();
 		await mkdir(path.join(root, "no-meta-dir"));
