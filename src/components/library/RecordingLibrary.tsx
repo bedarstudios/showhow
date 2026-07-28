@@ -670,7 +670,9 @@ export function RecordingLibrary() {
 				<div style={{ maxWidth: "820px", margin: "0 auto", padding: "60px 40px 120px" }}>
 					{!loading && loadError && <ErrorLibraryState />}
 					{!loading && !loadError && !hasRecordings && <EmptyLibraryState />}
-					{!loading && !loadError && activeEntry && <RecordingDetail entry={activeEntry} />}
+					{!loading && !loadError && activeEntry && (
+						<RecordingDetail key={activeEntry.bundleDir} entry={activeEntry} />
+					)}
 				</div>
 			</div>
 		</div>

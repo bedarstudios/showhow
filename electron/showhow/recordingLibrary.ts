@@ -71,7 +71,7 @@ async function readSteps(
 				typeof raw !== "object" ||
 				raw === null ||
 				!isFiniteStep(raw as RawStep) ||
-				path.basename(raw.screenshot) !== raw.screenshot
+				raw.screenshot.split(/[\\/]/u).length !== 1
 			) {
 				return [];
 			}

@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { RecordingLibraryEntry } from "@/lib/showhow/recordingLibrary";
@@ -84,6 +84,12 @@ const desktopDocEntry: WorkflowDocumentEntry = {
 		{ label: "Click Add product", ts: 12_000, screenshot: "step-02.png" },
 		{ label: "Enter the product title", ts: 21_000, screenshot: "step-03.png" },
 	],
+};
+
+const browserDocEntry: WorkflowDocumentEntry = {
+	...browserEntry,
+	video: "video.webm",
+	steps: [{ label: "Open account settings", ts: 5_000, screenshot: "step-01.png" }],
 };
 
 describe("RecordingLibrary", () => {
@@ -296,5 +302,31 @@ describe("RecordingLibrary — workflow document view (issue #23)", () => {
 
 		// Clicking the chip seeks the built-in player to the step's time (seconds).
 		expect(video.currentTime).toBe(12);
+	});
+
+	it("does not apply a queued seek after selecting another recording", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry, browserDocEntry]);
+		const { container } = render(<RecordingLibrary />);
+
+		await screen.findByText("Open the products page");
+		const firstVideo = container.querySelector("video") as HTMLVideoElement;
+		Object.defineProperty(firstVideo, "readyState", {
+			configurable: true,
+			value: HTMLMediaElement.HAVE_NOTHING,
+		});
+		await userEvent.click(screen.getByText("0:12"));
+
+		const browserRow = screen
+			.getAllByRole("button")
+			.find((button) => button.textContent?.includes(browserDocEntry.title));
+		expect(browserRow).toBeDefined();
+		await userEvent.click(browserRow!);
+		await screen.findByText("Open account settings");
+
+		const secondVideo = container.querySelector("video") as HTMLVideoElement;
+		secondVideo.currentTime = 0;
+		fireEvent.loadedMetadata(secondVideo);
+
+		expect(secondVideo.currentTime).toBe(0);
 	});
 });
