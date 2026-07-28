@@ -88,6 +88,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.invoke("showhow:list-recordings") as Promise<
 			import("../src/lib/showhow/recordingLibrary").RecordingLibraryEntry[]
 		>,
+	showhowCopyPath: (bundleDir: string) =>
+		ipcRenderer.invoke("showhow:copy-path", bundleDir) as Promise<{ success: boolean }>,
 	showhowWriteTranscript: (bundleDir: string, content: string) =>
 		ipcRenderer.invoke("showhow:write-transcript", bundleDir, content),
 	openRecordingStream: (fileName: string) => {

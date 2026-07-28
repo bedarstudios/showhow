@@ -287,3 +287,48 @@ multiple lines. Accepted its output rather than fighting the shared config.
 API returns. The workflow in Task 3 passes API objects straight through; tests
 use strings. One coercion in the function beats remembering which shape a caller
 holds.
+
+### 2026-07-28: Issue 23 stalled delegated lanes were replaced with synchronous implementation
+
+**What changed:** The bounded data/API and UI implementation lanes produced no shared-tree
+implementation delta and were cancelled at the user's direction. The parent executor completed
+the approved red-to-green implementation directly.
+
+**Why:** Waiting further would have delayed the scoped issue without producing reviewable code.
+
+**What was done instead (conservative option):** Preserved the existing 138-line renderer red-test
+delta unchanged, used it to drive the minimal scanner and document-view additions, and ran the
+affected tests, TypeScript, Biome, i18n, and branding checks before reporting.
+
+### 2026-07-28: Issue 23 live Electron media and clipboard boundary correction
+
+**What changed:** The initial document view used the renderer's `navigator.clipboard` and direct
+`file://` artifact URLs. Live Electron verification proved neither integration worked: the system
+clipboard stayed unchanged and the player remained at 0:00 because the library renderer could not
+load the local file URLs.
+
+**What was done instead:** Added a typed `showhow:copy-path` IPC boundary backed by Electron's
+clipboard service. Local recording artifacts now use the privileged, root-scoped
+`showhow-media://recordings/<bundle>/<artifact>` protocol rather than raw filesystem URLs. The
+protocol rejects traversal outside `~/Showhow/Recordings`; step seeking records a pending seek and
+reapplies it when media metadata becomes available.
+
+**TDD evidence:** New tests failed first because the clipboard helper and media protocol modules
+did not exist, while the renderer test failed because Copy path still used `navigator.clipboard`.
+After implementation the focused suite passed.
+
+### 2026-07-28: Issue 23 media protocol preserves Chromium Range requests
+
+**Root cause:** The first `showhow-media` handler converted the approved artifact path to a local
+file URL, but invoked `net.fetch()` without forwarding the renderer request headers. Chromium's
+initial media load could expose a frame and duration, while native play/seek requests requiring a
+`Range` response were served as unrelated full-file fetches and left the player at 0:00.
+
+**What changed:** `fetchShowhowMedia` now forwards all inbound protocol request headers, including
+`Range`, to Electron's `net.fetch(fileUrl, { headers })`. The resulting response retains the native
+media status and range headers (`206`, `Content-Range`, `Accept-Ranges`) from Electron's file
+fetch rather than synthesizing a cosmetic renderer seek state.
+
+**TDD evidence:** The new same-package protocol test failed RED with
+`TypeError: fetchShowhowMedia is not a function`; after the narrow forwarding helper and handler
+wiring, it passed GREEN and asserts that `range: bytes=1024-` reaches the local fetch.

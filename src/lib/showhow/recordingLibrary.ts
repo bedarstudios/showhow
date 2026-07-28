@@ -1,6 +1,46 @@
 /**
- * Shared type for a single local recording-library entry.
+ * Shared types for a single local recording-library entry.
  * Used by both the main-process scanner and the renderer UI.
+ */
+
+/**
+ * A single workflow step parsed from a bundle's `steps.json`.
+ *
+ * `screenshot` is the bare `step-NN.png` filename inside the bundle's
+ * `screenshots/` directory. `screenshotUrl` is the safe `file://` URL the
+ * renderer can load directly; it is only present when the screenshot file
+ * exists on disk (missing frames are surfaced as absent, never as a URL that
+ * 404s).
+ */
+export interface WorkflowStep {
+	/** Instruction label (from transcript-matched step label). */
+	label: string;
+	/** Click time in milliseconds (source of truth for the timestamp chip). */
+	ts: number;
+	/** `step-NN.png` filename inside the bundle's `screenshots/` directory. */
+	screenshot: string;
+	/** Safe `file://` URL to the screenshot, when the file exists. */
+	screenshotUrl?: string;
+}
+
+/**
+ * Step-capture availability, mirrored from `ShowhowMeta.stepCapture`. Surfaced
+ * so the renderer can distinguish a transcript-only doc (`unavailable`) from a
+ * doc whose steps are ready to render (`available`).
+ */
+export interface StepCaptureStatus {
+	status: "available" | "unavailable";
+	message?: string;
+}
+
+/**
+ * A local recording-library entry.
+ *
+ * The core fields (`bundleDir`, `title`, `source`, `createdAt`, `durationMs`)
+ * are always present and match the pre-issue-#23 contract. The workflow-document
+ * fields (`video`, `videoUrl`, `steps`, `stepCapture`) are optional and only
+ * attached when the corresponding artifacts exist on disk, so legacy/minimal
+ * bundles continue to serialize exactly as before.
  */
 export interface RecordingLibraryEntry {
 	/** Absolute path to the bundle directory. */
@@ -13,4 +53,12 @@ export interface RecordingLibraryEntry {
 	createdAt: number;
 	/** Recording duration in milliseconds, if known. */
 	durationMs?: number;
+	/** Bundle video filename, mirroring `ShowhowMeta.video`. Only present when the video file exists. */
+	video?: "video.mp4" | "video.webm";
+	/** Safe `file://` URL to the bundle video, when the file exists. */
+	videoUrl?: string;
+	/** Steps parsed from the bundle's `steps.json`. Only present when steps.json exists. */
+	steps?: WorkflowStep[];
+	/** Step-capture availability from meta.json, when present. */
+	stepCapture?: StepCaptureStatus;
 }

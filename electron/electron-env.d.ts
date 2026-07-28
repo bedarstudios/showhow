@@ -93,6 +93,7 @@ interface Window {
 		showhowListRecordings: () => Promise<
 			import("../src/lib/showhow/recordingLibrary").RecordingLibraryEntry[]
 		>;
+		showhowCopyPath: (bundleDir: string) => Promise<{ success: boolean }>;
 		showhowWriteTranscript: (bundleDir: string, content: string) => Promise<{ success: boolean }>;
 		openRecordingStream: (fileName: string) => Promise<{ success: boolean; error?: string }>;
 		appendRecordingChunk: (

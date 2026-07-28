@@ -165,4 +165,42 @@ describe("listRecordings", () => {
 		const entries = await listRecordings(root);
 		expect(entries).toEqual([]);
 	});
+
+	it("skips screenshot names containing either path separator", async () => {
+		const root = await makeTempRoot();
+		const dir = path.join(root, "recording-with-malformed-step");
+		const screenshotsDir = path.join(dir, "screenshots");
+		await mkdir(screenshotsDir, { recursive: true });
+		await writeFile(
+			path.join(dir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Recording with malformed step",
+				source: "desktop",
+				createdAt: 1_753_000_000_000,
+			}),
+		);
+		await writeFile(
+			path.join(dir, "steps.json"),
+			JSON.stringify([
+				{ label: "Malformed", ts: 1_000, screenshot: "..\\x.png" },
+				{ label: "Valid", ts: 2_000, screenshot: "step-02.png" },
+			]),
+		);
+		await writeFile(path.join(screenshotsDir, "..\\x.png"), "malformed");
+		await writeFile(path.join(screenshotsDir, "step-02.png"), "valid");
+
+		const entries = await listRecordings(root);
+
+		expect(entries).toHaveLength(1);
+		expect(entries[0].steps).toEqual([
+			{
+				label: "Valid",
+				ts: 2_000,
+				screenshot: "step-02.png",
+				screenshotUrl:
+					"showhow-media://recordings/recording-with-malformed-step/screenshots/step-02.png",
+			},
+		]);
+	});
 });
