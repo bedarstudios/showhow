@@ -472,6 +472,43 @@ export function RecordingLibrary() {
 						</div>
 					)}
 				</div>
+
+				<button
+					type="button"
+					onClick={() => window.electronAPI.switchToHud()}
+					style={{
+						marginTop: "auto",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						gap: "8px",
+						width: "100%",
+						padding: "10px 14px",
+						border: "1px solid var(--sh-color-divider)",
+						borderRadius: "10px",
+						background: "var(--sh-card-bg)",
+						color: "var(--sh-color-text)",
+						fontFamily: "var(--sh-font-body)",
+						fontSize: "13px",
+						fontWeight: 600,
+						cursor: "pointer",
+					}}
+				>
+					<svg
+						width="15"
+						height="15"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2.25"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
+						<path d="m15 18-6-6 6-6" />
+					</svg>
+					Back to recorder
+				</button>
 			</div>
 
 			{/* ---- main panel ---- */}

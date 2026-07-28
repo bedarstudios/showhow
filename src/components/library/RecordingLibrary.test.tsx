@@ -7,11 +7,16 @@ import { RecordingLibrary } from "./RecordingLibrary";
 
 // Mock window.electronAPI
 const mockShowhowListRecordings = vi.fn<() => Promise<RecordingLibraryEntry[]>>();
+const mockSwitchToHud = vi.fn<() => Promise<void>>();
 
 beforeEach(() => {
 	vi.resetAllMocks();
+	mockSwitchToHud.mockResolvedValue();
 	Object.defineProperty(window, "electronAPI", {
-		value: { showhowListRecordings: mockShowhowListRecordings },
+		value: {
+			showhowListRecordings: mockShowhowListRecordings,
+			switchToHud: mockSwitchToHud,
+		},
 		writable: true,
 		configurable: true,
 	});
@@ -139,5 +144,15 @@ describe("RecordingLibrary", () => {
 		render(<RecordingLibrary />);
 		// The sidebar "LIBRARY" heading is always present
 		expect(screen.getByText("Library")).toBeInTheDocument();
+	});
+
+	it("returns to the recorder from the library", async () => {
+		mockShowhowListRecordings.mockResolvedValue([]);
+		render(<RecordingLibrary />);
+
+		await screen.findByTestId("empty-library-state");
+		await userEvent.click(screen.getByRole("button", { name: "Back to recorder" }));
+
+		expect(mockSwitchToHud).toHaveBeenCalledTimes(1);
 	});
 });
