@@ -309,7 +309,7 @@ async function finalizeRecordingFile(
 	return streamed;
 }
 
-async function getApprovedProjectSession(
+export async function getApprovedProjectSession(
 	project: unknown,
 	projectFilePath?: string,
 ): Promise<RecordingSession | null> {
@@ -330,9 +330,10 @@ async function getApprovedProjectSession(
 		return null;
 	}
 
-	// Only auto-approve media within the project's dir or RECORDINGS_DIR, so a crafted
-	// project file can't approve reads to arbitrary locations.
-	const trustedDirs = [RECORDINGS_DIR];
+	// Only auto-approve media within the project's dir, RECORDINGS_DIR, or the
+	// canonical Showhow recordings root (where bundled recordings live after a
+	// restart), so a crafted project file can't approve reads to arbitrary locations.
+	const trustedDirs = [RECORDINGS_DIR, SHOWHOW_RECORDINGS_ROOT];
 	if (projectFilePath) {
 		trustedDirs.push(path.dirname(path.resolve(projectFilePath)));
 	}
