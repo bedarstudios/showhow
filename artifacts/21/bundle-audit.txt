@@ -43,7 +43,17 @@
 	"screenshots": {
 		"count": 6,
 		"stepCount": 6,
-		"matchesStepCount": true
+		"matchesStepCount": true,
+		"referencedPaths": [
+			"step-01.png",
+			"step-02.png",
+			"step-03.png",
+			"step-04.png",
+			"step-05.png",
+			"step-06.png"
+		],
+		"missingReferencedPaths": [],
+		"allReferencesPresent": true
 	},
 	"steps": {
 		"timestampsMs": [

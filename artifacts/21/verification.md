@@ -15,8 +15,8 @@ Environment: macOS, ticket worktree build, real bundle at
   duration.
 - [passed] The ticket-worktree Electron build launched and the Showhow HUD and Notes window were
   driven successfully; `after-app.jpg` records the app-level result.
-- [passed] Focused bundle-audit test: 1 file and 1 test passed.
-- [passed] Unit suite: 68 files and 525 tests passed.
+- [passed] Focused bundle-audit test: 1 file and 3 tests passed.
+- [passed] Unit suite: 68 files and 527 tests passed.
 - [passed] Browser suite: 2 files and 6 tests passed.
 - [passed] TypeScript: `npx tsc --noEmit`.
 - [passed] Biome: 380 files checked with no fixes required.

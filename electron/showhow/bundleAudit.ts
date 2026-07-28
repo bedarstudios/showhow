@@ -33,6 +33,9 @@ export interface BundleAuditReport {
 		count: number;
 		stepCount: number;
 		matchesStepCount: boolean;
+		referencedPaths: string[];
+		missingReferencedPaths: string[];
+		allReferencesPresent: boolean;
 	};
 	steps: {
 		timestampsMs: number[];
@@ -87,6 +90,15 @@ function stepTimestamps(value: unknown): number[] {
 	if (!Array.isArray(value)) return [];
 	return value.flatMap((step) =>
 		isRecord(step) && typeof step.ts === "number" && Number.isFinite(step.ts) ? [step.ts] : [],
+	);
+}
+
+function stepScreenshotPaths(value: unknown): string[] {
+	if (!Array.isArray(value)) return [];
+	return value.flatMap((step) =>
+		isRecord(step) && typeof step.screenshot === "string" && step.screenshot.length > 0
+			? [step.screenshot]
+			: [],
 	);
 }
 
@@ -158,6 +170,7 @@ export async function auditBundle(bundleDir: string): Promise<BundleAuditReport>
 		]);
 
 	const timestampsMs = stepTimestamps(stepsValue);
+	const referencedScreenshotPaths = stepScreenshotPaths(stepsValue);
 	const clickTimestampsMs = clickTimestamps(telemetryValue);
 	const markdownChipTimestampsMs = parseTimestampLines(stepsMarkdownContent, STEP_CHIP);
 	const markdownChipDeltasMs = markdownChipTimestampsMs.map((chip, index) =>
@@ -174,7 +187,17 @@ export async function auditBundle(bundleDir: string): Promise<BundleAuditReport>
 						timestampMs: value,
 						durationMs,
 					}));
-	const screenshotCount = screenshotEntries.filter((entry) => entry.isFile()).length;
+	const screenshotFileNames = screenshotEntries
+		.filter((entry) => entry.isFile())
+		.map((entry) => entry.name);
+	const screenshotCount = screenshotFileNames.length;
+	const screenshotFileNameSet = new Set(screenshotFileNames);
+	const missingReferencedScreenshotPaths = referencedScreenshotPaths.filter(
+		(screenshotPath) => !screenshotFileNameSet.has(screenshotPath),
+	);
+	const allScreenshotReferencesPresent =
+		referencedScreenshotPaths.length === timestampsMs.length &&
+		missingReferencedScreenshotPaths.length === 0;
 	const contract = {
 		video: { path: videoPath, present: videoPresent },
 		transcript: { path: transcriptPath, present: transcriptPresent },
@@ -195,7 +218,8 @@ export async function auditBundle(bundleDir: string): Promise<BundleAuditReport>
 			complete &&
 			cursorTelemetryPath !== null &&
 			(await exists(path.join(bundleDir, cursorTelemetryPath))) &&
-			screenshotCount === timestampsMs.length &&
+			timestampsMs.length > 0 &&
+			allScreenshotReferencesPresent &&
 			matchClickTelemetryExactly &&
 			markdownChipsWithinOneSecond,
 		contract: { complete, ...contract },
@@ -209,6 +233,9 @@ export async function auditBundle(bundleDir: string): Promise<BundleAuditReport>
 			count: screenshotCount,
 			stepCount: timestampsMs.length,
 			matchesStepCount: screenshotCount === timestampsMs.length,
+			referencedPaths: referencedScreenshotPaths,
+			missingReferencedPaths: missingReferencedScreenshotPaths,
+			allReferencesPresent: allScreenshotReferencesPresent,
 		},
 		steps: {
 			timestampsMs,
