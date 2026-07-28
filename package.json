@@ -53,6 +53,7 @@
 		"test:wgc-full:win": "node scripts/test-windows-wgc-helper.mjs --webcam --system-audio --microphone",
 		"capture:showhow-preview": "node scripts/capture-showhow-preview.mjs",
 		"inspect:cursor-click-bounce": "node scripts/inspect-native-cursor-click-bounce.mjs",
+		"audit:showhow-bundle": "node --experimental-strip-types scripts/audit-showhow-bundle.mjs",
 		"diagnostic:run": "node scripts/diagnostic-tool/diagnostic.mjs",
 		"diagnostic:smoke:win": "node scripts/diagnostic-tool/diagnostic.mjs --duration 3",
 		"build-vite": "tsc && vite build",
