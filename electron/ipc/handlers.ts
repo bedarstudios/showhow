@@ -1,4 +1,5 @@
 import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { EventEmitter } from "node:events";
 import { constants as fsConstants } from "node:fs";
 import fs from "node:fs/promises";
@@ -383,7 +384,8 @@ let currentRecordingSession: RecordingSession | null = null;
 // or cloud. Best-effort: a bind failure is logged and never blocks recording.
 const SHOWHOW_BRIDGE_HOST = "127.0.0.1" as const;
 const SHOWHOW_BRIDGE_PORT = Number(process.env.SHOWHOW_BRIDGE_PORT ?? 8765);
-const showhowBridge = new ShowhowBridgeServer();
+const SHOWHOW_BRIDGE_TOKEN = randomBytes(32).toString("base64url");
+const showhowBridge = new ShowhowBridgeServer({ pairingToken: SHOWHOW_BRIDGE_TOKEN });
 let showhowBridgeStarted = false;
 
 async function ensureShowhowBridgeStarted(): Promise<void> {
@@ -2410,7 +2412,8 @@ export function registerIpcHandlers(
 			host: SHOWHOW_BRIDGE_HOST,
 			port: showhowBridge.port,
 			paired: showhowBridge.isCompanionConnected(),
-			recording: showhowBridge.port !== 0 && (await showhowBridge.drainSteps()).length >= 0,
+			recording: showhowBridge.hasRecordingEpoch(),
+			pairingToken: SHOWHOW_BRIDGE_TOKEN,
 		};
 	});
 

@@ -55,7 +55,11 @@ function openClient(port: number): Promise<Client> {
 }
 
 function send(ws: WebSocket, payload: unknown): void {
-	ws.send(JSON.stringify(payload));
+	const message =
+		typeof payload === "object" && payload !== null && "type" in payload && payload.type === "hello"
+			? { ...payload, token: "test-token" }
+			: payload;
+	ws.send(JSON.stringify(message));
 }
 
 function waitForClose(ws: WebSocket, timeoutMs = 2000): Promise<number> {
@@ -69,9 +73,24 @@ function waitForClose(ws: WebSocket, timeoutMs = 2000): Promise<number> {
 }
 
 describe("ShowhowBridgeServer pairing and handshake", () => {
+	it("rejects a companion with an invalid pairing token", async () => {
+		const port = await nextFreePort();
+		const server = new ShowhowBridgeServer({ pairingToken: "secret" });
+		await server.start({ host: "127.0.0.1", port });
+
+		const client = await openClient(port);
+		send(client.ws, { v: 1, type: "hello", role: "companion", token: "wrong" });
+		const error = await client.recv();
+		expect(error).toEqual({ v: 1, type: "error", message: expect.stringContaining("token") });
+		await waitForClose(client.ws);
+		expect(server.isCompanionConnected()).toBe(false);
+
+		await server.stop();
+	});
+
 	it("accepts an explicit versioned pairing and acks with paired", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const client = await openClient(port);
@@ -85,7 +104,7 @@ describe("ShowhowBridgeServer pairing and handshake", () => {
 
 	it("sends the recording-start epoch handshake when a recording is active", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const recordingStartMs = 1_700_000_000_000;
@@ -103,7 +122,7 @@ describe("ShowhowBridgeServer pairing and handshake", () => {
 
 	it("retriggers the epoch handshake when the recording start is reset", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const client = await openClient(port);
@@ -126,7 +145,7 @@ describe("ShowhowBridgeServer pairing and handshake", () => {
 describe("ShowhowBridgeServer malformed and unsupported-version rejection", () => {
 	it("rejects a malformed message without crashing the server", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const client = await openClient(port);
@@ -146,7 +165,7 @@ describe("ShowhowBridgeServer malformed and unsupported-version rejection", () =
 
 	it("rejects an unsupported protocol version without crashing", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const client = await openClient(port);
@@ -161,7 +180,7 @@ describe("ShowhowBridgeServer malformed and unsupported-version rejection", () =
 describe("ShowhowBridgeServer step ingestion and timestamp conversion", () => {
 	it("converts event timestamps to recording-relative milliseconds", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const recordingStartMs = 1_700_000_000_000;
@@ -198,9 +217,51 @@ describe("ShowhowBridgeServer step ingestion and timestamp conversion", () => {
 		await server.stop();
 	});
 
+	it("clears buffered steps when the recording epoch is cleared", async () => {
+		const port = await nextFreePort();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
+		await server.start({ host: "127.0.0.1", port });
+
+		const recordingStartMs = 1_700_000_000_000;
+		server.setRecordingEpoch(recordingStartMs);
+		const client = await openClient(port);
+		send(client.ws, { v: 1, type: "hello", role: "companion" });
+		await client.recv();
+		await client.recv();
+		send(client.ws, {
+			v: 1,
+			type: "step",
+			ts: recordingStartMs + 500,
+			label: "stale",
+			cx: 0.5,
+			cy: 0.5,
+			redacted: false,
+			screenshot: null,
+		});
+
+		await new Promise((resolve) => setTimeout(resolve, 25));
+		server.clearRecordingEpoch();
+		server.setRecordingEpoch(recordingStartMs + 10_000);
+		send(client.ws, {
+			v: 1,
+			type: "step",
+			ts: recordingStartMs + 10_500,
+			label: "fresh",
+			cx: 0.5,
+			cy: 0.5,
+			redacted: false,
+			screenshot: null,
+		});
+		await new Promise((resolve) => setTimeout(resolve, 25));
+		expect(await server.drainSteps()).toMatchObject([{ label: "fresh", ts: 500 }]);
+
+		client.ws.close();
+		await server.stop();
+	});
+
 	it("clamps a step that precedes the epoch to zero", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 		server.setRecordingEpoch(1_700_000_000_000);
 
@@ -228,7 +289,7 @@ describe("ShowhowBridgeServer step ingestion and timestamp conversion", () => {
 
 	it("ignores steps that arrive before pairing", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const client = await openClient(port);
@@ -251,7 +312,7 @@ describe("ShowhowBridgeServer step ingestion and timestamp conversion", () => {
 describe("ShowhowBridgeServer disconnect semantics", () => {
 	it("marks browser steps unavailable on mid-recording disconnect and preserves drained steps", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 		server.setRecordingEpoch(1_700_000_000_000);
 
@@ -284,7 +345,7 @@ describe("ShowhowBridgeServer disconnect semantics", () => {
 
 	it("permits desktop fallback after disconnect: a new companion can re-pair", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 		server.setRecordingEpoch(1_700_000_000_000);
 
@@ -307,7 +368,7 @@ describe("ShowhowBridgeServer disconnect semantics", () => {
 
 	it("does not flag a disconnect when no recording epoch is active", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 
 		const client = await openClient(port);
@@ -321,7 +382,7 @@ describe("ShowhowBridgeServer disconnect semantics", () => {
 
 	it("resets the mid-recording disconnect flag when a new recording starts", async () => {
 		const port = await nextFreePort();
-		const server = new ShowhowBridgeServer();
+		const server = new ShowhowBridgeServer({ pairingToken: "test-token" });
 		await server.start({ host: "127.0.0.1", port });
 		server.setRecordingEpoch(1_700_000_000_000);
 

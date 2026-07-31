@@ -10,9 +10,17 @@ import {
 
 describe("bridgeProtocol parseClientMessage", () => {
 	it("accepts a versioned companion hello", () => {
-		const raw = JSON.stringify({ v: 1, type: "hello", role: "companion" });
+		const raw = JSON.stringify({ v: 1, type: "hello", role: "companion", token: "secret" });
 		const result = parseClientMessage(raw);
-		expect(result).toEqual({ ok: true, message: { v: 1, type: "hello", role: "companion" } });
+		expect(result).toEqual({
+			ok: true,
+			message: { v: 1, type: "hello", role: "companion", token: "secret" },
+		});
+	});
+
+	it("rejects a companion hello without a pairing token", () => {
+		const result = parseClientMessage(JSON.stringify({ v: 1, type: "hello", role: "companion" }));
+		expect(result).toEqual({ ok: false, error: expect.stringContaining("token") });
 	});
 
 	it("accepts a well-formed step message", () => {

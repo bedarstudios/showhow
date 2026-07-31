@@ -13,7 +13,7 @@
  * Contract (JSON text frames):
  *
  * Client -> Server:
- *   { "v": 1, "type": "hello", "role": "companion" }
+ *   { "v": 1, "type": "hello", "role": "companion", "token": <pairing token> }
  *   { "v": 1, "type": "step", "ts": <epochMs>, "label": <string>,
  *     "cx": <0..1>, "cy": <0..1>, "redacted": <bool>, "screenshot": <base64|null> }
  *
@@ -46,6 +46,7 @@ export interface HelloMessage {
 	v: typeof BRIDGE_PROTOCOL_VERSION;
 	type: "hello";
 	role: "companion";
+	token: string;
 }
 
 export interface StepMessage {
@@ -126,7 +127,18 @@ export function parseClientMessage(raw: string): ParseResult {
 		if (payload.role !== "companion") {
 			return { ok: false, error: "hello requires role 'companion'" };
 		}
-		return { ok: true, message: { v: BRIDGE_PROTOCOL_VERSION, type: "hello", role: "companion" } };
+		if (typeof payload.token !== "string" || payload.token.length === 0) {
+			return { ok: false, error: "hello requires a pairing token" };
+		}
+		return {
+			ok: true,
+			message: {
+				v: BRIDGE_PROTOCOL_VERSION,
+				type: "hello",
+				role: "companion",
+				token: payload.token,
+			},
+		};
 	}
 	if (type === "step") {
 		if (!isFiniteNumber(payload.ts)) {

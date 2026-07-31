@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { type WebSocket, WebSocketServer } from "ws";
 import {
 	BRIDGE_PROTOCOL_VERSION,
@@ -34,12 +35,17 @@ export interface BridgeServerOptions {
  * recording video.
  */
 export class ShowhowBridgeServer {
+	private readonly pairingToken: string;
 	private server: WebSocketServer | null = null;
 	private companion: WebSocket | null = null;
 	private recordingStartMs: number | null = null;
 	private readonly ingested: IngestedBrowserStep[] = [];
 	private connected = false;
 	private disconnectDuringRecording = false;
+
+	constructor(options: { pairingToken: string }) {
+		this.pairingToken = options.pairingToken;
+	}
 
 	async start(options: BridgeServerOptions): Promise<void> {
 		if (this.server) return;
@@ -63,6 +69,7 @@ export class ShowhowBridgeServer {
 			this.companion = null;
 			this.connected = false;
 		}
+		this.ingested.splice(0, this.ingested.length);
 		await new Promise<void>((resolve) => {
 			server.close(() => resolve());
 		});
@@ -100,6 +107,11 @@ export class ShowhowBridgeServer {
 	clearRecordingEpoch(): void {
 		this.recordingStartMs = null;
 		this.disconnectDuringRecording = false;
+		this.ingested.splice(0, this.ingested.length);
+	}
+
+	hasRecordingEpoch(): boolean {
+		return this.recordingStartMs !== null;
 	}
 
 	/**
@@ -178,6 +190,15 @@ export class ShowhowBridgeServer {
 		}
 		const message = parsed.message;
 		if (message.type === "hello") {
+			if (!this.tokensEqual(message.token, this.pairingToken)) {
+				this.send(ws, {
+					v: BRIDGE_PROTOCOL_VERSION,
+					type: "error",
+					message: "invalid pairing token",
+				});
+				ws.close();
+				return;
+			}
 			// Pair this connection as the companion.
 			this.companion = ws;
 			this.connected = true;
@@ -233,5 +254,11 @@ export class ShowhowBridgeServer {
 		if (ws.readyState === ws.OPEN) {
 			ws.send(serializeServerMessage(message));
 		}
+	}
+
+	private tokensEqual(left: string, right: string): boolean {
+		const leftBytes = Buffer.from(left);
+		const rightBytes = Buffer.from(right);
+		return leftBytes.length === rightBytes.length && timingSafeEqual(leftBytes, rightBytes);
 	}
 }
