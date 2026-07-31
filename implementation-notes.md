@@ -5,6 +5,18 @@ logged as they're discovered mid-build. Nothing is deleted from this file.
 
 ## Deviations
 
+### 2026-07-31: Issue 35 gain-only correction was disproven by orchestrator-owned runtime evidence
+
+**What changed:** The ticket orchestrator reran the exact Electron generator at 21:14:30 after gain
+normalization landed. Timestamp bounds were corrected, but near-equal words remained shuffled and
+the final two step labels were still incoherent.
+
+**What was done instead:** Retained the gain fix and added explicit integer-millisecond plus source-index
+ordering in `transcribeCore`, including a RED regression proving raw fractional timestamp sorting produces
+the observed reordering. A final Electron rerun against
+`~/Showhow/Recordings/2026-07-25_175438-recording` produced ordered phrases, a maximum timestamp of
+24,000 ms against the 26,552 ms duration, and six complete phrase-level step labels.
+
 ### 2026-07-28: Acceptance audit output retains JSON in a `.txt` artifact
 
 **What changed:** Issue 21 writes its stable JSON audit observation to

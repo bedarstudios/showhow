@@ -360,6 +360,21 @@ describe("buildSteps", () => {
 		);
 	});
 
+	it("uses a complete spoken phrase instead of the final word as a step label", () => {
+		const clicks: ClickInput[] = [{ timeMs: 4_000, cx: 0.25, cy: 0.5, outputPath: "step-01.png" }];
+		const words: TranscriptSegment[] = [
+			{ startMs: 0, text: "I" },
+			{ startMs: 100, text: "hope" },
+			{ startMs: 200, text: "this" },
+			{ startMs: 300, text: "is" },
+			{ startMs: 400, text: "a" },
+			{ startMs: 500, text: "great" },
+			{ startMs: 600, text: "one." },
+		];
+
+		expect(buildSteps(clicks, words)[0]?.label).toBe("I hope this is a great one.");
+	});
+
 	it("produces the full Step contract (ts, coords, tier, redaction, screenshot)", () => {
 		const clicks: ClickInput[] = [{ timeMs: 1_250, cx: 0.25, cy: 0.5, outputPath: "step-01.png" }];
 		expect(buildSteps(clicks, segments)).toEqual([

@@ -164,14 +164,15 @@ export function formatStepTimestamp(ms: number): string {
  */
 export function buildSteps(clicks: ClickInput[], segments: TranscriptSegment[]): Step[] {
 	return clicks.map((click, index) => {
-		let label: string | undefined;
+		let labelIndex: number | undefined;
 		let labelStartMs = -Infinity;
-		for (const seg of segments) {
+		for (const [segmentIndex, seg] of segments.entries()) {
 			if (seg.startMs <= click.timeMs && seg.startMs >= labelStartMs) {
 				labelStartMs = seg.startMs;
-				label = seg.text;
+				labelIndex = segmentIndex;
 			}
 		}
+		const label = labelIndex === undefined ? undefined : phraseLabelAt(segments, labelIndex);
 		return {
 			label: label && label.trim() !== "" ? label.trim() : `Step ${index + 1}`,
 			ts: click.timeMs,
@@ -181,6 +182,33 @@ export function buildSteps(clicks: ClickInput[], segments: TranscriptSegment[]):
 			screenshot: click.outputPath,
 		};
 	});
+}
+
+function phraseLabelAt(segments: TranscriptSegment[], index: number): string {
+	const isWord = (segment: TranscriptSegment) => !/\s/u.test(segment.text.trim());
+	if (!isWord(segments[index]!)) return segments[index]!.text.trim();
+
+	let start = index;
+	while (
+		start > 0 &&
+		isWord(segments[start - 1]!) &&
+		!/[.!?]$/u.test(segments[start - 1]!.text.trim())
+	) {
+		start -= 1;
+	}
+	let end = index;
+	while (
+		end < segments.length - 1 &&
+		isWord(segments[end + 1]!) &&
+		!/[.!?]$/u.test(segments[end]!.text.trim())
+	) {
+		end += 1;
+	}
+	if (!/[.!?]$/u.test(segments[end]!.text.trim())) return segments[index]!.text.trim();
+	return segments
+		.slice(start, end + 1)
+		.map((segment) => segment.text.trim())
+		.join(" ");
 }
 
 const TRANSCRIPT_ONLY_NOTE =
