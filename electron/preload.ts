@@ -92,6 +92,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.invoke("showhow:copy-path", bundleDir) as Promise<{ success: boolean }>,
 	showhowWriteTranscript: (bundleDir: string, content: string) =>
 		ipcRenderer.invoke("showhow:write-transcript", bundleDir, content),
+	showhowBridgeStatus: () =>
+		ipcRenderer.invoke("showhow:bridge-status") as Promise<{
+			host: string;
+			port: number;
+			paired: boolean;
+			recording: boolean;
+			pairingToken: string;
+		}>,
 	openRecordingStream: (fileName: string) => {
 		return ipcRenderer.invoke("open-recording-stream", fileName);
 	},

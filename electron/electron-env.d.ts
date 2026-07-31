@@ -95,6 +95,13 @@ interface Window {
 		>;
 		showhowCopyPath: (bundleDir: string) => Promise<{ success: boolean }>;
 		showhowWriteTranscript: (bundleDir: string, content: string) => Promise<{ success: boolean }>;
+		showhowBridgeStatus: () => Promise<{
+			host: string;
+			port: number;
+			paired: boolean;
+			recording: boolean;
+			pairingToken: string;
+		}>;
 		openRecordingStream: (fileName: string) => Promise<{ success: boolean; error?: string }>;
 		appendRecordingChunk: (
 			fileName: string,

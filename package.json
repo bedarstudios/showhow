@@ -52,6 +52,7 @@
 		"test:wgc-webcam:win": "node scripts/test-windows-wgc-helper.mjs --webcam",
 		"test:wgc-full:win": "node scripts/test-windows-wgc-helper.mjs --webcam --system-audio --microphone",
 		"capture:showhow-preview": "node scripts/capture-showhow-preview.mjs",
+		"check:bridge-bundle": "node scripts/check-bridge-bundle.mjs",
 		"inspect:cursor-click-bounce": "node scripts/inspect-native-cursor-click-bounce.mjs",
 		"audit:showhow-bundle": "node --experimental-strip-types scripts/audit-showhow-bundle.mjs",
 		"diagnostic:run": "node scripts/diagnostic-tool/diagnostic.mjs",
@@ -108,7 +109,8 @@
 		"tailwind-merge": "^3.5.0",
 		"tailwindcss-animate": "^1.0.7",
 		"uuid": "^13.0.0",
-		"web-demuxer": "^4.0.0"
+		"web-demuxer": "^4.0.0",
+		"ws": "^8.21.1"
 	},
 	"devDependencies": {
 		"@actions/core": "^3.0.1",
@@ -122,6 +124,7 @@
 		"@types/node": "^22.19.17",
 		"@types/react": "^18.3.28",
 		"@types/react-dom": "^18.3.7",
+		"@types/ws": "^8.18.1",
 		"@vitejs/plugin-react": "^5.2.0",
 		"@vitest/browser": "^4.1.4",
 		"@vitest/browser-playwright": "^4.1.4",
