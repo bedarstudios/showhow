@@ -18,6 +18,19 @@ export default defineConfig({
 				vite: {
 					build: {
 						rollupOptions: {
+							external: [
+								// `ws` is a Node-only dependency of the desktop bridge. Its
+								// optional native deps (`bufferutil`, `utf-8-validate`) are
+								// `require()`d inside a try/catch so ws falls back to a pure-JS
+								// implementation when they are absent. Bundling ws lets Vite
+								// rewrite that `require()` into a top-level stub that throws
+								// `Could not resolve "bufferutil" imported by "ws"` in the dev
+								// bundle, crashing the Electron main at load. Externalizing ws
+								// keeps the require a real runtime require inside ws's own
+								// try/catch, so the localhost bridge loads without the native
+								// helpers installed.
+								"ws",
+							],
 							output: {
 								entryFileNames: "main.js",
 							},

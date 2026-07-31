@@ -112,9 +112,9 @@ export interface Step {
 	/** Click time in milliseconds (integer, source of truth). */
 	ts: number;
 	coords: { cx: number; cy: number };
-	tier: "desktop";
-	redaction: false;
-	/** The `step-NN.png` filename inside `screenshots/`. */
+	tier: "desktop" | "browser";
+	redaction: boolean;
+	/** The `step-NN.png` filename inside `screenshots/`, or "" when no screenshot exists. */
 	screenshot: string;
 }
 
@@ -225,7 +225,9 @@ export function renderStepsMarkdown(steps: Step[]): string {
 	const lines: string[] = ["# Workflow doc", ""];
 	for (const [i, step] of steps.entries()) {
 		lines.push(`${i + 1}. [${formatStepTimestamp(step.ts)}] ${step.label}`);
-		lines.push(`   ![${step.screenshot}](screenshots/${step.screenshot})`);
+		if (step.screenshot !== "") {
+			lines.push(`   ![${step.screenshot}](screenshots/${step.screenshot})`);
+		}
 	}
 	return `${lines.join("\n")}\n`;
 }
@@ -482,6 +484,94 @@ export async function regenerateDocArtifacts(
 		console.warn("[showhow] regenerateDocArtifacts failed; bundle left intact:", error);
 	}
 	return result;
+}
+
+// --- Phase 4 browser-tier step persistence (companion bridge) ----------------
+
+/**
+ * A browser-tier step ingested from the companion extension. `ts` is already
+ * recording-relative integer milliseconds (converted by the bridge from the
+ * wall-clock epoch via the recording-start handshake). `screenshot` is a
+ * base64-encoded PNG of the pre-action page state, or null when the companion
+ * did not capture one.
+ */
+export interface BrowserStepRecord {
+	tier: "browser";
+	ts: number;
+	label: string;
+	coords: { cx: number; cy: number };
+	redaction: boolean;
+	screenshot: string | null;
+}
+
+/**
+ * Persist ingested browser-tier steps into a recording bundle. Writes each
+ * companion screenshot (base64 PNG) to `screenshots/step-NN.png`, then writes
+ * deterministic `steps.json` and `steps.md` with `tier: "browser"` and
+ * recording-relative `ts`. Paired writes are rollback-safe (stage to temp,
+ * promote both only if both stage). Never throws away a valid prior pair: a
+ * write failure leaves the prior artifacts untouched and rethrows so the
+ * caller can mark the bundle's step capture unavailable without losing video.
+ */
+export async function persistBrowserSteps(
+	bundleDir: string,
+	browserSteps: BrowserStepRecord[],
+	seam?: WriteDocArtifactsSeam,
+): Promise<void> {
+	const screenshotsDir = path.join(bundleDir, "screenshots");
+	await fs.mkdir(screenshotsDir, { recursive: true });
+
+	const steps: Step[] = browserSteps.map((step, index) => {
+		const filename = `step-${String(index + 1).padStart(2, "0")}.png`;
+		return {
+			label: step.label,
+			ts: step.ts,
+			coords: { cx: step.coords.cx, cy: step.coords.cy },
+			tier: "browser",
+			redaction: step.redaction,
+			screenshot: step.screenshot !== null ? filename : "",
+		};
+	});
+
+	// Write screenshots for steps that carry one. A screenshot write failure
+	// blanks that step's screenshot reference but does not abort the whole
+	// persistence: the doc remains usable with the remaining steps/screenshots.
+	for (const [index, step] of browserSteps.entries()) {
+		if (step.screenshot === null) continue;
+		const filename = `step-${String(index + 1).padStart(2, "0")}.png`;
+		try {
+			await fs.writeFile(
+				path.join(screenshotsDir, filename),
+				Buffer.from(step.screenshot, "base64"),
+			);
+		} catch (error) {
+			console.warn(
+				`[showhow] browser screenshot ${filename} write failed; blanking reference:`,
+				error,
+			);
+			steps[index]!.screenshot = "";
+		}
+	}
+
+	const jsonContent = serializeStepsJson(steps);
+	const mdContent = renderStepsMarkdown(steps);
+
+	const jsonPath = path.join(bundleDir, "steps.json");
+	const mdPath = path.join(bundleDir, "steps.md");
+	const jsonTmp = path.join(bundleDir, "steps.json.tmp");
+	const mdTmp = path.join(bundleDir, "steps.md.tmp");
+	const write = seam?.writeFile ?? defaultWriteFile;
+
+	await serializePerBundle(bundleDir, async () => {
+		await write(jsonTmp, jsonContent);
+		try {
+			await write(mdTmp, mdContent);
+		} catch (error) {
+			await fs.rm(jsonTmp, { force: true });
+			throw error;
+		}
+		await promotePaired(jsonPath, jsonTmp, mdPath, mdTmp);
+	});
 }
 
 /**

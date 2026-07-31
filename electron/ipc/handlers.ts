@@ -51,8 +51,11 @@ import {
 	PROJECT_SAVE_FILTER_EXTENSIONS,
 } from "../projectFilePolicy";
 import { patchWebmDurationOnDisk } from "../recording/webm-duration";
+import { ShowhowBridgeServer } from "../showhow/bridgeServer";
 import {
+	type BrowserStepRecord,
 	createRecordingBundle,
+	persistBrowserSteps,
 	regenerateDocArtifacts,
 	SHOWHOW_RECORDINGS_ROOT,
 } from "../showhow/bundle";
@@ -374,6 +377,81 @@ let selectedDesktopSource: DesktopCapturerSource | null = null;
 let lastEnumeratedSources = new Map<string, DesktopCapturerSource>();
 let currentProjectPath: string | null = null;
 let currentRecordingSession: RecordingSession | null = null;
+
+// --- Showhow desktop bridge (localhost WebSocket for the companion extension) -
+// Bound strictly to 127.0.0.1 so the bridge is never reachable from the network
+// or cloud. Best-effort: a bind failure is logged and never blocks recording.
+const SHOWHOW_BRIDGE_HOST = "127.0.0.1" as const;
+const SHOWHOW_BRIDGE_PORT = Number(process.env.SHOWHOW_BRIDGE_PORT ?? 8765);
+const showhowBridge = new ShowhowBridgeServer();
+let showhowBridgeStarted = false;
+
+async function ensureShowhowBridgeStarted(): Promise<void> {
+	if (showhowBridgeStarted) return;
+	showhowBridgeStarted = true;
+	try {
+		await showhowBridge.start({ host: SHOWHOW_BRIDGE_HOST, port: SHOWHOW_BRIDGE_PORT });
+		console.info("[showhow-bridge] listening on 127.0.0.1:" + showhowBridge.port);
+	} catch (error) {
+		// Bridge is best-effort: a failure to bind must never block recording or
+		// discard video. The companion simply stays unpaired.
+		console.error("[showhow-bridge] failed to start:", error);
+	}
+}
+
+/**
+ * Drain ingested browser-tier steps from the bridge and persist them into the
+ * bundle as browser-tier step artifacts with recording-relative `ts`. Companion
+ * failure never stops or discards the video: on a mid-recording disconnect with
+ * no ingested steps, the bundle's step capture is marked unavailable so the
+ * desktop tier remains usable. Never throws.
+ */
+async function applyBrowserStepsToBundle(bundleDir: string): Promise<void> {
+	let browserSteps: BrowserStepRecord[] = [];
+	try {
+		browserSteps = await showhowBridge.drainSteps();
+	} catch (error) {
+		console.error("[showhow-bridge] drainSteps failed:", error);
+	}
+	if (browserSteps.length > 0) {
+		try {
+			await persistBrowserSteps(bundleDir, browserSteps);
+			await markBundleStepCapture(bundleDir, {
+				status: "available",
+			});
+		} catch (error) {
+			console.error("[showhow-bridge] browser step persistence failed:", error);
+			await markBundleStepCapture(bundleDir, {
+				status: "unavailable",
+				message:
+					"Browser step capture failed; semantic steps unavailable. Desktop tier remains usable.",
+			});
+		}
+		return;
+	}
+	if (showhowBridge.hadMidRecordingDisconnect()) {
+		await markBundleStepCapture(bundleDir, {
+			status: "unavailable",
+			message:
+				"Browser companion disconnected mid-recording; semantic steps unavailable. Desktop tier remains usable.",
+		});
+	}
+}
+
+/** Rewrite a bundle's meta.json stepCapture field. Never throws. */
+async function markBundleStepCapture(
+	bundleDir: string,
+	stepCapture: { status: "available" | "unavailable"; message?: string },
+): Promise<void> {
+	try {
+		const metaPath = path.join(bundleDir, "meta.json");
+		const meta = JSON.parse(await fs.readFile(metaPath, "utf-8")) as { stepCapture?: unknown };
+		meta.stepCapture = stepCapture;
+		await fs.writeFile(metaPath, JSON.stringify(meta, null, 2), "utf-8");
+	} catch (error) {
+		console.error("[showhow-bridge] markBundleStepCapture failed:", error);
+	}
+}
 
 // Cached source from the user's pick. Used by setDisplayMediaRequestHandler in main.ts for cursor-free capture.
 export function getSelectedDesktopSource(): DesktopCapturerSource | null {
@@ -1292,6 +1370,9 @@ export function registerIpcHandlers(
 	onRecordingStateChange?: (recording: boolean, sourceName: string) => void,
 	_switchToHud?: () => void,
 ) {
+	// Start the localhost companion bridge once. Best-effort; never blocks IPC.
+	void ensureShowhowBridgeStarted();
+
 	async function requestScreenAccess() {
 		if (process.platform !== "darwin") {
 			return { success: true, granted: true, status: "granted" };
@@ -1714,6 +1795,9 @@ export function registerIpcHandlers(
 					pendingCursorRecordingData = null;
 				}
 
+				// Trigger the companion bridge epoch handshake (best-effort).
+				showhowBridge.setRecordingEpoch(cursorStartTimeMs);
+
 				const proc = spawn(helperPath, [JSON.stringify(config)], {
 					cwd: RECORDINGS_DIR,
 					stdio: ["pipe", "pipe", "pipe"],
@@ -1865,6 +1949,10 @@ export function registerIpcHandlers(
 			} else {
 				pendingCursorRecordingData = null;
 			}
+
+			// Trigger the companion bridge epoch handshake so browser steps
+			// carry recording-relative timestamps. Best-effort; never blocks.
+			showhowBridge.setRecordingEpoch(cursorStartTimeMs);
 
 			const proc = spawn(helperPath, [JSON.stringify(config)], {
 				cwd: RECORDINGS_DIR,
@@ -2087,6 +2175,7 @@ export function registerIpcHandlers(
 			nativeWindowsPauseStartedAtMs = null;
 			nativeWindowsPauseRanges = [];
 			nativeWindowsIsPaused = false;
+			showhowBridge.clearRecordingEpoch();
 			const source = selectedSource || { name: "Screen" };
 			if (onRecordingStateChange) {
 				onRecordingStateChange(false, source.name);
@@ -2129,6 +2218,7 @@ export function registerIpcHandlers(
 					fs.rm(screenVideoPath, { force: true }),
 					fs.rm(`${screenVideoPath}.cursor.json`, { force: true }),
 				]);
+				showhowBridge.clearRecordingEpoch();
 				return { success: true, discarded: true };
 			}
 
@@ -2153,6 +2243,14 @@ export function registerIpcHandlers(
 			} catch (error) {
 				console.error("Showhow bundle creation failed; keeping flat recording files:", error);
 			}
+
+			// Persist ingested browser-tier steps (companion bridge). Companion
+			// failure never discards video; on disconnect the bundle is marked
+			// unavailable so the desktop tier remains usable.
+			if (bundleDir) {
+				await applyBrowserStepsToBundle(bundleDir);
+			}
+			showhowBridge.clearRecordingEpoch();
 
 			const session: RecordingSession = {
 				screenVideoPath: bundledScreenPath,
@@ -2253,6 +2351,12 @@ export function registerIpcHandlers(
 					console.error("Showhow bundle creation failed; keeping flat recording files:", error);
 				}
 
+				// Persist ingested browser-tier steps (companion bridge).
+				if (bundleDir) {
+					await applyBrowserStepsToBundle(bundleDir);
+				}
+				showhowBridge.clearRecordingEpoch();
+
 				const session: RecordingSession = {
 					screenVideoPath: bundledScreenPath,
 					webcamVideoPath: bundledWebcamPath,
@@ -2299,6 +2403,15 @@ export function registerIpcHandlers(
 
 	ipcMain.handle("showhow:list-recordings", async () => {
 		return listRecordings();
+	});
+
+	ipcMain.handle("showhow:bridge-status", async () => {
+		return {
+			host: SHOWHOW_BRIDGE_HOST,
+			port: showhowBridge.port,
+			paired: showhowBridge.isCompanionConnected(),
+			recording: showhowBridge.port !== 0 && (await showhowBridge.drainSteps()).length >= 0,
+		};
 	});
 
 	ipcMain.handle("showhow:copy-path", (_, bundleDir: unknown) => {
@@ -2416,6 +2529,13 @@ export function registerIpcHandlers(
 			console.error("Showhow bundle creation failed; keeping flat recording files:", error);
 		}
 
+		// Persist ingested browser-tier steps (companion bridge). Browser
+		// MediaRecorder fallback save path.
+		if (bundleDir) {
+			await applyBrowserStepsToBundle(bundleDir);
+		}
+		showhowBridge.clearRecordingEpoch();
+
 		const session: RecordingSession = bundledWebcamPath
 			? {
 					screenVideoPath: bundledScreenPath,
@@ -2507,8 +2627,18 @@ export function registerIpcHandlers(
 				normalizeCursorCaptureMode(cursorCaptureMode) ?? "editable-overlay";
 			if (recording && normalizedCursorCaptureMode === "editable-overlay") {
 				await startCursorRecording(recordingId);
+				// Browser MediaRecorder fallback start: trigger the companion
+				// bridge epoch handshake so browser steps are time-normalized.
+				showhowBridge.setRecordingEpoch(
+					typeof recordingId === "number" && Number.isFinite(recordingId)
+						? recordingId
+						: Date.now(),
+				);
 			} else {
 				await stopCursorRecording();
+				if (!recording) {
+					showhowBridge.clearRecordingEpoch();
+				}
 			}
 
 			const source = selectedSource || { name: "Screen" };

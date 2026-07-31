@@ -344,3 +344,17 @@ fetch rather than synthesizing a cosmetic renderer seek state.
 **TDD evidence:** The new same-package protocol test failed RED with
 `TypeError: fetchShowhowMedia is not a function`; after the narrow forwarding helper and handler
 wiring, it passed GREEN and asserts that `range: bytes=1024-` reaches the local fetch.
+
+## Issue 24 deviations
+
+- The first Electron dev launch exposed Vite bundling `ws` optional dependency
+  stubs as a runtime throw. The narrow fix externalizes `ws` from the Electron
+  main bundle in `vite.config.ts`; `scripts/check-bridge-bundle.mjs` guards the
+  generated bundle against the original throw.
+- The real recorder UI reached the existing native-helper/accessibility alert
+  before a recording-start epoch could be exercised manually. The bridge pair,
+  disconnect, and Electron startup paths were driven; epoch conversion is
+  covered by the focused integration tests and is marked untested in the
+  verification record for the physical recording path.
+- The installed Herdr CLI lacks the documented `herdr wait` command. The
+  supplied executor pane was preserved and monitored via `herdr pane get`.
