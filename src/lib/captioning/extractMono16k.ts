@@ -91,6 +91,41 @@ async function resampleMono(
 	return rendered.getChannelData(0).slice();
 }
 
+/** Target RMS for caption audio (about -23 dBFS). */
+const CAPTION_TARGET_RMS = 0.07;
+/** Do not amplify quiet noise by more than this ratio. */
+const CAPTION_MAX_GAIN = 12;
+/** Digital silence has no speech signal to recover. */
+const CAPTION_SILENCE_RMS = 1e-4;
+/** Preserve headroom after normalizing. */
+const CAPTION_PEAK_CEILING = 0.95;
+
+/**
+ * Raises quiet decoded speech to a level Whisper can transcribe reliably.
+ * The RMS-derived gain is bounded by the peak ceiling so output cannot clip.
+ */
+export function normalizeForCaptions(samples: Float32Array): Float32Array {
+	if (samples.length === 0) return samples;
+
+	let sumSquares = 0;
+	let peak = 0;
+	for (const sample of samples) {
+		sumSquares += sample * sample;
+		peak = Math.max(peak, Math.abs(sample));
+	}
+	const rms = Math.sqrt(sumSquares / samples.length);
+	if (rms < CAPTION_SILENCE_RMS || rms >= CAPTION_TARGET_RMS || peak <= 0) return samples;
+
+	const gain = Math.min(CAPTION_TARGET_RMS / rms, CAPTION_MAX_GAIN, CAPTION_PEAK_CEILING / peak);
+	if (gain <= 1) return samples;
+
+	const normalized = new Float32Array(samples.length);
+	for (let index = 0; index < samples.length; index++) {
+		normalized[index] = samples[index]! * gain;
+	}
+	return normalized;
+}
+
 async function truncateAndResampleTo16k(
 	mono: Float32Array,
 	fromRate: number,
@@ -105,7 +140,7 @@ async function truncateAndResampleTo16k(
 		truncated = true;
 	}
 
-	const samples = await resampleMono(work, fromRate, 16_000, signal);
+	const samples = normalizeForCaptions(await resampleMono(work, fromRate, 16_000, signal));
 	return { samples, truncated, durationSec: samples.length / 16_000 };
 }
 

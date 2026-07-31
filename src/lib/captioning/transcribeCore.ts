@@ -60,28 +60,36 @@ function segmentsFromTranscriberChunks(
 	trims: TrimRegion[],
 	audioDurationSec: number,
 ): CaptionSegment[] {
-	const sorted = [...chunks].sort((x, y) => {
-		const ax = x.timestamp?.[0];
-		const ay = y.timestamp?.[0];
-		const na = typeof ax === "number" ? ax : -1;
-		const nb = typeof ay === "number" ? ay : -1;
-		return na - nb;
-	});
+	const sorted = chunks
+		.map((chunk, sourceIndex) => {
+			const startSec = chunk.timestamp?.[0];
+			return {
+				chunk,
+				sourceIndex,
+				startMs: typeof startSec === "number" ? Math.round(startSec * 1000) : -1,
+			};
+		})
+		.sort((left, right) => left.startMs - right.startMs || left.sourceIndex - right.sourceIndex);
 
-	const segments: CaptionSegment[] = [];
+	const segments: Array<CaptionSegment & { sourceIndex: number; startMs: number }> = [];
 
 	for (let idx = 0; idx < sorted.length; idx++) {
-		const c = sorted[idx]!;
+		const { chunk: c, sourceIndex } = sorted[idx]!;
 		const ts = c.timestamp as [number | null, number | null] | undefined;
 		if (!ts) continue;
 		let a = ts[0];
 		let b = ts[1];
 		if (a == null) a = 0;
-		a = Math.max(0, a);
+		if (a < 0 || a > audioDurationSec) {
+			console.error(
+				`[captioning] Whisper timestamp ${a} outside decoded audio duration 0-${audioDurationSec}; clamping`,
+			);
+		}
+		a = Math.min(audioDurationSec, Math.max(0, a));
 		if (b == null) {
 			let nextStart: number | null = null;
 			for (let j = idx + 1; j < sorted.length; j++) {
-				const na = sorted[j]?.timestamp?.[0];
+				const na = sorted[j]?.chunk.timestamp?.[0];
 				if (typeof na === "number") {
 					nextStart = na;
 					break;
@@ -89,6 +97,12 @@ function segmentsFromTranscriberChunks(
 			}
 			b = nextStart ?? audioDurationSec;
 		}
+		if (b < 0 || b > audioDurationSec) {
+			console.error(
+				`[captioning] Whisper timestamp ${b} outside decoded audio duration 0-${audioDurationSec}; clamping`,
+			);
+		}
+		b = Math.min(audioDurationSec, Math.max(0, b));
 		if (b <= a) {
 			b = Math.min(a + 0.25, audioDurationSec);
 		}
@@ -106,11 +120,13 @@ function segmentsFromTranscriberChunks(
 		const endMs = Math.round(endSec * 1000);
 		if (segmentOverlapsTrim(startMs, endMs, trims)) continue;
 
-		segments.push({ startSec, endSec, text });
+		segments.push({ startSec, endSec, text, sourceIndex, startMs: Math.round(startSec * 1000) });
 	}
 
-	segments.sort((u, v) => u.startSec - v.startSec || u.endSec - v.endSec);
-	const rawDeduped: CaptionSegment[] = [];
+	segments.sort(
+		(left, right) => left.startMs - right.startMs || left.sourceIndex - right.sourceIndex,
+	);
+	const rawDeduped: Array<CaptionSegment & { sourceIndex: number; startMs: number }> = [];
 	for (const seg of segments) {
 		const prev = rawDeduped[rawDeduped.length - 1];
 		if (prev && prev.text === seg.text && seg.startSec <= prev.endSec) {
@@ -120,7 +136,7 @@ function segmentsFromTranscriberChunks(
 		}
 		rawDeduped.push(seg);
 	}
-	return rawDeduped;
+	return rawDeduped.map(({ sourceIndex: _sourceIndex, startMs: _startMs, ...segment }) => segment);
 }
 
 /** Runs the transcriber on one audio slice, chunking only long clips. */
