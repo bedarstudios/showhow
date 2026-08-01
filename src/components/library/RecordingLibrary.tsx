@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { RecordingLibraryEntry } from "@/lib/showhow/recordingLibrary";
+import type { WorkflowDocumentUpdate } from "@/lib/showhow/workflowDocument";
 
 // ---- helpers -----------------------------------------------------------------
 
@@ -234,9 +235,20 @@ function ErrorLibraryState() {
 
 // ---- main panel (active recording detail) -----------------------------------
 
-function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
+function RecordingDetail({
+	entry,
+	onEntryChange,
+}: {
+	entry: RecordingLibraryEntry;
+	onEntryChange: (entry: RecordingLibraryEntry) => void;
+}) {
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [pendingSeekMs, setPendingSeekMs] = useState<number | null>(null);
+	const [editingTitle, setEditingTitle] = useState(false);
+	const [titleDraft, setTitleDraft] = useState(entry.title);
+	const [editingStepIndex, setEditingStepIndex] = useState<number | null>(null);
+	const [instructionDraft, setInstructionDraft] = useState("");
+	const [revealedSteps, setRevealedSteps] = useState<Set<number>>(() => new Set());
 	const isDesktop = entry.source === "desktop";
 	const sourceLabel = isDesktop ? "Desktop" : "Browser";
 	const sourceTagStyle: React.CSSProperties = {
@@ -251,6 +263,32 @@ function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
 		entry.videoUrl ?? (entry.video ? fallbackBundleUrl(entry.bundleDir, entry.video) : undefined);
 	const copyPath = () => {
 		void window.electronAPI.showhowCopyPath(entry.bundleDir);
+	};
+	const persist = async (update: WorkflowDocumentUpdate, nextEntry: RecordingLibraryEntry) => {
+		const result = await window.electronAPI.showhowUpdateWorkflowDocument(entry.bundleDir, update);
+		if (result.success) onEntryChange(nextEntry);
+		return result.success;
+	};
+	const saveTitle = async () => {
+		const title = titleDraft.trim();
+		if (title === "") return;
+		if (await persist({ type: "title", title }, { ...entry, title })) setEditingTitle(false);
+	};
+	const saveStep = async (index: number) => {
+		const label = instructionDraft.trim();
+		if (label === "" || !entry.steps) return;
+		const steps = entry.steps.map((step, stepIndex) =>
+			stepIndex === index ? { ...step, label } : step,
+		);
+		if (await persist({ type: "step", index, label }, { ...entry, steps }))
+			setEditingStepIndex(null);
+	};
+	const deleteStep = async (index: number) => {
+		const steps = entry.steps?.filter((_, stepIndex) => stepIndex !== index);
+		if (!steps) return;
+		if (await persist({ type: "delete-step", index }, { ...entry, steps })) {
+			setRevealedSteps(new Set());
+		}
 	};
 	const seekToStep = (timestampMs: number) => {
 		if (videoRef.current) {
@@ -280,9 +318,33 @@ function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
 					marginBottom: "8px",
 				}}
 			>
-				<h1 style={{ fontSize: "30px", margin: 0, color: "var(--sh-color-text)", flex: 1 }}>
-					{entry.title}
-				</h1>
+				{editingTitle ? (
+					<input
+						aria-label="Recording title"
+						value={titleDraft}
+						onChange={(event) => setTitleDraft(event.target.value)}
+						onKeyDown={(event) => {
+							if (event.key === "Enter") void saveTitle();
+							if (event.key === "Escape") setEditingTitle(false);
+						}}
+						autoFocus
+						style={{ fontSize: "30px", flex: 1 }}
+					/>
+				) : (
+					<h1 style={{ fontSize: "30px", margin: 0, color: "var(--sh-color-text)", flex: 1 }}>
+						{entry.title}
+					</h1>
+				)}
+				<button
+					type="button"
+					aria-label="Edit title"
+					onClick={() => {
+						setTitleDraft(entry.title);
+						setEditingTitle(true);
+					}}
+				>
+					Edit
+				</button>
 			</div>
 
 			<div
@@ -402,8 +464,10 @@ function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
 					>
 						{entry.steps.map((step, index) => {
 							const screenshotSrc =
-								step.screenshotUrl ??
-								fallbackBundleUrl(entry.bundleDir, `screenshots/${step.screenshot}`);
+								step.screenshot === ""
+									? undefined
+									: (step.screenshotUrl ??
+										fallbackBundleUrl(entry.bundleDir, `screenshots/${step.screenshot}`));
 							return (
 								<li
 									key={`${step.ts}-${step.screenshot}`}
@@ -432,16 +496,18 @@ function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
 										{index + 1}
 									</span>
 									<div style={{ minWidth: 0 }}>
-										<img
-											src={screenshotSrc}
-											alt={`Step ${index + 1}: ${step.label}`}
-											style={{
-												width: "100%",
-												display: "block",
-												borderRadius: "var(--sh-radius-md)",
-												marginBottom: "12px",
-											}}
-										/>
+										{screenshotSrc && (
+											<img
+												src={screenshotSrc}
+												alt={`Step ${index + 1}: ${step.label}`}
+												style={{
+													width: "100%",
+													display: "block",
+													borderRadius: "var(--sh-radius-md)",
+													marginBottom: "12px",
+												}}
+											/>
+										)}
 										<div
 											style={{
 												display: "flex",
@@ -450,7 +516,79 @@ function RecordingDetail({ entry }: { entry: RecordingLibraryEntry }) {
 												gap: "12px",
 											}}
 										>
-											<p style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>{step.label}</p>
+											<div style={{ minWidth: 0, flex: 1 }}>
+												{editingStepIndex === index ? (
+													<input
+														aria-label={`Step ${index + 1} instruction`}
+														value={instructionDraft}
+														onChange={(event) => setInstructionDraft(event.target.value)}
+														onKeyDown={(event) => {
+															if (event.key === "Enter") void saveStep(index);
+															if (event.key === "Escape") setEditingStepIndex(null);
+														}}
+														autoFocus
+													/>
+												) : (
+													<p style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>
+														{step.redaction && !revealedSteps.has(index)
+															? "Sensitive text hidden"
+															: step.label}
+													</p>
+												)}
+												<div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+													<button
+														type="button"
+														aria-label={`Edit step ${index + 1}`}
+														onClick={() => {
+															setInstructionDraft(step.label);
+															setEditingStepIndex(index);
+														}}
+													>
+														Edit
+													</button>
+													<button
+														type="button"
+														aria-label={`Delete step ${index + 1}`}
+														onClick={() => void deleteStep(index)}
+													>
+														Delete
+													</button>
+													{step.redaction && (
+														<button
+															type="button"
+															aria-label={`Reveal step ${index + 1} text`}
+															onClick={() =>
+																setRevealedSteps((current) => new Set(current).add(index))
+															}
+														>
+															Reveal
+														</button>
+													)}
+												</div>
+												{step.redaction && revealedSteps.has(index) && (
+													<label>
+														<input
+															type="checkbox"
+															checked={step.includeRevealedText === true}
+															onChange={(event) => {
+																const includeRevealedText = event.target.checked;
+																const steps = entry.steps?.map((current, stepIndex) =>
+																	stepIndex === index
+																		? { ...current, includeRevealedText }
+																		: current,
+																);
+																if (steps) {
+																	void persist(
+																		{ type: "step", index, includeRevealedText },
+																		{ ...entry, steps },
+																	);
+																}
+															}}
+														/>
+														Include revealed text in steps.md
+													</label>
+												)}
+											</div>
 											<button
 												type="button"
 												onClick={() => seekToStep(step.ts)}
@@ -515,6 +653,11 @@ export function RecordingLibrary() {
 
 	const hasRecordings = entries.length > 0;
 	const activeEntry = hasRecordings ? entries[activeIndex] : null;
+	const replaceEntry = (nextEntry: RecordingLibraryEntry) => {
+		setEntries((current) =>
+			current.map((entry) => (entry.bundleDir === nextEntry.bundleDir ? nextEntry : entry)),
+		);
+	};
 
 	return (
 		<div
@@ -671,7 +814,11 @@ export function RecordingLibrary() {
 					{!loading && loadError && <ErrorLibraryState />}
 					{!loading && !loadError && !hasRecordings && <EmptyLibraryState />}
 					{!loading && !loadError && activeEntry && (
-						<RecordingDetail key={activeEntry.bundleDir} entry={activeEntry} />
+						<RecordingDetail
+							key={activeEntry.bundleDir}
+							entry={activeEntry}
+							onEntryChange={replaceEntry}
+						/>
 					)}
 				</div>
 			</div>

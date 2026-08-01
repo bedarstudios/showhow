@@ -22,6 +22,8 @@ interface RawStep {
 	label?: unknown;
 	ts?: unknown;
 	screenshot?: unknown;
+	redaction?: unknown;
+	includeRevealedText?: unknown;
 }
 
 function isValidSource(value: unknown): value is "desktop" | "browser" {
@@ -75,13 +77,18 @@ async function readSteps(
 			) {
 				return [];
 			}
-			const screenshotPath = path.join(bundleDir, "screenshots", raw.screenshot);
+			const screenshotPath =
+				raw.screenshot === "" ? undefined : path.join(bundleDir, "screenshots", raw.screenshot);
 			return [
 				{
 					label: raw.label,
 					ts: raw.ts,
 					screenshot: raw.screenshot,
-					...((await fileExists(screenshotPath))
+					...(typeof raw.redaction === "boolean" ? { redaction: raw.redaction } : {}),
+					...(typeof raw.includeRevealedText === "boolean"
+						? { includeRevealedText: raw.includeRevealedText }
+						: {}),
+					...(screenshotPath !== undefined && (await fileExists(screenshotPath))
 						? { screenshotUrl: createShowhowMediaUrl(bundleDir, `screenshots/${raw.screenshot}`) }
 						: {}),
 				},
@@ -96,8 +103,7 @@ function isFiniteStep(value: RawStep): value is { label: string; ts: number; scr
 		value.label.length > 0 &&
 		typeof value.ts === "number" &&
 		Number.isFinite(value.ts) &&
-		typeof value.screenshot === "string" &&
-		value.screenshot.length > 0
+		typeof value.screenshot === "string"
 	);
 }
 

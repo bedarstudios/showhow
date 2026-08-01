@@ -92,6 +92,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.invoke("showhow:copy-path", bundleDir) as Promise<{ success: boolean }>,
 	showhowWriteTranscript: (bundleDir: string, content: string) =>
 		ipcRenderer.invoke("showhow:write-transcript", bundleDir, content),
+	showhowUpdateWorkflowDocument: (
+		bundleDir: string,
+		update: import("../src/lib/showhow/workflowDocument").WorkflowDocumentUpdate,
+	) =>
+		ipcRenderer.invoke("showhow:update-workflow-document", bundleDir, update) as Promise<{
+			success: boolean;
+		}>,
 	showhowBridgeStatus: () =>
 		ipcRenderer.invoke("showhow:bridge-status") as Promise<{
 			host: string;

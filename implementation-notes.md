@@ -432,3 +432,16 @@ write reran the desktop telemetry doc generator and replaced `steps.json` with d
 **What was done instead:** Regeneration detects existing browser-tier source steps and leaves that artifact
 pair intact. A RED bundle seam proves the late transcript write preserves the semantic label, redaction flag,
 and screenshot reference.
+
+### 2026-08-01: Issue 26 reveal state cannot recover capture-time typed values
+
+**What changed:** The workflow-document view provides per-step reveal state for redacted steps, but it does
+not expose an original typed value.
+
+**Why:** The companion contract deliberately never reads or persists typed values; a redacted step retains
+only its safe instruction label and `redaction` flag. Recovering a value at edit time would violate the
+privacy contract.
+
+**What was done instead:** Reveal displays the stored instruction label only in the local UI. An explicit,
+persisted `includeRevealedText` opt-in is still required before that label is rendered into `steps.md`; without
+it Markdown uses `[redacted]`. Users may edit the instruction themselves before opting in.

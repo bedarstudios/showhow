@@ -203,4 +203,43 @@ describe("listRecordings", () => {
 			},
 		]);
 	});
+
+	it("returns a screenshotless redacted step with its reveal opt-in state", async () => {
+		const root = await makeTempRoot();
+		const dir = path.join(root, "recording-with-redacted-step");
+		await mkdir(dir);
+		await writeFile(
+			path.join(dir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Sensitive recording",
+				source: "browser",
+				createdAt: 1_753_000_000_000,
+			}),
+		);
+		await writeFile(
+			path.join(dir, "steps.json"),
+			JSON.stringify([
+				{
+					label: "Type account number",
+					ts: 1_000,
+					screenshot: "",
+					redaction: true,
+					includeRevealedText: false,
+				},
+			]),
+		);
+
+		const entries = await listRecordings(root);
+
+		expect(entries[0]?.steps).toEqual([
+			{
+				label: "Type account number",
+				ts: 1_000,
+				screenshot: "",
+				redaction: true,
+				includeRevealedText: false,
+			},
+		]);
+	});
 });

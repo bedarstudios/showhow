@@ -19,6 +19,7 @@ import {
 	type Step,
 	serializeStepsJson,
 	type TranscriptSegment,
+	updateWorkflowDocument,
 	type WriteDocArtifactsSeam,
 } from "./bundle";
 
@@ -400,6 +401,33 @@ describe("buildSteps", () => {
 });
 
 describe("renderStepsMarkdown", () => {
+	it("keeps redacted text out of Markdown unless its step explicitly opts in", () => {
+		const steps: Step[] = [
+			{
+				label: "Type the one-time code",
+				ts: 1_250,
+				coords: { cx: 0.25, cy: 0.5 },
+				tier: "browser",
+				redaction: true,
+				screenshot: "step-01.png",
+			},
+			{
+				label: "Type the one-time code",
+				ts: 2_500,
+				coords: { cx: 0.25, cy: 0.5 },
+				tier: "browser",
+				redaction: true,
+				includeRevealedText: true,
+				screenshot: "step-02.png",
+			},
+		];
+
+		const markdown = renderStepsMarkdown(steps);
+
+		expect(markdown).toContain("1. [0:01] [redacted]");
+		expect(markdown).toContain("2. [0:02] Type the one-time code");
+	});
+
 	it("renders 'N. [m:ss] label' with a screenshot reference for each step", () => {
 		const steps: Step[] = [
 			{
@@ -419,6 +447,65 @@ describe("renderStepsMarkdown", () => {
 	it("renders a transcript-only note when there are no steps", () => {
 		const md = renderStepsMarkdown([]);
 		expect(md).toContain("transcript-only");
+	});
+});
+
+describe("updateWorkflowDocument", () => {
+	it("persists title and step edits, deletion, and the safe revealed-text default", async () => {
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-doc-edit-"));
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Original recording",
+				source: "browser",
+				createdAt: 1,
+				video: "video.webm",
+				transcript: "transcript.txt",
+				steps: null,
+			}),
+		);
+		await writeFile(
+			path.join(bundleDir, "steps.json"),
+			serializeStepsJson([
+				{
+					label: "Type account number",
+					ts: 1_000,
+					coords: { cx: 0, cy: 0 },
+					tier: "browser",
+					redaction: true,
+					screenshot: "step-01.png",
+				},
+				{
+					label: "Submit form",
+					ts: 2_000,
+					coords: { cx: 0, cy: 0 },
+					tier: "browser",
+					redaction: false,
+					screenshot: "step-02.png",
+				},
+			]),
+		);
+
+		await updateWorkflowDocument(bundleDir, { type: "title", title: "Add an account" });
+		await updateWorkflowDocument(bundleDir, {
+			type: "step",
+			index: 0,
+			label: "Type account number 1234",
+		});
+		await updateWorkflowDocument(bundleDir, { type: "delete-step", index: 1 });
+
+		expect(JSON.parse(await readFile(path.join(bundleDir, "meta.json"), "utf-8")).title).toBe(
+			"Add an account",
+		);
+		expect(JSON.parse(await readFile(path.join(bundleDir, "steps.json"), "utf-8"))).toEqual([
+			expect.objectContaining({
+				label: "Type account number 1234",
+				redaction: true,
+				includeRevealedText: false,
+			}),
+		]);
+		expect(await readFile(path.join(bundleDir, "steps.md"), "utf-8")).toContain("[redacted]");
 	});
 });
 

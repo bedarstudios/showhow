@@ -3,6 +3,7 @@ import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import type { WorkflowDocumentUpdate } from "../../src/lib/showhow/workflowDocument";
 
 const execFile = promisify(execFileCallback);
 
@@ -114,6 +115,8 @@ export interface Step {
 	coords: { cx: number; cy: number };
 	tier: "desktop" | "browser";
 	redaction: boolean;
+	/** User opt-in: only then may a redacted step's label appear in steps.md. */
+	includeRevealedText?: boolean;
 	/** The `step-NN.png` filename inside `screenshots/`, or "" when no screenshot exists. */
 	screenshot: string;
 }
@@ -224,12 +227,114 @@ export function renderStepsMarkdown(steps: Step[]): string {
 	if (steps.length === 0) return TRANSCRIPT_ONLY_NOTE;
 	const lines: string[] = ["# Workflow doc", ""];
 	for (const [i, step] of steps.entries()) {
-		lines.push(`${i + 1}. [${formatStepTimestamp(step.ts)}] ${step.label}`);
+		const label = step.redaction && step.includeRevealedText !== true ? "[redacted]" : step.label;
+		lines.push(`${i + 1}. [${formatStepTimestamp(step.ts)}] ${label}`);
 		if (step.screenshot !== "") {
 			lines.push(`   ![${step.screenshot}](screenshots/${step.screenshot})`);
 		}
 	}
 	return `${lines.join("\n")}\n`;
+}
+
+export type { WorkflowDocumentUpdate } from "../../src/lib/showhow/workflowDocument";
+
+/**
+ * Apply a single user edit to the bundle source of truth and regenerate its
+ * Markdown. Redacted labels remain excluded unless that individual step has
+ * explicitly opted in. All document artifacts are staged before promotion.
+ */
+export async function updateWorkflowDocument(
+	bundleDir: string,
+	update: WorkflowDocumentUpdate,
+): Promise<void> {
+	await serializePerBundle(bundleDir, async () => {
+		const metaPath = path.join(bundleDir, "meta.json");
+		const stepsPath = path.join(bundleDir, "steps.json");
+		const markdownPath = path.join(bundleDir, "steps.md");
+		const [rawMeta, rawSteps] = await Promise.all([
+			fs.readFile(metaPath, "utf-8"),
+			fs.readFile(stepsPath, "utf-8"),
+		]);
+		const meta = parseEditableMeta(rawMeta);
+		const steps = parseEditableSteps(rawSteps);
+
+		if (update.type === "title") {
+			if (update.title.trim() === "") throw new Error("workflow document title cannot be empty");
+			meta.title = update.title.trim();
+		} else {
+			if (!Number.isInteger(update.index) || update.index < 0 || update.index >= steps.length) {
+				throw new Error("workflow document step index is out of range");
+			}
+			if (update.type === "delete-step") {
+				steps.splice(update.index, 1);
+			} else {
+				const step = steps[update.index]!;
+				if (update.label !== undefined) {
+					if (update.label.trim() === "")
+						throw new Error("workflow document instruction cannot be empty");
+					step.label = update.label.trim();
+				}
+				if (update.includeRevealedText !== undefined) {
+					step.includeRevealedText = update.includeRevealedText;
+				} else if (step.redaction && step.includeRevealedText === undefined) {
+					step.includeRevealedText = false;
+				}
+			}
+		}
+
+		const metaTmp = path.join(bundleDir, "meta.json.tmp");
+		const stepsTmp = path.join(bundleDir, "steps.json.tmp");
+		const markdownTmp = path.join(bundleDir, "steps.md.tmp");
+		try {
+			await Promise.all([
+				fs.writeFile(metaTmp, `${JSON.stringify(meta, null, 2)}\n`, "utf-8"),
+				fs.writeFile(stepsTmp, serializeStepsJson(steps), "utf-8"),
+				fs.writeFile(markdownTmp, renderStepsMarkdown(steps), "utf-8"),
+			]);
+		} catch (error) {
+			await Promise.all([
+				fs.rm(metaTmp, { force: true }),
+				fs.rm(stepsTmp, { force: true }),
+				fs.rm(markdownTmp, { force: true }),
+			]);
+			throw error;
+		}
+		await promoteWorkflowEdit(metaPath, metaTmp, stepsPath, stepsTmp, markdownPath, markdownTmp);
+	});
+}
+
+function parseEditableMeta(raw: string): Record<string, unknown> & { title: string } {
+	const parsed: unknown = JSON.parse(raw);
+	if (
+		typeof parsed !== "object" ||
+		parsed === null ||
+		!("title" in parsed) ||
+		typeof parsed.title !== "string"
+	) {
+		throw new Error("workflow document meta.json is invalid");
+	}
+	return parsed as Record<string, unknown> & { title: string };
+}
+
+function parseEditableSteps(raw: string): Step[] {
+	const parsed: unknown = JSON.parse(raw);
+	if (!Array.isArray(parsed) || !parsed.every(isEditableStep)) {
+		throw new Error("workflow document steps.json is invalid");
+	}
+	return parsed;
+}
+
+function isEditableStep(value: unknown): value is Step {
+	return (
+		typeof value === "object" &&
+		value !== null &&
+		typeof (value as Step).label === "string" &&
+		typeof (value as Step).ts === "number" &&
+		typeof (value as Step).redaction === "boolean" &&
+		typeof (value as Step).screenshot === "string" &&
+		((value as Step).includeRevealedText === undefined ||
+			typeof (value as Step).includeRevealedText === "boolean")
+	);
 }
 
 /**
@@ -851,4 +956,48 @@ async function promotePaired(
 		}
 		throw error;
 	}
+}
+
+async function promoteWorkflowEdit(
+	finalMeta: string,
+	tmpMeta: string,
+	finalJson: string,
+	tmpJson: string,
+	finalMarkdown: string,
+	tmpMarkdown: string,
+): Promise<void> {
+	const [priorMeta, priorJson] = await Promise.all([
+		readOptionalFile(finalMeta),
+		readOptionalFile(finalJson),
+	]);
+	try {
+		await fs.rename(tmpMeta, finalMeta);
+		await fs.rename(tmpJson, finalJson);
+		await fs.rename(tmpMarkdown, finalMarkdown);
+	} catch (error) {
+		await Promise.all([
+			restoreOptionalFile(finalMeta, priorMeta),
+			restoreOptionalFile(finalJson, priorJson),
+			fs.rm(tmpMeta, { force: true }),
+			fs.rm(tmpJson, { force: true }),
+			fs.rm(tmpMarkdown, { force: true }),
+		]);
+		throw error;
+	}
+}
+
+async function readOptionalFile(filePath: string): Promise<Buffer | undefined> {
+	try {
+		return await fs.readFile(filePath);
+	} catch {
+		return undefined;
+	}
+}
+
+async function restoreOptionalFile(filePath: string, content: Buffer | undefined): Promise<void> {
+	if (content === undefined) {
+		await fs.rm(filePath, { force: true });
+		return;
+	}
+	await fs.writeFile(filePath, content);
 }

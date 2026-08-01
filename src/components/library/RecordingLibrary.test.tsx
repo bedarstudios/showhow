@@ -10,16 +10,20 @@ const mockShowhowListRecordings = vi.fn<() => Promise<RecordingLibraryEntry[]>>(
 const mockSwitchToHud = vi.fn<() => Promise<void>>();
 const mockClipboardWriteText = vi.fn<(text: string) => Promise<void>>();
 const mockShowhowCopyPath = vi.fn<(bundleDir: string) => Promise<{ success: boolean }>>();
+const mockShowhowUpdateWorkflowDocument =
+	vi.fn<(bundleDir: string, update: unknown) => Promise<{ success: boolean }>>();
 
 beforeEach(() => {
 	vi.resetAllMocks();
 	mockSwitchToHud.mockResolvedValue();
 	mockClipboardWriteText.mockResolvedValue(undefined);
 	mockShowhowCopyPath.mockResolvedValue({ success: true });
+	mockShowhowUpdateWorkflowDocument.mockResolvedValue({ success: true });
 	Object.defineProperty(window, "electronAPI", {
 		value: {
 			showhowListRecordings: mockShowhowListRecordings,
 			showhowCopyPath: mockShowhowCopyPath,
+			showhowUpdateWorkflowDocument: mockShowhowUpdateWorkflowDocument,
 			switchToHud: mockSwitchToHud,
 		},
 		writable: true,
@@ -67,6 +71,8 @@ interface WorkflowStep {
 	ts: number;
 	/** `step-NN.png` filename inside the bundle's `screenshots/` directory. */
 	screenshot: string;
+	redaction?: boolean;
+	includeRevealedText?: boolean;
 }
 
 interface WorkflowDocumentEntry extends RecordingLibraryEntry {
@@ -208,6 +214,97 @@ describe("RecordingLibrary", () => {
 		await userEvent.click(screen.getByRole("button", { name: "Back to recorder" }));
 
 		expect(mockSwitchToHud).toHaveBeenCalledTimes(1);
+	});
+});
+
+describe("RecordingLibrary — workflow document editing (issue #26)", () => {
+	it("edits the title and instruction inline, then persists both changes", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		const titleInput = screen.getByRole("textbox", { name: "Recording title" });
+		await userEvent.clear(titleInput);
+		await userEvent.type(titleInput, "Create a product");
+		await userEvent.keyboard("{Enter}");
+
+		await userEvent.click(screen.getByRole("button", { name: "Edit step 1" }));
+		const instructionInput = screen.getByRole("textbox", { name: "Step 1 instruction" });
+		await userEvent.clear(instructionInput);
+		await userEvent.type(instructionInput, "Open Products");
+		await userEvent.keyboard("{Enter}");
+
+		expect(mockShowhowUpdateWorkflowDocument).toHaveBeenCalledWith(desktopDocEntry.bundleDir, {
+			type: "title",
+			title: "Create a product",
+		});
+		expect(mockShowhowUpdateWorkflowDocument).toHaveBeenCalledWith(desktopDocEntry.bundleDir, {
+			type: "step",
+			index: 0,
+			label: "Open Products",
+		});
+	});
+
+	it("reveals a redacted step only in the UI and requires opt-in before persisting it to Markdown", async () => {
+		mockShowhowListRecordings.mockResolvedValue([
+			{
+				...desktopDocEntry,
+				steps: [{ ...desktopDocEntry.steps[0], screenshot: "", redaction: true }],
+			},
+		]);
+		render(<RecordingLibrary />);
+
+		await screen.findByText("Sensitive text hidden");
+		expect(screen.queryByRole("img", { name: "Step 1: Open the products page" })).toBeNull();
+		await userEvent.click(screen.getByRole("button", { name: "Reveal step 1 text" }));
+		expect(screen.getByText("Open the products page")).toBeInTheDocument();
+		await userEvent.click(
+			screen.getByRole("checkbox", { name: "Include revealed text in steps.md" }),
+		);
+
+		expect(mockShowhowUpdateWorkflowDocument).toHaveBeenCalledWith(desktopDocEntry.bundleDir, {
+			type: "step",
+			index: 0,
+			includeRevealedText: true,
+		});
+	});
+
+	it("deletes a step and persists the deletion", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		render(<RecordingLibrary />);
+
+		await screen.findByText("Click Add product");
+		await userEvent.click(screen.getByRole("button", { name: "Delete step 2" }));
+
+		expect(mockShowhowUpdateWorkflowDocument).toHaveBeenCalledWith(desktopDocEntry.bundleDir, {
+			type: "delete-step",
+			index: 1,
+		});
+		expect(screen.queryByText("Click Add product")).not.toBeInTheDocument();
+	});
+
+	it("does not reveal a different redacted step after deleting an earlier step", async () => {
+		mockShowhowListRecordings.mockResolvedValue([
+			{
+				...desktopDocEntry,
+				steps: [
+					{ ...desktopDocEntry.steps[0], label: "First secret", screenshot: "", redaction: true },
+					{ ...desktopDocEntry.steps[1], label: "Second secret", screenshot: "", redaction: true },
+					{ ...desktopDocEntry.steps[2], label: "Third secret", screenshot: "", redaction: true },
+				],
+			},
+		]);
+		render(<RecordingLibrary />);
+
+		await screen.findAllByText("Sensitive text hidden");
+		await userEvent.click(screen.getByRole("button", { name: "Reveal step 2 text" }));
+		expect(screen.getByText("Second secret")).toBeInTheDocument();
+		await userEvent.click(screen.getByRole("button", { name: "Delete step 1" }));
+
+		await waitFor(() => expect(screen.queryByText("First secret")).not.toBeInTheDocument());
+		expect(screen.queryByText("Third secret")).not.toBeInTheDocument();
+		expect(screen.getAllByText("Sensitive text hidden")).toHaveLength(2);
 	});
 });
 

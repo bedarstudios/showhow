@@ -95,6 +95,10 @@ interface Window {
 		>;
 		showhowCopyPath: (bundleDir: string) => Promise<{ success: boolean }>;
 		showhowWriteTranscript: (bundleDir: string, content: string) => Promise<{ success: boolean }>;
+		showhowUpdateWorkflowDocument: (
+			bundleDir: string,
+			update: import("../src/lib/showhow/workflowDocument").WorkflowDocumentUpdate,
+		) => Promise<{ success: boolean }>;
 		showhowBridgeStatus: () => Promise<{
 			host: string;
 			port: number;
