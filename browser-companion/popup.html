@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Showhow Companion</title>
+		<style>
+			body { font: 14px system-ui, sans-serif; margin: 16px; min-width: 260px; color: #142f18; }
+			label, input { display: block; width: 100%; box-sizing: border-box; }
+			label { margin: 10px 0 4px; font-weight: 600; }
+			input { padding: 7px; }
+			#status { font-weight: 700; color: #6b5b00; }
+			#status.paired { color: #21733a; }
+			button { margin-top: 12px; padding: 7px 10px; }
+		</style>
+	</head>
+	<body>
+		<div id="status" aria-live="polite">Browser: Unpaired</div>
+		<p>The desktop app owns recording start and stop.</p>
+		<label for="endpoint">Desktop bridge URL</label>
+		<input id="endpoint" placeholder="ws://127.0.0.1:8765" />
+		<label for="token">Pairing token</label>
+		<input id="token" type="password" autocomplete="off" />
+		<button id="save" type="button">Save pairing</button>
+		<script src="popup.js"></script>
+	</body>
+</html>

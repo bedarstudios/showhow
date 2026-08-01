@@ -231,6 +231,13 @@ function resetLaunchMocks() {
 	i18nState.value.dismissSystemLocaleSuggestion.mockClear();
 	i18nState.value.resolveSystemLocaleSuggestion.mockClear();
 	stubElectronAPI(vi.fn(async () => null));
+	window.electronAPI.showhowBridgeStatus = vi.fn(async () => ({
+		host: "127.0.0.1",
+		port: 8765,
+		paired: false,
+		recording: false,
+		pairingToken: "test-token",
+	}));
 }
 
 describe("LaunchWindow record button", () => {
@@ -376,6 +383,23 @@ describe("LaunchWindow record button", () => {
 
 		expect(window.electronAPI.switchToLibrary).toHaveBeenCalledTimes(1);
 		expect(window.electronAPI.switchToEditor).not.toHaveBeenCalled();
+	});
+
+	it("shows the paired browser companion status without adding recording controls", async () => {
+		window.electronAPI.showhowBridgeStatus = vi.fn(async () => ({
+			host: "127.0.0.1",
+			port: 8765,
+			paired: true,
+			recording: true,
+			pairingToken: "test-token",
+		}));
+
+		renderLaunchWindow();
+
+		await waitFor(() => {
+			expect(screen.getByTestId("browser-companion-status")).toHaveTextContent("Browser: Paired");
+		});
+		expect(screen.queryByRole("button", { name: /browser.*record/i })).not.toBeInTheDocument();
 	});
 });
 

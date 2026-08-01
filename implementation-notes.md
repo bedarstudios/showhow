@@ -358,3 +358,77 @@ wiring, it passed GREEN and asserts that `range: bytes=1024-` reaches the local 
   verification record for the physical recording path.
 - The installed Herdr CLI lacks the documented `herdr wait` command. The
   supplied executor pane was preserved and monitored via `herdr pane get`.
+
+### 2026-08-01: Issue 25 companion source required a focused local build target
+
+**What changed:** The desktop repository retained the localhost bridge from Issue 24 but contained no
+browser-extension source or build entry point. The browser companion is added as a Manifest V3 source
+folder and bundled with the repository's existing esbuild dependency via `npm run build:browser-companion`.
+
+**Why:** Shipping unbundled TypeScript or recreating accessibility-name logic in plain JavaScript would
+either be unusable by Chromium or bypass the approved `dom-accessibility-api` labeling path.
+
+**What was done instead (conservative option):** The generated `browser-companion/dist/` stays ignored;
+only the small extension source, its manifest/popup, and the build script are versioned. The popup exposes
+pairing status/configuration only and contains no recording controls. A narrow local declaration resolves
+the installed package's broken TypeScript export typing without adding a dependency.
+
+### 2026-08-01: Issue 25 bridge restart required persistent companion reconnect policy
+
+**What changed:** A real desktop restart left Chrome storage at `paired: true` after its service-worker
+socket failed before opening. The original worker only attempted one connection; its close handler cleared
+storage but never retried, and an error-before-close had no cleanup path.
+
+**What was done instead:** Extracted the socket lifecycle into a tested policy that clears paired state on
+every attempted/rejected connection, treats `error` and `close` as one disconnect, and retries with a
+bounded 500ms-to-10s exponential backoff. A manual pairing-token update cancels any pending retry and
+starts a fresh connection. The policy owns no recording controls.
+
+### 2026-08-01: Issue 25 MV3 wake-up required a connection-ready step queue
+
+**What changed:** A real paired recording produced only the desktop tier because the MV3 worker woke on
+the first content message, created a `CONNECTING` socket, and immediately discarded that step when its
+ready state was not OPEN.
+
+**What was done instead:** Pending browser steps now wait in the connection policy until the same socket's
+open event sends the hello handshake, then flush in order. The queue survives the existing reconnect path;
+there are still no extension recording controls.
+
+### 2026-08-01: Issue 25 MV3 startup and first-step connection race
+
+**What changed:** A second paired recording still omitted browser steps. The worker's startup
+`connection.connect()` and the first content-message `send()` both crossed the empty-socket check while
+their shared storage read was pending, creating two sockets. The queued step could attach to the stale one.
+
+**What was done instead:** `connect()` is now single-flight while configuration is loading. Concurrent
+startup and first-step callers share one socket, and the existing open-event queue flushes the step through
+that socket.
+
+### 2026-08-01: Issue 25 MV3 message-response channel closure
+
+**What changed:** Chrome DevTools proved the content script was injected but reported closed message ports
+and back/forward-cache channel closure. The worker's `async` runtime listener awaited capture/step work
+without synchronously returning `true`, so Chrome could close the response channel first.
+
+**What was done instead:** The listener is now synchronous and delegates to a tested message handler. Each
+asynchronous capture, queued step, and reconnect response calls `sendResponse`; the handler returns `true`
+before work begins. Capture failures return a null screenshot and step/reconnect failures return `{ ok: false }`.
+
+### 2026-08-01: Issue 25 Chrome screenshot data URLs require payload decoding
+
+**What changed:** A genuine paired recording still wrote no usable browser artifacts, and the acceptance
+bundle exposed that `captureVisibleTab` returns `data:image/png;base64,...`, not raw base64. Persisting the
+whole URL decoded its text prefix into non-PNG screenshot bytes.
+
+**What was done instead:** Browser screenshot persistence accepts the existing raw-base64 bridge contract
+and strips Chrome's PNG data-URL prefix when present. A RED bundle integration test proves the written file
+starts with PNG magic bytes for the real Chrome form.
+
+### 2026-08-01: Issue 25 late transcript regeneration must retain browser source steps
+
+**What changed:** A genuine paired recording delivered semantic browser steps, but the later transcript
+write reran the desktop telemetry doc generator and replaced `steps.json` with desktop-derived output.
+
+**What was done instead:** Regeneration detects existing browser-tier source steps and leaves that artifact
+pair intact. A RED bundle seam proves the late transcript write preserves the semantic label, redaction flag,
+and screenshot reference.

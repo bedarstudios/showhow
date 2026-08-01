@@ -1,0 +1,16 @@
+{
+	"manifest_version": 3,
+	"name": "Showhow Browser Companion",
+	"version": "0.1.0",
+	"description": "Streams redacted browser steps to a paired Showhow desktop recording.",
+	"permissions": ["activeTab", "storage", "tabs"],
+	"background": { "service_worker": "dist/service-worker.js", "type": "module" },
+	"action": { "default_popup": "popup.html" },
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["dist/content-script.js"],
+			"run_at": "document_start"
+		}
+	]
+}
