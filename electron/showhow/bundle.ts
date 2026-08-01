@@ -249,6 +249,21 @@ export async function updateWorkflowDocument(
 ): Promise<void> {
 	await serializePerBundle(bundleDir, async () => {
 		const metaPath = path.join(bundleDir, "meta.json");
+		if (update.type === "title") {
+			if (update.title.trim() === "") throw new Error("workflow document title cannot be empty");
+			const meta = parseEditableMeta(await fs.readFile(metaPath, "utf-8"));
+			meta.title = update.title.trim();
+			const metaTmp = path.join(bundleDir, "meta.json.tmp");
+			try {
+				await fs.writeFile(metaTmp, `${JSON.stringify(meta, null, 2)}\n`, "utf-8");
+				await fs.rename(metaTmp, metaPath);
+			} catch (error) {
+				await fs.rm(metaTmp, { force: true });
+				throw error;
+			}
+			return;
+		}
+
 		const stepsPath = path.join(bundleDir, "steps.json");
 		const markdownPath = path.join(bundleDir, "steps.md");
 		const [rawMeta, rawSteps] = await Promise.all([
@@ -258,27 +273,22 @@ export async function updateWorkflowDocument(
 		const meta = parseEditableMeta(rawMeta);
 		const steps = parseEditableSteps(rawSteps);
 
-		if (update.type === "title") {
-			if (update.title.trim() === "") throw new Error("workflow document title cannot be empty");
-			meta.title = update.title.trim();
+		if (!Number.isInteger(update.index) || update.index < 0 || update.index >= steps.length) {
+			throw new Error("workflow document step index is out of range");
+		}
+		if (update.type === "delete-step") {
+			steps.splice(update.index, 1);
 		} else {
-			if (!Number.isInteger(update.index) || update.index < 0 || update.index >= steps.length) {
-				throw new Error("workflow document step index is out of range");
+			const step = steps[update.index]!;
+			if (update.label !== undefined) {
+				if (update.label.trim() === "")
+					throw new Error("workflow document instruction cannot be empty");
+				step.label = update.label.trim();
 			}
-			if (update.type === "delete-step") {
-				steps.splice(update.index, 1);
-			} else {
-				const step = steps[update.index]!;
-				if (update.label !== undefined) {
-					if (update.label.trim() === "")
-						throw new Error("workflow document instruction cannot be empty");
-					step.label = update.label.trim();
-				}
-				if (update.includeRevealedText !== undefined) {
-					step.includeRevealedText = update.includeRevealedText;
-				} else if (step.redaction && step.includeRevealedText === undefined) {
-					step.includeRevealedText = false;
-				}
+			if (update.includeRevealedText !== undefined) {
+				step.includeRevealedText = update.includeRevealedText;
+			} else if (step.redaction && step.includeRevealedText === undefined) {
+				step.includeRevealedText = false;
 			}
 		}
 

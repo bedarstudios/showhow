@@ -1,4 +1,4 @@
-import { mkdtemp, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -451,6 +451,27 @@ describe("renderStepsMarkdown", () => {
 });
 
 describe("updateWorkflowDocument", () => {
+	it("updates a title when the bundle has no readable step artifacts", async () => {
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-title-edit-"));
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Transcript-only recording",
+				source: "desktop",
+				createdAt: 1,
+			}),
+		);
+
+		await updateWorkflowDocument(bundleDir, { type: "title", title: "Renamed recording" });
+
+		expect(JSON.parse(await readFile(path.join(bundleDir, "meta.json"), "utf-8")).title).toBe(
+			"Renamed recording",
+		);
+		await expect(access(path.join(bundleDir, "steps.json"))).rejects.toThrow();
+		await expect(access(path.join(bundleDir, "steps.md"))).rejects.toThrow();
+	});
+
 	it("persists title and step edits, deletion, and the safe revealed-text default", async () => {
 		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-doc-edit-"));
 		await writeFile(
