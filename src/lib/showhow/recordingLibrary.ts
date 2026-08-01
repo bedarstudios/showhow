@@ -21,6 +21,10 @@ export interface WorkflowStep {
 	screenshot: string;
 	/** Safe `file://` URL to the screenshot, when the file exists. */
 	screenshotUrl?: string;
+	/** Whether this step originated from capture-time sensitive text redaction. */
+	redaction?: boolean;
+	/** Explicit per-step permission to include revealed text in steps.md. */
+	includeRevealedText?: boolean;
 }
 
 /**

@@ -59,6 +59,8 @@ import {
 	persistBrowserSteps,
 	regenerateDocArtifacts,
 	SHOWHOW_RECORDINGS_ROOT,
+	updateWorkflowDocument,
+	type WorkflowDocumentUpdate,
 } from "../showhow/bundle";
 import { listRecordings } from "../showhow/recordingLibrary";
 import { mapCursorSampleToTelemetryPoint } from "./cursorTelemetry";
@@ -67,6 +69,17 @@ import { RecordingStreamRegistry, registerRecordingStreamHandlers } from "./reco
 import { copyShowhowBundlePath } from "./showhowLibrary";
 
 export const SHORTCUTS_FILE = path.join(app.getPath("userData"), "shortcuts.json");
+
+function isWorkflowDocumentUpdate(value: unknown): value is WorkflowDocumentUpdate {
+	if (typeof value !== "object" || value === null || !("type" in value)) return false;
+	if (value.type === "title") return "title" in value && typeof value.title === "string";
+	if (value.type === "delete-step") return "index" in value && typeof value.index === "number";
+	if (value.type !== "step" || !("index" in value) || typeof value.index !== "number") return false;
+	return (
+		(!("label" in value) || typeof value.label === "string") &&
+		(!("includeRevealedText" in value) || typeof value.includeRevealedText === "boolean")
+	);
+}
 const RECORDING_FILE_PREFIX = "recording-";
 const RECORDING_SESSION_SUFFIX = ".session.json";
 const ALLOWED_IMPORT_VIDEO_EXTENSIONS = new Set([
@@ -2457,6 +2470,30 @@ export function registerIpcHandlers(
 			return { success: false };
 		}
 	});
+
+	ipcMain.handle(
+		"showhow:update-workflow-document",
+		async (_, bundleDir: unknown, update: unknown) => {
+			if (typeof bundleDir !== "string" || !isWorkflowDocumentUpdate(update)) {
+				return { success: false };
+			}
+			const resolved = path.resolve(bundleDir);
+			if (!resolved.startsWith(`${SHOWHOW_RECORDINGS_ROOT}${path.sep}`)) {
+				console.error(
+					"showhow:update-workflow-document rejected path outside recordings root:",
+					resolved,
+				);
+				return { success: false };
+			}
+			try {
+				await updateWorkflowDocument(resolved, update);
+				return { success: true };
+			} catch (error) {
+				console.error("showhow:update-workflow-document failed:", error);
+				return { success: false };
+			}
+		},
+	);
 
 	ipcMain.handle("store-recorded-session", async (_, payload: StoreRecordedSessionInput) => {
 		try {
