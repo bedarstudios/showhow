@@ -270,6 +270,28 @@ describe("RecordingLibrary — workflow document editing (issue #26)", () => {
 		});
 	});
 
+	it("requires reveal before a redacted instruction can be edited", async () => {
+		mockShowhowListRecordings.mockResolvedValue([
+			{
+				...desktopDocEntry,
+				steps: [{ ...desktopDocEntry.steps[0], screenshot: "", redaction: true }],
+			},
+		]);
+		render(<RecordingLibrary />);
+
+		await screen.findByText("Sensitive text hidden");
+		const editButton = screen.getByRole("button", { name: "Edit step 1" });
+		expect(editButton).toBeDisabled();
+		expect(screen.queryByRole("textbox", { name: "Step 1 instruction" })).toBeNull();
+
+		await userEvent.click(screen.getByRole("button", { name: "Reveal step 1 text" }));
+		expect(editButton).toBeEnabled();
+		await userEvent.click(editButton);
+		expect(screen.getByRole("textbox", { name: "Step 1 instruction" })).toHaveValue(
+			"Open the products page",
+		);
+	});
+
 	it("deletes a step and persists the deletion", async () => {
 		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
 		render(<RecordingLibrary />);

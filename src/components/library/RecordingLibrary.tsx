@@ -539,6 +539,7 @@ function RecordingDetail({
 													<button
 														type="button"
 														aria-label={`Edit step ${index + 1}`}
+														disabled={step.redaction && !revealedSteps.has(index)}
 														onClick={() => {
 															setInstructionDraft(step.label);
 															setEditingStepIndex(index);
