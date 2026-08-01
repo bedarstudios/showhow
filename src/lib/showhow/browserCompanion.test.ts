@@ -33,18 +33,99 @@ describe("BrowserCompanionCapture", () => {
 	});
 
 	it("redacts typed values before streaming them from the page", async () => {
+		vi.useFakeTimers();
 		const { capture, captureScreenshot, sendStep } = makeCapture();
 		document.body.innerHTML =
 			'<label>Account password <input type="password" value="hunter2" /></label>';
 		const input = document.querySelector("input")!;
 
 		await capture.captureInput({ target: input, clientX: 10, clientY: 20, view: window });
+		await vi.advanceTimersByTimeAsync(300);
 
 		expect(sendStep).toHaveBeenCalledWith(
 			expect.objectContaining({ label: "Type Account password", redacted: true }),
 		);
 		expect(captureScreenshot).not.toHaveBeenCalled();
 		expect(JSON.stringify(sendStep.mock.calls)).not.toContain("hunter2");
+		vi.useRealTimers();
+	});
+
+	it("coalesces a typing session into one redacted semantic step", async () => {
+		vi.useFakeTimers();
+		const { capture, sendStep } = makeCapture();
+		document.body.innerHTML = '<label>Text input <input value="a" /></label>';
+		const input = document.querySelector("input")!;
+
+		await capture.captureInput({ target: input, view: window });
+		await capture.captureInput({ target: input, view: window });
+		await vi.advanceTimersByTimeAsync(299);
+		expect(sendStep).not.toHaveBeenCalled();
+		await vi.advanceTimersByTimeAsync(1);
+
+		expect(sendStep).toHaveBeenCalledTimes(1);
+		expect(sendStep).toHaveBeenCalledWith(
+			expect.objectContaining({ label: "Type Text input", redacted: true }),
+		);
+		vi.useRealTimers();
+	});
+
+	it("does not classify checkbox changes as typed input", async () => {
+		const { capture, sendStep } = makeCapture();
+		document.body.innerHTML = '<label>Default checkbox <input type="checkbox" /></label>';
+
+		await capture.captureInput({ target: document.querySelector("input")!, view: window });
+
+		expect(sendStep).not.toHaveBeenCalled();
+	});
+
+	it("ignores a text-field change after its input session already emitted", async () => {
+		vi.useFakeTimers();
+		const { capture, sendStep } = makeCapture();
+		document.body.innerHTML = "<label>Text input <input /></label>";
+		const input = document.querySelector("input")!;
+
+		await capture.captureInput({ target: input, view: window }, "input");
+		await vi.advanceTimersByTimeAsync(300);
+		await capture.captureInput({ target: input, view: window }, "change");
+		await vi.advanceTimersByTimeAsync(300);
+
+		expect(sendStep).toHaveBeenCalledTimes(1);
+		vi.useRealTimers();
+	});
+
+	it("filters a cross-realm text-field change by local element metadata", async () => {
+		vi.useFakeTimers();
+		const { capture, sendStep } = makeCapture();
+		document.body.innerHTML = "<label>Text input <input /></label>";
+		const input = document.querySelector("input")!;
+		const originalInputConstructor = globalThis.HTMLInputElement;
+		vi.stubGlobal("HTMLInputElement", class {});
+
+		await capture.captureInput({ target: input, view: window }, "input");
+		await vi.advanceTimersByTimeAsync(300);
+		await capture.captureInput({ target: input, view: window }, "change");
+		await vi.advanceTimersByTimeAsync(300);
+
+		expect(sendStep).toHaveBeenCalledTimes(1);
+		vi.stubGlobal("HTMLInputElement", originalInputConstructor);
+		vi.useRealTimers();
+	});
+
+	it("captures a select changed without an input event", async () => {
+		vi.useFakeTimers();
+		const { capture, sendStep } = makeCapture();
+		document.body.innerHTML = "<label>Plan <select><option>Free</option></select></label>";
+
+		await capture.captureInput(
+			{ target: document.querySelector("select")!, view: window },
+			"change",
+		);
+		await vi.advanceTimersByTimeAsync(300);
+
+		expect(sendStep).toHaveBeenCalledWith(
+			expect.objectContaining({ label: "Type Plan", redacted: true }),
+		);
+		vi.useRealTimers();
 	});
 
 	it("ignores clicks without a meaningful browser action", async () => {

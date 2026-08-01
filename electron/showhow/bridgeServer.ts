@@ -233,6 +233,13 @@ export class ShowhowBridgeServer {
 			});
 			return;
 		}
+		if (message.type === "ping") {
+			if (ws !== this.companion) {
+				this.send(ws, { v: BRIDGE_PROTOCOL_VERSION, type: "error", message: "not paired" });
+				ws.close();
+			}
+			return;
+		}
 	}
 
 	private handleDisconnect(ws: WebSocket): void {

@@ -2,6 +2,8 @@
 // biome-ignore-all lint/correctness/noUndeclaredVariables: Chrome provides this extension API.
 
 import { BrowserCompanionCapture, type CompanionStep } from "../browserCompanion";
+import { deferMutableClick, isReplayingClick } from "./deferredClick";
+import { SHOWHOW_NAVIGATION_EVENT } from "./pageNavigationBridge";
 
 const capture = new BrowserCompanionCapture({
 	sendStep: async (step: CompanionStep) => {
@@ -19,17 +21,27 @@ const capture = new BrowserCompanionCapture({
 	getUrl: () => window.location.href,
 });
 
-document.addEventListener("click", (event) => void capture.captureClick(event), true);
-document.addEventListener("input", (event) => void capture.captureInput(event), true);
-document.addEventListener("change", (event) => void capture.captureInput(event), true);
+document.addEventListener(
+	"click",
+	(event) => {
+		if (!(event instanceof MouseEvent) || !(event.target instanceof HTMLElement)) return;
+		const target = event.target.closest<HTMLInputElement>(
+			'input[type="checkbox"], input[type="radio"]',
+		);
+		if (target) {
+			if (isReplayingClick(target)) return;
+			void deferMutableClick(event, target, () => capture.captureClick(event));
+			return;
+		}
+		void capture.captureClick(event);
+	},
+	true,
+);
+document.addEventListener("input", (event) => void capture.captureInput(event, "input"), true);
+document.addEventListener("change", (event) => void capture.captureInput(event, "change"), true);
 
-const notifyNavigation = () => void capture.captureNavigation();
-for (const method of ["pushState", "replaceState"] as const) {
-	const original = history[method];
-	history[method] = function (...args: Parameters<History[typeof method]>) {
-		const result = original.apply(this, args);
-		notifyNavigation();
-		return result;
-	};
-}
-window.addEventListener("popstate", notifyNavigation);
+window.addEventListener(SHOWHOW_NAVIGATION_EVENT, (event) => {
+	if (event.target === window && "detail" in event && event.detail === null) {
+		void capture.captureNavigation();
+	}
+});

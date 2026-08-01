@@ -29,6 +29,8 @@ interface CompanionPointerEvent {
  * while this module only produces safe semantic steps for a paired transport.
  */
 export class BrowserCompanionCapture {
+	private readonly typingTimers = new Map<HTMLElement, ReturnType<typeof setTimeout>>();
+
 	constructor(private readonly options: BrowserCompanionCaptureOptions) {}
 
 	async captureClick(event: CompanionPointerEvent): Promise<void> {
@@ -37,12 +39,24 @@ export class BrowserCompanionCapture {
 		await this.captureAction("Click", target, event, false, true);
 	}
 
-	async captureInput(event: CompanionPointerEvent): Promise<void> {
+	async captureInput(
+		event: CompanionPointerEvent,
+		source: "input" | "change" = "input",
+	): Promise<void> {
 		const target = inputTarget(event.target);
 		if (!target) return;
-		// Typed values are never read or placed in a step. The persisted redaction
-		// flag makes the safe representation explicit at every later layer.
-		await this.captureAction("Type", target, event, true, false);
+		if (source === "change" && isTextEntry(target)) {
+			return;
+		}
+		const existing = this.typingTimers.get(target);
+		if (existing) clearTimeout(existing);
+		const timer = setTimeout(() => {
+			this.typingTimers.delete(target);
+			// Typed values are never read or placed in a step. The persisted redaction
+			// flag makes the safe representation explicit at every later layer.
+			void this.captureAction("Type", target, event, true, false);
+		}, 300);
+		this.typingTimers.set(target, timer);
 	}
 
 	async captureNavigation(): Promise<void> {
@@ -88,9 +102,23 @@ function interactiveTarget(target: EventTarget | null): HTMLElement | null {
 
 function inputTarget(target: EventTarget | null): HTMLElement | null {
 	if (!(target instanceof HTMLElement)) return null;
-	return target.closest<HTMLElement>(
+	const input = target.closest<HTMLElement>(
 		'input:not([type="hidden"]), textarea, select, [contenteditable="true"]',
 	);
+	if (input && isCheckboxOrRadio(input)) {
+		return null;
+	}
+	return input;
+}
+
+function isTextEntry(element: HTMLElement): boolean {
+	return element.localName === "input" || element.localName === "textarea";
+}
+
+function isCheckboxOrRadio(element: HTMLElement): boolean {
+	if (element.localName !== "input") return false;
+	const type = element.getAttribute("type")?.toLowerCase();
+	return type === "checkbox" || type === "radio";
 }
 
 function clampCoordinate(value: number, size: number): number {

@@ -23,6 +23,7 @@ export interface CompanionConnectionOptions {
 
 const INITIAL_RETRY_DELAY_MS = 500;
 const MAX_RETRY_DELAY_MS = 10_000;
+const HEARTBEAT_DELAY_MS = 20_000;
 
 interface PendingMessage {
 	message: string;
@@ -37,6 +38,7 @@ export class CompanionConnection {
 	private socket: CompanionSocket | null = null;
 	private connecting: Promise<void> | null = null;
 	private retryTimer: ReturnType<typeof setTimeout> | null = null;
+	private heartbeatTimer: ReturnType<typeof setTimeout> | null = null;
 	private retryDelayMs = INITIAL_RETRY_DELAY_MS;
 	private readonly pendingMessages: PendingMessage[] = [];
 
@@ -70,6 +72,7 @@ export class CompanionConnection {
 			this.retryDelayMs = INITIAL_RETRY_DELAY_MS;
 			socket.send(JSON.stringify({ v: 1, type: "hello", role: "companion", token: pairing.token }));
 			this.flushPendingMessages(socket);
+			this.scheduleHeartbeat(socket);
 		});
 		socket.addEventListener("message", (event) => {
 			try {
@@ -91,6 +94,7 @@ export class CompanionConnection {
 		this.cancelRetry();
 		const socket = this.socket;
 		this.socket = null;
+		this.cancelHeartbeat();
 		socket?.close();
 		this.retryDelayMs = INITIAL_RETRY_DELAY_MS;
 		await this.options.setPaired(false);
@@ -131,6 +135,22 @@ export class CompanionConnection {
 		if (!this.retryTimer) return;
 		this.options.cancel(this.retryTimer);
 		this.retryTimer = null;
+	}
+
+	private scheduleHeartbeat(socket: CompanionSocket): void {
+		this.cancelHeartbeat();
+		this.heartbeatTimer = this.options.schedule(() => {
+			this.heartbeatTimer = null;
+			if (this.socket !== socket || socket.readyState !== 1) return;
+			socket.send(JSON.stringify({ v: 1, type: "ping" }));
+			this.scheduleHeartbeat(socket);
+		}, HEARTBEAT_DELAY_MS);
+	}
+
+	private cancelHeartbeat(): void {
+		if (!this.heartbeatTimer) return;
+		this.options.cancel(this.heartbeatTimer);
+		this.heartbeatTimer = null;
 	}
 
 	private flushPendingMessages(socket: CompanionSocket): void {

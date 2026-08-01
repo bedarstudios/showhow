@@ -110,6 +110,27 @@ describe("CompanionConnection", () => {
 		expect(sockets[0]!.sent).toContain('{"type":"step"}');
 	});
 
+	it("keeps the worker-owned pairing socket active after the popup closes", async () => {
+		vi.useFakeTimers();
+		const socket = new FakeSocket();
+		const connection = new CompanionConnection({
+			readConfig: async () => ({ endpoint: "ws://127.0.0.1:8765", token: "token" }),
+			createSocket: () => socket,
+			setPaired: async () => undefined,
+			schedule: (callback, delayMs) => setTimeout(callback, delayMs),
+			cancel: clearTimeout,
+		});
+
+		await connection.connect();
+		socket.readyState = 1;
+		socket.emit("open");
+		await vi.advanceTimersByTimeAsync(20_000);
+
+		expect(socket.closed).toBe(false);
+		expect(socket.sent).toContain('{"v":1,"type":"ping"}');
+		vi.useRealTimers();
+	});
+
 	it("bounds repeated reconnect attempts and does not double-schedule error plus close", async () => {
 		vi.useFakeTimers();
 		const sockets: FakeSocket[] = [];

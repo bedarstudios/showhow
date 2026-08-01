@@ -63,7 +63,12 @@ export interface StepMessage {
 	screenshot: string | null;
 }
 
-export type ClientMessage = HelloMessage | StepMessage;
+export interface PingMessage {
+	v: typeof BRIDGE_PROTOCOL_VERSION;
+	type: "ping";
+}
+
+export type ClientMessage = HelloMessage | StepMessage | PingMessage;
 
 export interface PairedMessage {
 	v: typeof BRIDGE_PROTOCOL_VERSION;
@@ -172,6 +177,9 @@ export function parseClientMessage(raw: string): ParseResult {
 				screenshot: payload.screenshot,
 			},
 		};
+	}
+	if (type === "ping") {
+		return { ok: true, message: { v: BRIDGE_PROTOCOL_VERSION, type: "ping" } };
 	}
 	return { ok: false, error: "unknown message type" };
 }
