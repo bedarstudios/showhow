@@ -2,6 +2,7 @@ import { fixWebmDuration } from "@fix-webm-duration/fix";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useScopedT } from "@/contexts/I18nContext";
+import { resolveCursorAccessPreflight } from "@/lib/cursorAccessPreflight";
 import {
 	type NativeMacRecordingRequest,
 	parseMacDisplayIdFromSourceId,
@@ -11,7 +12,11 @@ import {
 	type NativeWindowsRecordingRequest,
 	parseWindowHandleFromSourceId,
 } from "@/lib/nativeWindowsRecording";
-import type { CursorCaptureMode, RecordedVideoAssetInput } from "@/lib/recordingSession";
+import type {
+	CursorCaptureMode,
+	RecordedVideoAssetInput,
+	StepCaptureReason,
+} from "@/lib/recordingSession";
 import { requestCameraAccess } from "@/lib/requestCameraAccess";
 import { createRecorderHandle, type RecorderHandle } from "./recorderHandle";
 
@@ -122,6 +127,17 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 	const [countdownActive, setCountdownActive] = useState(false);
 	const webcamReady = useRef(false);
 	const webcamAcquireId = useRef(0);
+	// Recorder-first fail-open: when macOS accessibility is denied for the
+	// editable-overlay cursor mode, the recording continues in a degraded
+	// system-cursor mode instead of aborting before the countdown. These refs
+	// track the degradation for the active recording so the effective cursor
+	// mode and a structured step-capture reason are persisted at save time.
+	const cursorAccessDegradedRef = useRef(false);
+	const pendingStepCaptureReasonRef = useRef<StepCaptureReason | undefined>(undefined);
+	const getEffectiveCursorCaptureMode = useCallback(
+		(): CursorCaptureMode => (cursorAccessDegradedRef.current ? "system" : cursorCaptureMode),
+		[cursorCaptureMode],
+	);
 	const canPauseRecording =
 		recording &&
 		Boolean(
@@ -384,8 +400,11 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 								? { videoData: webcamVideoData, fileName: webcamFileName }
 								: undefined,
 						createdAt: activeRecordingId,
-						cursorCaptureMode,
+						cursorCaptureMode: getEffectiveCursorCaptureMode(),
 						durationMs: duration,
+						...(pendingStepCaptureReasonRef.current
+							? { stepCaptureReason: pendingStepCaptureReasonRef.current }
+							: {}),
 					});
 
 					if (!result.success) {
@@ -424,7 +443,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 				}
 			})();
 		},
-		[cursorCaptureMode, teardownMedia],
+		[getEffectiveCursorCaptureMode, teardownMedia],
 	);
 
 	const finalizeNativeWindowsRecording = useCallback(
@@ -497,7 +516,10 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 								fileName: webcamFileName,
 							},
 							createdAt: activeNativeRecording.recordingId,
-							cursorCaptureMode,
+							cursorCaptureMode: getEffectiveCursorCaptureMode(),
+							...(pendingStepCaptureReasonRef.current
+								? { stepCaptureReason: pendingStepCaptureReasonRef.current }
+								: {}),
 						});
 						if (stored.success && stored.session) {
 							storedSession = stored.session;
@@ -528,7 +550,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 				setSaving(false);
 			}
 		},
-		[cursorCaptureMode, getRecordingDurationMs],
+		[getEffectiveCursorCaptureMode, getRecordingDurationMs],
 	);
 
 	const finalizeNativeMacRecording = useCallback(
@@ -581,7 +603,11 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 			};
 
 			try {
-				const result = await window.electronAPI.stopNativeMacRecording(discard, duration);
+				const result = await window.electronAPI.stopNativeMacRecording(
+					discard,
+					duration,
+					pendingStepCaptureReasonRef.current,
+				);
 				const webcamAsset = await webcamAssetPromise;
 				if (discard || result.discarded) {
 					clearNativeRecordingState();
@@ -602,7 +628,10 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 						screenVideoPath: result.path,
 						recordingId: activeNativeRecording.recordingId,
 						webcam: webcamAsset,
-						cursorCaptureMode,
+						cursorCaptureMode: getEffectiveCursorCaptureMode(),
+						...(pendingStepCaptureReasonRef.current
+							? { stepCaptureReason: pendingStepCaptureReasonRef.current }
+							: {}),
 					});
 					if (attachResult.success) {
 						result.session = attachResult.session;
@@ -635,7 +664,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 				setSaving(false);
 			}
 		},
-		[cursorCaptureMode, getRecordingDurationMs],
+		[getEffectiveCursorCaptureMode, getRecordingDurationMs],
 	);
 
 	const stopRecording = useRef(() => {
@@ -994,7 +1023,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 					width: TARGET_WIDTH,
 					height: TARGET_HEIGHT,
 					bitrate: computeBitrate(TARGET_WIDTH, TARGET_HEIGHT),
-					hideSystemCursor: cursorCaptureMode === "editable-overlay",
+					hideSystemCursor: getEffectiveCursorCaptureMode() === "editable-overlay",
 				},
 				audio: {
 					system: {
@@ -1016,7 +1045,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 					fps: WEBCAM_TARGET_FRAME_RATE,
 				},
 				cursor: {
-					mode: cursorCaptureMode,
+					mode: getEffectiveCursorCaptureMode(),
 				},
 				outputs: {
 					screenPath: "",
@@ -1086,13 +1115,36 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 
 		try {
 			const platform = await window.electronAPI.getPlatform();
+			// Reset degradation tracking for this recording attempt; the refs are
+			// only applied when the preflight decides to degrade.
+			cursorAccessDegradedRef.current = false;
+			pendingStepCaptureReasonRef.current = undefined;
 			if (platform === "darwin" && cursorCaptureMode === "editable-overlay") {
 				// The main process shows a native dialog that deep-links to the
-				// Accessibility settings pane when access is missing, so we just stop
-				// here and let the user grant it and press record again.
-				const access = await window.electronAPI.requestNativeMacCursorAccess();
-				if (!access.granted) {
-					return;
+				// Accessibility settings pane when access is missing. Recorder-first
+				// fail-open: a denial (or a preflight check failure) no longer aborts
+				// before the countdown -- the recording continues in a degraded
+				// system-cursor mode and a structured `accessibility-denied`
+				// step-capture reason is persisted so it is distinguishable from a
+				// genuine no-click/frame-extraction recording.
+				let accessGranted = false;
+				let accessCheckSucceeded = true;
+				try {
+					const access = await window.electronAPI.requestNativeMacCursorAccess();
+					accessGranted = access.granted;
+				} catch (accessError) {
+					accessCheckSucceeded = false;
+					console.warn("macOS cursor accessibility preflight threw:", accessError);
+				}
+				const preflight = resolveCursorAccessPreflight({
+					platform,
+					cursorCaptureMode,
+					accessCheckSucceeded,
+					accessGranted,
+				});
+				if (preflight.degradedToSystemCursor) {
+					cursorAccessDegradedRef.current = true;
+					pendingStepCaptureReasonRef.current = preflight.stepCaptureReason;
 				}
 			}
 		} catch (error) {
@@ -1180,7 +1232,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 				// the editor can render a replacement; system mode bakes it into the video.
 				screenMediaStream = await navigator.mediaDevices.getDisplayMedia({
 					video: {
-						cursor: cursorCaptureMode === "editable-overlay" ? "never" : "always",
+						cursor: getEffectiveCursorCaptureMode() === "editable-overlay" ? "never" : "always",
 						width: { max: TARGET_WIDTH },
 						height: { max: TARGET_HEIGHT },
 						frameRate: { ideal: TARGET_FRAME_RATE },
@@ -1391,7 +1443,11 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 			setRecording(true);
 			setPaused(false);
 			setElapsedSeconds(0);
-			window.electronAPI?.setRecordingState(true, recordingId.current, cursorCaptureMode);
+			window.electronAPI?.setRecordingState(
+				true,
+				recordingId.current,
+				getEffectiveCursorCaptureMode(),
+			);
 
 			const activeScreenRecorder = screenRecorder.current;
 			const activeWebcamRecorder = webcamRecorder.current;

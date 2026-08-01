@@ -31,10 +31,22 @@ export interface WorkflowStep {
  * Step-capture availability, mirrored from `ShowhowMeta.stepCapture`. Surfaced
  * so the renderer can distinguish a transcript-only doc (`unavailable`) from a
  * doc whose steps are ready to render (`available`).
+ *
+ * `reason` is a structured degradation cause, distinguishable across the
+ * sources of unavailability. It is optional so legacy bundles (and any reader
+ * that predates it) continue to deserialize exactly as before.
  */
+export type StepCaptureReason =
+	| "no-clicks"
+	| "frame-extraction"
+	| "accessibility-denied"
+	| "companion-unpaired"
+	| "companion-disconnected";
+
 export interface StepCaptureStatus {
 	status: "available" | "unavailable";
 	message?: string;
+	reason?: StepCaptureReason;
 }
 
 /**

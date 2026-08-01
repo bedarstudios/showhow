@@ -3,6 +3,7 @@ import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import type { StepCaptureReason } from "../../src/lib/showhow/recordingLibrary";
 import type { WorkflowDocumentUpdate } from "../../src/lib/showhow/workflowDocument";
 
 const execFile = promisify(execFileCallback);
@@ -30,6 +31,7 @@ export interface ShowhowMeta {
 	stepCapture?: {
 		status: "available" | "unavailable";
 		message?: string;
+		reason?: StepCaptureReason;
 	};
 }
 
@@ -39,6 +41,8 @@ export interface BuildMetaInput {
 	hasWebcam: boolean;
 	hasCursorTelemetry: boolean;
 	videoFileName?: "video.webm" | "video.mp4";
+	/** Recording source; defaults to "desktop". "browser" is forward-compatible. */
+	source?: "desktop" | "browser";
 }
 
 export interface CreateBundleInput {
@@ -58,6 +62,16 @@ export interface CreateBundleInput {
 	 * time, step labels fall back to `Step N`.
 	 */
 	transcriptContent?: string;
+	/**
+	 * Structured step-capture degradation reason supplied by the caller (e.g.
+	 * `accessibility-denied` when the recorder degraded to system-cursor mode).
+	 * When provided, it takes precedence over the derived no-clicks reason so
+	 * the root cause is distinguishable from a genuine zero-click recording.
+	 * Frame-extraction failures still surface their own reason regardless.
+	 */
+	stepCaptureReason?: StepCaptureReason;
+	/** Recording source written to meta.json; defaults to "desktop". */
+	source?: "desktop" | "browser";
 }
 
 export interface CreateBundleResult {
@@ -368,7 +382,7 @@ export function buildMeta(input: BuildMetaInput): ShowhowMeta {
 	return {
 		schemaVersion: 1,
 		title,
-		source: "desktop",
+		source: input.source ?? "desktop",
 		createdAt: input.createdAt,
 		...(input.durationMs !== undefined ? { durationMs: input.durationMs } : {}),
 		video: videoFileName,
@@ -474,9 +488,16 @@ export async function createRecordingBundle(input: CreateBundleInput): Promise<C
 	}));
 	let stepCapture: ShowhowMeta["stepCapture"];
 	if (stepFrames.length === 0) {
+		// A caller-supplied degradation reason (e.g. accessibility-denied) is the
+		// root cause of there being no click coordinates; it takes precedence over
+		// the generic no-clicks reason so the cause stays distinguishable.
 		stepCapture = {
 			status: "unavailable",
-			message: "No desktop clicks were captured; this bundle has a transcript-only doc.",
+			reason: input.stepCaptureReason ?? "no-clicks",
+			message:
+				input.stepCaptureReason === "accessibility-denied"
+					? "macOS accessibility was denied; recorded in system-cursor mode, so semantic steps are unavailable."
+					: "No desktop clicks were captured; this bundle has a transcript-only doc.",
 		};
 	} else {
 		try {
@@ -488,8 +509,11 @@ export async function createRecordingBundle(input: CreateBundleInput): Promise<C
 			stepCapture = { status: "available" };
 		} catch (error) {
 			console.warn("[showhow] desktop click frame extraction unavailable:", error);
+			// Frame-extraction failure must not be mislabeled as no-clicks: clicks
+			// WERE captured, but their frames could not be extracted.
 			stepCapture = {
 				status: "unavailable",
+				reason: "frame-extraction",
 				message:
 					"Desktop click frames could not be extracted; this bundle has a transcript-only doc.",
 			};
@@ -508,6 +532,7 @@ export async function createRecordingBundle(input: CreateBundleInput): Promise<C
 		hasWebcam: webcamDest !== undefined,
 		hasCursorTelemetry,
 		videoFileName,
+		...(input.source !== undefined ? { source: input.source } : {}),
 	});
 	if (stepCapture) {
 		meta.stepCapture = stepCapture;

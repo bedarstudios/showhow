@@ -30,6 +30,7 @@ import {
 	type RecordingSession,
 	type StoreRecordedSessionInput,
 } from "../../src/lib/recordingSession";
+import type { StepCaptureReason } from "../../src/lib/showhow/recordingLibrary";
 import type {
 	CursorRecordingData,
 	CursorRecordingSample,
@@ -62,7 +63,8 @@ import {
 	updateWorkflowDocument,
 	type WorkflowDocumentUpdate,
 } from "../showhow/bundle";
-import { listRecordings } from "../showhow/recordingLibrary";
+import { applyCompanionStepCapture } from "../showhow/companionStepCapture";
+import { listRecordings, regenerateRecordingDoc } from "../showhow/recordingLibrary";
 import { mapCursorSampleToTelemetryPoint } from "./cursorTelemetry";
 import { registerNativeBridgeHandlers } from "./nativeBridge";
 import { RecordingStreamRegistry, registerRecordingStreamHandlers } from "./recordingStream";
@@ -384,6 +386,7 @@ type AttachNativeMacWebcamRecordingInput = {
 	recordingId?: number;
 	webcam?: RecordedVideoAssetInput;
 	cursorCaptureMode?: CursorCaptureMode;
+	stepCaptureReason?: StepCaptureReason;
 };
 
 let selectedSource: SelectedSource | null = null;
@@ -418,8 +421,10 @@ async function ensureShowhowBridgeStarted(): Promise<void> {
  * Drain ingested browser-tier steps from the bridge and persist them into the
  * bundle as browser-tier step artifacts with recording-relative `ts`. Companion
  * failure never stops or discards the video: on a mid-recording disconnect with
- * no ingested steps, the bundle's step capture is marked unavailable so the
- * desktop tier remains usable. Never throws.
+ * no ingested steps, the bundle's step capture is marked unavailable with a
+ * structured `companion-disconnected`/`companion-unpaired` reason so the desktop
+ * tier remains usable. Never throws, and never overrides an already-available
+ * bundle (desktop clicks were extracted) with a companion degradation reason.
  */
 async function applyBrowserStepsToBundle(bundleDir: string): Promise<void> {
 	let browserSteps: BrowserStepRecord[] = [];
@@ -428,35 +433,48 @@ async function applyBrowserStepsToBundle(bundleDir: string): Promise<void> {
 	} catch (error) {
 		console.error("[showhow-bridge] drainSteps failed:", error);
 	}
-	if (browserSteps.length > 0) {
-		try {
-			await persistBrowserSteps(bundleDir, browserSteps);
-			await markBundleStepCapture(bundleDir, {
-				status: "available",
-			});
-		} catch (error) {
-			console.error("[showhow-bridge] browser step persistence failed:", error);
-			await markBundleStepCapture(bundleDir, {
-				status: "unavailable",
-				message:
-					"Browser step capture failed; semantic steps unavailable. Desktop tier remains usable.",
-			});
-		}
-		return;
-	}
-	if (showhowBridge.hadMidRecordingDisconnect()) {
-		await markBundleStepCapture(bundleDir, {
-			status: "unavailable",
-			message:
-				"Browser companion disconnected mid-recording; semantic steps unavailable. Desktop tier remains usable.",
-		});
+	const { source, alreadyAvailable } = await readBundleSourceAndAvailability(bundleDir);
+	await applyCompanionStepCapture({
+		browserSteps,
+		bundleSource: source,
+		bundleAlreadyAvailable: alreadyAvailable,
+		isCompanionConnected: showhowBridge.isCompanionConnected(),
+		hadMidRecordingDisconnect: showhowBridge.hadMidRecordingDisconnect(),
+		persistSteps: (steps) => persistBrowserSteps(bundleDir, steps),
+		markStepCapture: (mark) => markBundleStepCapture(bundleDir, mark),
+	});
+}
+
+/** Read a bundle's source and current stepCapture availability. Never throws. */
+async function readBundleSourceAndAvailability(
+	bundleDir: string,
+): Promise<{ source: "desktop" | "browser"; alreadyAvailable: boolean }> {
+	try {
+		const metaPath = path.join(bundleDir, "meta.json");
+		const meta = JSON.parse(await fs.readFile(metaPath, "utf-8")) as {
+			source?: unknown;
+			stepCapture?: unknown;
+		};
+		const source = meta.source === "browser" ? "browser" : "desktop";
+		const alreadyAvailable =
+			typeof meta.stepCapture === "object" &&
+			meta.stepCapture !== null &&
+			(meta.stepCapture as { status?: unknown }).status === "available";
+		return { source, alreadyAvailable };
+	} catch (error) {
+		console.error("[showhow-bridge] readBundleSourceAndAvailability failed:", error);
+		return { source: "desktop", alreadyAvailable: false };
 	}
 }
 
 /** Rewrite a bundle's meta.json stepCapture field. Never throws. */
 async function markBundleStepCapture(
 	bundleDir: string,
-	stepCapture: { status: "available" | "unavailable"; message?: string },
+	stepCapture: {
+		status: "available" | "unavailable";
+		message?: string;
+		reason?: import("../../src/lib/showhow/recordingLibrary").StepCaptureReason;
+	},
 ): Promise<void> {
 	try {
 		const metaPath = path.join(bundleDir, "meta.json");
@@ -2198,124 +2216,128 @@ export function registerIpcHandlers(
 		}
 	});
 
-	ipcMain.handle("stop-native-mac-recording", async (_, discard?: boolean, durationMs?: number) => {
-		if (process.platform !== "darwin") {
-			return { success: false, error: "Native macOS capture requires macOS." };
-		}
-
-		const proc = nativeMacCaptureProcess;
-		const preferredPath = nativeMacCaptureTargetPath;
-		const recordingId = nativeMacCaptureRecordingId ?? Date.now();
-		const cursorCaptureMode = nativeMacCursorCaptureMode;
-
-		if (!proc) {
-			return { success: false, error: "Native macOS capture is not running." };
-		}
-
-		try {
-			completeNativeMacCursorPauseRange();
-			const stoppedPathPromise = waitForNativeMacCaptureStop(proc);
-			proc.stdin.write("stop\n");
-			const stoppedPath = await stoppedPathPromise;
-			const screenVideoPath = stoppedPath || preferredPath;
-			if (!screenVideoPath) {
-				throw new Error("Native macOS capture did not return an output path.");
+	ipcMain.handle(
+		"stop-native-mac-recording",
+		async (_, discard?: boolean, durationMs?: number, stepCaptureReason?: StepCaptureReason) => {
+			if (process.platform !== "darwin") {
+				return { success: false, error: "Native macOS capture requires macOS." };
 			}
 
-			if (cursorCaptureMode === "editable-overlay") {
-				await stopCursorRecording();
-			} else {
-				pendingCursorRecordingData = null;
-			}
-			if (discard) {
-				pendingCursorRecordingData = null;
-				await Promise.all([
-					fs.rm(screenVideoPath, { force: true }),
-					fs.rm(`${screenVideoPath}.cursor.json`, { force: true }),
-				]);
-				showhowBridge.clearRecordingEpoch();
-				return { success: true, discarded: true };
+			const proc = nativeMacCaptureProcess;
+			const preferredPath = nativeMacCaptureTargetPath;
+			const recordingId = nativeMacCaptureRecordingId ?? Date.now();
+			const cursorCaptureMode = nativeMacCursorCaptureMode;
+
+			if (!proc) {
+				return { success: false, error: "Native macOS capture is not running." };
 			}
 
-			if (cursorCaptureMode === "editable-overlay") {
-				compactPendingCursorTelemetryPauseRanges(nativeMacPauseRanges);
-				shiftPendingCursorTelemetry(nativeMacCursorOffsetMs);
-				await writePendingCursorTelemetry(screenVideoPath);
-			}
-
-			// Showhow: relocate this recording into its agent-ready bundle folder.
-			// Best-effort -- a bundling failure must never lose the recording.
-			let bundledScreenPath = screenVideoPath;
-			let bundleDir: string | undefined;
 			try {
-				const bundle = await createRecordingBundle({
-					screenVideoPath,
+				completeNativeMacCursorPauseRange();
+				const stoppedPathPromise = waitForNativeMacCaptureStop(proc);
+				proc.stdin.write("stop\n");
+				const stoppedPath = await stoppedPathPromise;
+				const screenVideoPath = stoppedPath || preferredPath;
+				if (!screenVideoPath) {
+					throw new Error("Native macOS capture did not return an output path.");
+				}
+
+				if (cursorCaptureMode === "editable-overlay") {
+					await stopCursorRecording();
+				} else {
+					pendingCursorRecordingData = null;
+				}
+				if (discard) {
+					pendingCursorRecordingData = null;
+					await Promise.all([
+						fs.rm(screenVideoPath, { force: true }),
+						fs.rm(`${screenVideoPath}.cursor.json`, { force: true }),
+					]);
+					showhowBridge.clearRecordingEpoch();
+					return { success: true, discarded: true };
+				}
+
+				if (cursorCaptureMode === "editable-overlay") {
+					compactPendingCursorTelemetryPauseRanges(nativeMacPauseRanges);
+					shiftPendingCursorTelemetry(nativeMacCursorOffsetMs);
+					await writePendingCursorTelemetry(screenVideoPath);
+				}
+
+				// Showhow: relocate this recording into its agent-ready bundle folder.
+				// Best-effort -- a bundling failure must never lose the recording.
+				let bundledScreenPath = screenVideoPath;
+				let bundleDir: string | undefined;
+				try {
+					const bundle = await createRecordingBundle({
+						screenVideoPath,
+						createdAt: recordingId,
+						durationMs: isValidDurationMs(durationMs) ? durationMs : undefined,
+						...(stepCaptureReason ? { stepCaptureReason } : {}),
+					});
+					bundledScreenPath = bundle.screenVideoPath;
+					bundleDir = bundle.bundleDir;
+				} catch (error) {
+					console.error("Showhow bundle creation failed; keeping flat recording files:", error);
+				}
+
+				// Persist ingested browser-tier steps (companion bridge). Companion
+				// failure never discards video; on disconnect the bundle is marked
+				// unavailable so the desktop tier remains usable.
+				if (bundleDir) {
+					await applyBrowserStepsToBundle(bundleDir);
+				}
+				showhowBridge.clearRecordingEpoch();
+
+				const session: RecordingSession = {
+					screenVideoPath: bundledScreenPath,
 					createdAt: recordingId,
-					durationMs: isValidDurationMs(durationMs) ? durationMs : undefined,
-				});
-				bundledScreenPath = bundle.screenVideoPath;
-				bundleDir = bundle.bundleDir;
+					cursorCaptureMode,
+					...(bundleDir
+						? {
+								showhowBundleDir: bundleDir,
+								showhowVideoFileUrl: pathToFileURL(bundledScreenPath).toString(),
+							}
+						: {}),
+				};
+				setCurrentRecordingSessionState(session);
+				currentProjectPath = null;
+
+				const sessionManifestPath = path.join(
+					RECORDINGS_DIR,
+					`${path.parse(screenVideoPath).name}${RECORDING_SESSION_SUFFIX}`,
+				);
+				await fs.writeFile(sessionManifestPath, JSON.stringify(session, null, 2), "utf-8");
+
+				return {
+					success: true,
+					path: bundledScreenPath,
+					session,
+					bundleDir,
+					videoFileUrl: pathToFileURL(bundledScreenPath).toString(),
+					message: "Native macOS recording session stored successfully",
+				};
 			} catch (error) {
-				console.error("Showhow bundle creation failed; keeping flat recording files:", error);
+				console.error("Failed to stop native macOS recording:", error);
+				await stopCursorRecording();
+				return { success: false, error: error instanceof Error ? error.message : String(error) };
+			} finally {
+				nativeMacCaptureProcess = null;
+				nativeMacCaptureTargetPath = null;
+				nativeMacCaptureRecordingId = null;
+				nativeMacCursorOffsetMs = 0;
+				nativeMacCursorCaptureMode = "editable-overlay";
+				nativeMacCursorRecordingStartMs = 0;
+				nativeMacPauseStartedAtMs = null;
+				nativeMacPauseRanges = [];
+				nativeMacIsPaused = false;
+				activeMacCaptureBounds = null;
+				const source = selectedSource || { name: "Screen" };
+				if (onRecordingStateChange) {
+					onRecordingStateChange(false, source.name);
+				}
 			}
-
-			// Persist ingested browser-tier steps (companion bridge). Companion
-			// failure never discards video; on disconnect the bundle is marked
-			// unavailable so the desktop tier remains usable.
-			if (bundleDir) {
-				await applyBrowserStepsToBundle(bundleDir);
-			}
-			showhowBridge.clearRecordingEpoch();
-
-			const session: RecordingSession = {
-				screenVideoPath: bundledScreenPath,
-				createdAt: recordingId,
-				cursorCaptureMode,
-				...(bundleDir
-					? {
-							showhowBundleDir: bundleDir,
-							showhowVideoFileUrl: pathToFileURL(bundledScreenPath).toString(),
-						}
-					: {}),
-			};
-			setCurrentRecordingSessionState(session);
-			currentProjectPath = null;
-
-			const sessionManifestPath = path.join(
-				RECORDINGS_DIR,
-				`${path.parse(screenVideoPath).name}${RECORDING_SESSION_SUFFIX}`,
-			);
-			await fs.writeFile(sessionManifestPath, JSON.stringify(session, null, 2), "utf-8");
-
-			return {
-				success: true,
-				path: bundledScreenPath,
-				session,
-				bundleDir,
-				videoFileUrl: pathToFileURL(bundledScreenPath).toString(),
-				message: "Native macOS recording session stored successfully",
-			};
-		} catch (error) {
-			console.error("Failed to stop native macOS recording:", error);
-			await stopCursorRecording();
-			return { success: false, error: error instanceof Error ? error.message : String(error) };
-		} finally {
-			nativeMacCaptureProcess = null;
-			nativeMacCaptureTargetPath = null;
-			nativeMacCaptureRecordingId = null;
-			nativeMacCursorOffsetMs = 0;
-			nativeMacCursorCaptureMode = "editable-overlay";
-			nativeMacCursorRecordingStartMs = 0;
-			nativeMacPauseStartedAtMs = null;
-			nativeMacPauseRanges = [];
-			nativeMacIsPaused = false;
-			activeMacCaptureBounds = null;
-			const source = selectedSource || { name: "Screen" };
-			if (onRecordingStateChange) {
-				onRecordingStateChange(false, source.name);
-			}
-		}
-	});
+		},
+	);
 
 	ipcMain.handle(
 		"attach-native-mac-webcam-recording",
@@ -2358,6 +2380,7 @@ export function registerIpcHandlers(
 						screenVideoPath,
 						webcamVideoPath,
 						createdAt,
+						...(payload.stepCaptureReason ? { stepCaptureReason: payload.stepCaptureReason } : {}),
 					});
 					bundledScreenPath = bundle.screenVideoPath;
 					bundledWebcamPath = bundle.webcamVideoPath;
@@ -2495,6 +2518,21 @@ export function registerIpcHandlers(
 		},
 	);
 
+	ipcMain.handle("showhow:regenerate-doc", async (_, bundleDir: unknown) => {
+		if (typeof bundleDir !== "string") {
+			return { success: false, stepsWritten: 0, transcriptAvailable: false, entry: null };
+		}
+		const resolved = path.resolve(bundleDir);
+		if (!resolved.startsWith(`${SHOWHOW_RECORDINGS_ROOT}${path.sep}`)) {
+			console.error("showhow:regenerate-doc rejected path outside recordings root:", resolved);
+			return { success: false, stepsWritten: 0, transcriptAvailable: false, entry: null };
+		}
+		// Re-runs the deterministic doc engine from the stored cursor telemetry +
+		// transcript. Never throws and never removes source video/meta/transcript;
+		// a derivation failure is returned as { success: false } with sources intact.
+		return regenerateRecordingDoc(resolved);
+	});
+
 	ipcMain.handle("store-recorded-session", async (_, payload: StoreRecordedSessionInput) => {
 		try {
 			return await storeRecordedSessionFiles(payload);
@@ -2514,6 +2552,8 @@ export function registerIpcHandlers(
 				? payload.createdAt
 				: Date.now();
 		const cursorCaptureMode = normalizeCursorCaptureMode(payload.cursorCaptureMode);
+		const stepCaptureReason = payload.stepCaptureReason;
+		const source = payload.source === "browser" ? "browser" : "desktop";
 		const screenVideoPath = resolveRecordingOutputPath(payload.screen.fileName);
 		const screenStreamed = await finalizeRecordingFile(
 			recordingStreams,
@@ -2561,6 +2601,8 @@ export function registerIpcHandlers(
 				webcamVideoPath,
 				createdAt,
 				durationMs: isValidDurationMs(payload.durationMs) ? payload.durationMs : undefined,
+				...(stepCaptureReason ? { stepCaptureReason } : {}),
+				...(source !== "desktop" ? { source } : {}),
 			});
 			bundledScreenPath = bundle.screenVideoPath;
 			bundledWebcamPath = bundle.webcamVideoPath;

@@ -99,6 +99,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.invoke("showhow:update-workflow-document", bundleDir, update) as Promise<{
 			success: boolean;
 		}>,
+	showhowRegenerateDoc: (bundleDir: string) =>
+		ipcRenderer.invoke("showhow:regenerate-doc", bundleDir) as Promise<{
+			success: boolean;
+			stepsWritten: number;
+			transcriptAvailable: boolean;
+			entry: import("../src/lib/showhow/recordingLibrary").RecordingLibraryEntry | null;
+		}>,
 	showhowBridgeStatus: () =>
 		ipcRenderer.invoke("showhow:bridge-status") as Promise<{
 			host: string;
@@ -154,14 +161,19 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	resumeNativeMacRecording: () => {
 		return ipcRenderer.invoke("resume-native-mac-recording");
 	},
-	stopNativeMacRecording: (discard?: boolean, durationMs?: number) => {
-		return ipcRenderer.invoke("stop-native-mac-recording", discard, durationMs);
+	stopNativeMacRecording: (
+		discard?: boolean,
+		durationMs?: number,
+		stepCaptureReason?: import("../src/lib/showhow/recordingLibrary").StepCaptureReason,
+	) => {
+		return ipcRenderer.invoke("stop-native-mac-recording", discard, durationMs, stepCaptureReason);
 	},
 	attachNativeMacWebcamRecording: (payload: {
 		screenVideoPath: string;
 		recordingId: number;
 		webcam: { fileName: string; videoData: ArrayBuffer };
 		cursorCaptureMode?: import("../src/lib/recordingSession").CursorCaptureMode;
+		stepCaptureReason?: import("../src/lib/showhow/recordingLibrary").StepCaptureReason;
 	}) => {
 		return ipcRenderer.invoke("attach-native-mac-webcam-recording", payload);
 	},

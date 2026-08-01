@@ -445,3 +445,68 @@ privacy contract.
 **What was done instead:** Reveal displays the stored instruction label only in the local UI. An explicit,
 persisted `includeRevealedText` opt-in is still required before that label is rendered into `steps.md`; without
 it Markdown uses `[redacted]`. Users may edit the instruction themselves before opting in.
+
+### 2026-08-01: Issue 27 — missing focused IPC test for `showhow:regenerate-doc`
+
+**Root cause:** `electron/showhow/bundle.ts#regenerateDocArtifacts` is fail-open (never throws, never removes
+source video/meta/transcript), but no IPC/preload route exposed it to the renderer. The scanner mapped an absent
+`steps.json` to no steps, and `src/components/library/RecordingLibrary.tsx` gated the entire workflow area on
+`entry.steps && entry.steps.length > 0`, hiding any doc status, Create action, generating/retry state, or
+fallback explanation. The initial implementation pass added the IPC handler, preload bridge, scanner
+orchestration (`regenerateRecordingDoc`), and renderer resilience states, but missed the explicitly required
+focused main-process/IPC test that *invokes* the registered `showhow:regenerate-doc` handler and proves a
+derivation failure returns a typed safe result while source video/meta/transcript remain intact.
+
+**Initial missed IPC-test requirement:** The first pass added main-level tests for `regenerateRecordingDoc`
+(in `electron/showhow/recordingLibrary.test.ts`) and renderer tests (in
+`src/components/library/RecordingLibrary.test.tsx`), but no test exercised the actual `ipcMain.handle`
+registration. The repository's existing handler-test pattern (`electron/ipc/handlers.test.ts`) mocks
+`ipcMain.handle` as a no-op, so the handler was never invoked through the IPC boundary.
+
+**Correction:** Added `electron/ipc/showhowRegenerateDoc.test.ts` following the existing handler-test patterns
+(hoisted temp roots, `vi.mock("electron", ...)`, `vi.mock("../main", ...)`), extended so `ipcMain.handle`
+captures each registration into a `Map` keyed by channel. The real `regenerateDocArtifacts` and
+`createRecordingBundle` run end-to-end against a real bundle on disk (the `../showhow/bundle` mock uses
+`importOriginal` to preserve all exports and only override `SHOWHOW_RECORDINGS_ROOT` to a temp dir). The bridge
+server is stubbed so registration never binds a real WebSocket. The test builds a real bundle, corrupts the
+cursor telemetry to force a derivation failure, invokes the captured handler as the renderer would, and asserts
+the typed safe failure result (`{ success: false, stepsWritten: 0, transcriptAvailable: false, ... }`) plus
+intact source video/meta/transcript and preserved prior `steps.json`/`steps.md`. Path validation (outside-root
+and non-string bundle paths) is also asserted. No test-only production APIs were added and path validation was
+not weakened.
+
+### 2026-08-01: Issue 27 — live native macOS accessibility-denied reason lost across stop→bundle
+
+**Root cause:** The recorder-first fail-open policy degrades editable-overlay to system-cursor mode when macOS
+accessibility is denied, and the renderer tracks the structured `accessibility-denied` step-capture reason in
+`pendingStepCaptureReasonRef`. However, the native macOS stop path (`finalizeNativeMacRecording` →
+`stopNativeMacRecording(discard, duration)`) never passed that reason to the main process, and the
+`stop-native-mac-recording` IPC handler called `createRecordingBundle` without `stepCaptureReason`. The result:
+a system-mode recording with no cursor JSON was classified as generic `no-clicks` in `meta.stepCapture.reason`
+instead of the root-cause `accessibility-denied`, making the degradation indistinguishable from a genuine
+zero-click recording. The same gap existed in the `attach-native-mac-webcam-recording` re-bundle path.
+
+**Live failure:** A real macOS recording made with accessibility denied produced a bundle whose
+`meta.stepCapture.reason` was `no-clicks`, not `accessibility-denied`. The renderer's `getEffectiveCursorCaptureMode`
+ref-based approach already correctly produced `cursor.mode: system` and `hideSystemCursor: false` in the
+`startNativeMacRecording` request (no stale closure), so the start path was not the defect; the defect was
+solely the lost reason across the stop→bundle boundary.
+
+**Correction:** The renderer now passes `pendingStepCaptureReasonRef.current` as the third argument to
+`stopNativeMacRecording` and includes it in the `attachNativeMacWebcamRecording` payload. The preload bridge
+and `Window.electronAPI` type declaration forward the optional `stepCaptureReason` parameter. The
+`stop-native-mac-recording` and `attach-native-mac-webcam-recording` IPC handlers accept the typed
+`StepCaptureReason` and forward it to `createRecordingBundle` only when present, so normal
+editable-overlay/no-click recordings are unaffected. The fail-open contract (video/transcript preserved on any
+derivation failure) is unchanged. No test-only production APIs were added; path validation was not weakened.
+
+**Tests added:** `src/hooks/useScreenRecorder.test.ts` gained a block proving the actual
+`startNativeMacRecording` request uses `cursor.mode: system` + `hideSystemCursor: false` on accessibility denial
+(and `editable-overlay` + `true` on grant), plus a block proving `stopNativeMacRecording` receives
+`stepCaptureReason: accessibility-denied` on denial and `undefined` on grant.
+`electron/ipc/showhowMacStepCaptureReason.test.ts` proves `createRecordingBundle` with
+`stepCaptureReason: accessibility-denied` persists `meta.stepCapture.reason = accessibility-denied` (not
+`no-clicks`) while preserving the video, and that a normal system-mode recording without the reason still
+classifies as `no-clicks`. The start-request test was initially expected to be RED but passed immediately
+because `getEffectiveCursorCaptureMode` already reads the ref at call time; the stop-reason test was the
+genuine RED (3rd arg `undefined`) before the fix.

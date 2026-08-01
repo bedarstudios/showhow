@@ -130,6 +130,7 @@ describe("createRecordingBundle", () => {
 		const meta = JSON.parse(await readFile(path.join(result.bundleDir, "meta.json"), "utf-8"));
 		expect(meta.stepCapture).toEqual({
 			status: "unavailable",
+			reason: "frame-extraction",
 			message:
 				"Desktop click frames could not be extracted; this bundle has a transcript-only doc.",
 		});
@@ -294,6 +295,100 @@ describe("createRecordingBundle", () => {
 		const stepsJson = await readFile(path.join(result.bundleDir, "steps.json"), "utf-8");
 		const steps = JSON.parse(stepsJson) as Step[];
 		expect(steps[0].label).toBe("Step 1");
+	});
+
+	it("persists a structured no-clicks stepCapture reason when no clicks were captured", async () => {
+		const work = await mkdtemp(path.join(os.tmpdir(), "showhow-bundle-"));
+		const root = path.join(work, "Recordings");
+		const screenVideoPath = path.join(work, "rec-noclicks.webm");
+		await writeFile(screenVideoPath, "fake-webm");
+		await writeFile(`${screenVideoPath}.cursor.json`, JSON.stringify({ samples: [] }));
+
+		const result = await createRecordingBundle({
+			screenVideoPath,
+			createdAt: new Date(2026, 6, 11, 16, 42, 7).getTime(),
+			recordingsRoot: root,
+		});
+
+		const meta = JSON.parse(await readFile(path.join(result.bundleDir, "meta.json"), "utf-8"));
+		expect(meta.stepCapture).toEqual({
+			status: "unavailable",
+			reason: "no-clicks",
+			message: expect.any(String),
+		});
+	});
+
+	it("persists a frame-extraction stepCapture reason distinct from no-clicks when extraction fails", async () => {
+		const work = await mkdtemp(path.join(os.tmpdir(), "showhow-bundle-"));
+		const root = path.join(work, "Recordings");
+		const screenVideoPath = path.join(work, "rec-click.mp4");
+		await writeFile(screenVideoPath, "fake-mp4");
+		await writeFile(
+			`${screenVideoPath}.cursor.json`,
+			JSON.stringify({
+				samples: [{ timeMs: 100, cx: 0.5, cy: 0.5, interactionType: "click" }],
+			}),
+		);
+
+		const result = await createRecordingBundle({
+			screenVideoPath,
+			createdAt: new Date(2026, 6, 11, 16, 42, 7).getTime(),
+			recordingsRoot: root,
+			extractFrames: async () => {
+				throw new Error("ffmpeg is unavailable");
+			},
+		});
+
+		const meta = JSON.parse(await readFile(path.join(result.bundleDir, "meta.json"), "utf-8"));
+		expect(meta.stepCapture).toEqual({
+			status: "unavailable",
+			reason: "frame-extraction",
+			message: expect.any(String),
+		});
+		// Frame-extraction must not be mislabeled as no-clicks.
+		expect(meta.stepCapture.reason).not.toBe("no-clicks");
+	});
+
+	it("persists an accessibility-denied stepCapture reason supplied by the caller, overriding no-clicks", async () => {
+		const work = await mkdtemp(path.join(os.tmpdir(), "showhow-bundle-"));
+		const root = path.join(work, "Recordings");
+		const screenVideoPath = path.join(work, "rec-degraded.webm");
+		await writeFile(screenVideoPath, "fake-webm");
+		// No cursor telemetry: degraded system-cursor recording produces no click coords.
+		await writeFile(`${screenVideoPath}.cursor.json`, JSON.stringify({ samples: [] }));
+
+		const result = await createRecordingBundle({
+			screenVideoPath,
+			createdAt: new Date(2026, 6, 11, 16, 42, 7).getTime(),
+			recordingsRoot: root,
+			stepCaptureReason: "accessibility-denied",
+		});
+
+		const meta = JSON.parse(await readFile(path.join(result.bundleDir, "meta.json"), "utf-8"));
+		expect(meta.stepCapture).toEqual({
+			status: "unavailable",
+			reason: "accessibility-denied",
+			message: expect.any(String),
+		});
+		// The accessibility-denied reason must not collapse to no-clicks.
+		expect(meta.stepCapture.reason).not.toBe("no-clicks");
+	});
+
+	it("writes the source field from the caller into meta.json (defaults to desktop)", async () => {
+		const work = await mkdtemp(path.join(os.tmpdir(), "showhow-bundle-"));
+		const root = path.join(work, "Recordings");
+		const screenVideoPath = path.join(work, "rec-source.webm");
+		await writeFile(screenVideoPath, "fake-webm");
+
+		const result = await createRecordingBundle({
+			screenVideoPath,
+			createdAt: new Date(2026, 6, 11, 16, 42, 7).getTime(),
+			recordingsRoot: root,
+			source: "browser",
+		});
+
+		const meta = JSON.parse(await readFile(path.join(result.bundleDir, "meta.json"), "utf-8"));
+		expect(meta.source).toBe("browser");
 	});
 });
 
