@@ -154,6 +154,7 @@ export function LaunchWindow() {
 	);
 	const [supportsCursorModeToggle, setSupportsCursorModeToggle] = useState(false);
 	const [isLinuxHud, setIsLinuxHud] = useState(false);
+	const [companionPaired, setCompanionPaired] = useState(false);
 	const languageTriggerRef = useRef<HTMLButtonElement | null>(null);
 	const languageMenuPanelRef = useRef<HTMLDivElement | null>(null);
 	const hudBarRef = useRef<HTMLDivElement | null>(null);
@@ -236,6 +237,26 @@ export function LaunchWindow() {
 
 		return () => {
 			cancelled = true;
+		};
+	}, []);
+
+	useEffect(() => {
+		let cancelled = false;
+		const refresh = () => {
+			void window.electronAPI.showhowBridgeStatus().then(
+				(status) => {
+					if (!cancelled) setCompanionPaired(status.paired);
+				},
+				() => {
+					if (!cancelled) setCompanionPaired(false);
+				},
+			);
+		};
+		refresh();
+		const interval = window.setInterval(refresh, 2_000);
+		return () => {
+			cancelled = true;
+			window.clearInterval(interval);
 		};
 	}, []);
 
@@ -910,6 +931,14 @@ export function LaunchWindow() {
 						{selectedSource}
 					</span>
 				</button>
+
+				<span
+					data-testid="browser-companion-status"
+					className={`${trayLayout === "vertical" ? "sr-only" : ""} text-[10px] font-medium ${companionPaired ? "text-green-400" : "text-white/45"}`}
+					aria-live="polite"
+				>
+					Browser: {companionPaired ? "Paired" : "Unpaired"}
+				</span>
 
 				{/* Audio controls group */}
 				<div

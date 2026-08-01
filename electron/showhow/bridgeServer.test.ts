@@ -410,7 +410,7 @@ describe("persistBrowserSteps bundle integration", () => {
 				label: "Click Upload",
 				coords: { cx: 0.5, cy: 0.5 },
 				redaction: false,
-				screenshot: "iVBORw0KGgo=",
+				screenshot: "data:image/png;base64,iVBORw0KGgo=",
 			} satisfies IngestedBrowserStep & { screenshot: string },
 		];
 		await persistBrowserSteps(bundleDir, steps);

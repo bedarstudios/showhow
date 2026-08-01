@@ -58,6 +58,7 @@
 		"diagnostic:run": "node scripts/diagnostic-tool/diagnostic.mjs",
 		"diagnostic:smoke:win": "node scripts/diagnostic-tool/diagnostic.mjs --duration 3",
 		"build-vite": "tsc && vite build",
+		"build:browser-companion": "node scripts/build-browser-companion.mjs",
 		"test:browser": "vitest --config vitest.browser.config.ts --run",
 		"test:browser:install": "playwright install --with-deps chromium-headless-shell",
 		"test:e2e": "playwright test",

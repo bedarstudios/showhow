@@ -12,6 +12,7 @@ import {
 	type FrameExtractor,
 	formatStepTimestamp,
 	parseTranscript,
+	persistBrowserSteps,
 	type RegenerateDocArtifactsResult,
 	regenerateDocArtifacts,
 	renderStepsMarkdown,
@@ -608,6 +609,36 @@ describe("createRecordingBundle frame-extraction failure", () => {
 });
 
 describe("regenerateDocArtifacts", () => {
+	it("preserves browser-tier source steps when a late transcript arrives", async () => {
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-browser-steps-"));
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({ video: "video.webm", transcript: "transcript.txt" }),
+			"utf-8",
+		);
+		await persistBrowserSteps(bundleDir, [
+			{
+				tier: "browser",
+				ts: 1_500,
+				label: "Type Password",
+				coords: { cx: 0.2, cy: 0.3 },
+				redaction: true,
+				screenshot: "data:image/png;base64,iVBORw0KGgo=",
+			},
+		]);
+		await writeFile(path.join(bundleDir, "transcript.txt"), "[0:01] desktop narration\n", "utf-8");
+
+		await regenerateDocArtifacts(bundleDir);
+
+		expect(JSON.parse(await readFile(path.join(bundleDir, "steps.json"), "utf-8"))).toEqual([
+			expect.objectContaining({
+				label: "Type Password",
+				tier: "browser",
+				redaction: true,
+				screenshot: "step-01.png",
+			}),
+		]);
+	});
 	async function buildBundleWithClicks(opts: {
 		transcriptContent?: string;
 		extractFrames?: FrameExtractor;

@@ -469,6 +469,13 @@ export async function regenerateDocArtifacts(
 		transcriptAvailable: false,
 	};
 	try {
+		const existingBrowserSteps = await readBrowserSteps(bundleDir);
+		if (existingBrowserSteps !== null) {
+			result.success = true;
+			result.stepsWritten = existingBrowserSteps.length;
+			result.transcriptAvailable = await fileExists(path.join(bundleDir, "transcript.txt"));
+			return result;
+		}
 		// Reconstruct stepFrames from the stored cursor telemetry, reusing the
 		// stored click ordering and the canonical step-NN.png filenames.
 		const stepFrames = await stepFramesFromBundle(bundleDir);
@@ -484,6 +491,25 @@ export async function regenerateDocArtifacts(
 		console.warn("[showhow] regenerateDocArtifacts failed; bundle left intact:", error);
 	}
 	return result;
+}
+
+/** Browser steps are source-of-truth semantic capture and must never be replaced by desktop telemetry. */
+async function readBrowserSteps(bundleDir: string): Promise<Step[] | null> {
+	try {
+		const parsed: unknown = JSON.parse(
+			await fs.readFile(path.join(bundleDir, "steps.json"), "utf-8"),
+		);
+		if (!Array.isArray(parsed) || !parsed.some((step) => isBrowserStep(step))) return null;
+		return parsed as Step[];
+	} catch {
+		return null;
+	}
+}
+
+function isBrowserStep(value: unknown): value is Step {
+	return (
+		typeof value === "object" && value !== null && (value as { tier?: unknown }).tier === "browser"
+	);
 }
 
 // --- Phase 4 browser-tier step persistence (companion bridge) ----------------
@@ -540,10 +566,10 @@ export async function persistBrowserSteps(
 		if (step.screenshot === null) continue;
 		const filename = `step-${String(index + 1).padStart(2, "0")}.png`;
 		try {
-			await fs.writeFile(
-				path.join(screenshotsDir, filename),
-				Buffer.from(step.screenshot, "base64"),
-			);
+			const pngBase64 = step.screenshot.startsWith("data:image/png;base64,")
+				? step.screenshot.slice("data:image/png;base64,".length)
+				: step.screenshot;
+			await fs.writeFile(path.join(screenshotsDir, filename), Buffer.from(pngBase64, "base64"));
 		} catch (error) {
 			console.warn(
 				`[showhow] browser screenshot ${filename} write failed; blanking reference:`,
