@@ -62,10 +62,12 @@ export class BrowserCompanionCapture {
 	async captureNavigation(): Promise<void> {
 		const url = new URL(this.options.getUrl());
 		// Query strings and fragments can carry OAuth codes, reset tokens, and
-		// session material, so navigation labels persist the pathname only.
+		// session material, so navigation labels persist the pathname only —
+		// with token-like segments masked, since reset and invitation links
+		// embed credentials in the path itself.
 		await this.options.sendStep({
 			ts: this.options.now(),
-			label: `Navigate to ${url.pathname}`,
+			label: `Navigate to ${sanitizePathname(url.pathname)}`,
 			cx: 0,
 			cy: 0,
 			redacted: false,
@@ -121,6 +123,22 @@ function isCheckboxOrRadio(element: HTMLElement): boolean {
 	if (element.localName !== "input") return false;
 	const type = element.getAttribute("type")?.toLowerCase();
 	return type === "checkbox" || type === "radio";
+}
+
+function sanitizePathname(pathname: string): string {
+	return pathname
+		.split("/")
+		.map((segment) => (isTokenLikeSegment(segment) ? "…" : segment))
+		.join("/");
+}
+
+function isTokenLikeSegment(segment: string): boolean {
+	if (segment.length < 16) return false;
+	if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)) return true;
+	if (/^[0-9a-f]{16,}$/i.test(segment)) return true;
+	// Long mixed alphanumeric segments (JWTs, signed tokens) contain digits;
+	// ordinary route words never reach this shape.
+	return /^[A-Za-z0-9_.~-]{20,}$/.test(segment) && /\d/.test(segment);
 }
 
 function clampCoordinate(value: number, size: number): number {

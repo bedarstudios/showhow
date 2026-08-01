@@ -171,4 +171,35 @@ describe("BrowserCompanionCapture", () => {
 		);
 		expect(JSON.stringify(sendStep.mock.calls)).not.toContain("secret");
 	});
+
+	it("masks token-like pathname segments in navigation labels", async () => {
+		const cases: Array<[string, string]> = [
+			["https://app.example/reset/3f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c", "Navigate to /reset/…"],
+			[
+				"https://app.example/invite/0b9c8d7e-6f5a-4b3c-2d1e-0f9a8b7c6d5e/accept",
+				"Navigate to /invite/…/accept",
+			],
+			[
+				"https://app.example/auth/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9abc123",
+				"Navigate to /auth/…",
+			],
+		];
+		for (const [url, label] of cases) {
+			const { capture, sendStep } = makeCapture(url);
+			await capture.captureNavigation();
+			expect(sendStep).toHaveBeenCalledWith(expect.objectContaining({ label }));
+		}
+	});
+
+	it("keeps ordinary pathname segments readable in navigation labels", async () => {
+		const { capture, sendStep } = makeCapture(
+			"https://app.example/selenium/web/verified-final-spa",
+		);
+
+		await capture.captureNavigation();
+
+		expect(sendStep).toHaveBeenCalledWith(
+			expect.objectContaining({ label: "Navigate to /selenium/web/verified-final-spa" }),
+		);
+	});
 });

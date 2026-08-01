@@ -226,4 +226,18 @@ describe("CompanionConnection", () => {
 		expect(Math.max(...delays)).toBe(10_000);
 		vi.useRealTimers();
 	});
+
+	it("rejects a step sent while no pairing token is configured", async () => {
+		const connection = new CompanionConnection({
+			readConfig: async () => ({ endpoint: "ws://127.0.0.1:8765", token: "" }),
+			createSocket: () => new FakeSocket(),
+			setPaired: async () => undefined,
+			schedule: (callback, delayMs) => setTimeout(callback, delayMs),
+			cancel: clearTimeout,
+		});
+
+		// A resolved send would make the worker answer Chrome with ok: true for a
+		// step that was never queued anywhere.
+		await expect(connection.send('{"type":"step"}')).rejects.toThrow();
+	});
 });

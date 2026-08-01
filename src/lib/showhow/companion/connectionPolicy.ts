@@ -112,7 +112,11 @@ export class CompanionConnection {
 			this.socket.send(message);
 			return;
 		}
-		if (!this.socket) return;
+		if (!this.socket) {
+			// Resolving here would let the worker acknowledge Chrome with ok: true
+			// for a step that was neither sent nor queued.
+			throw new Error("companion connection unavailable");
+		}
 		// Queued messages survive disconnects and flush only after the next
 		// paired acknowledgment, so steps are never handed to a rejected socket.
 		await new Promise<void>((resolve) => {
