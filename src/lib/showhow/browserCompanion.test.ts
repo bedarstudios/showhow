@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 import { BrowserCompanionCapture } from "./browserCompanion";
 
-function makeCapture() {
+function makeCapture(url = "https://app.example.test/settings?tab=profile") {
 	const sendStep = vi.fn(async () => undefined);
 	const captureScreenshot = vi.fn(async () => "pre-action-png");
 	const capture = new BrowserCompanionCapture({
 		sendStep,
 		captureScreenshot,
 		now: () => 1_700_000_004_000,
-		getUrl: () => "https://app.example.test/settings?tab=profile",
+		getUrl: () => url,
 	});
 	return { capture, sendStep, captureScreenshot };
 }
@@ -151,11 +151,24 @@ describe("BrowserCompanionCapture", () => {
 		expect(captureScreenshot).not.toHaveBeenCalled();
 		expect(sendStep).toHaveBeenCalledWith({
 			ts: 1_700_000_004_000,
-			label: "Navigate to /settings?tab=profile",
+			label: "Navigate to /settings",
 			cx: 0,
 			cy: 0,
 			redacted: false,
 			screenshot: null,
 		});
+	});
+
+	it("keeps URL query and fragment secrets out of navigation labels", async () => {
+		const { capture, sendStep } = makeCapture(
+			"https://app.example/oauth/callback?code=secret-code#access_token=secret-token",
+		);
+
+		await capture.captureNavigation();
+
+		expect(sendStep).toHaveBeenCalledWith(
+			expect.objectContaining({ label: "Navigate to /oauth/callback" }),
+		);
+		expect(JSON.stringify(sendStep.mock.calls)).not.toContain("secret");
 	});
 });

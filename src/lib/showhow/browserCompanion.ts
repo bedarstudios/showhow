@@ -61,9 +61,11 @@ export class BrowserCompanionCapture {
 
 	async captureNavigation(): Promise<void> {
 		const url = new URL(this.options.getUrl());
+		// Query strings and fragments can carry OAuth codes, reset tokens, and
+		// session material, so navigation labels persist the pathname only.
 		await this.options.sendStep({
 			ts: this.options.now(),
-			label: `Navigate to ${url.pathname}${url.search}${url.hash}`,
+			label: `Navigate to ${url.pathname}`,
 			cx: 0,
 			cy: 0,
 			redacted: false,

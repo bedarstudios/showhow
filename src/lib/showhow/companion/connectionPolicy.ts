@@ -40,6 +40,7 @@ export class CompanionConnection {
 	private retryTimer: ReturnType<typeof setTimeout> | null = null;
 	private heartbeatTimer: ReturnType<typeof setTimeout> | null = null;
 	private retryDelayMs = INITIAL_RETRY_DELAY_MS;
+	private pairedAck = false;
 	private readonly pendingMessages: PendingMessage[] = [];
 
 	constructor(private readonly options: CompanionConnectionOptions) {}
@@ -71,14 +72,17 @@ export class CompanionConnection {
 			if (this.socket !== socket) return;
 			this.retryDelayMs = INITIAL_RETRY_DELAY_MS;
 			socket.send(JSON.stringify({ v: 1, type: "hello", role: "companion", token: pairing.token }));
-			this.flushPendingMessages(socket);
 			this.scheduleHeartbeat(socket);
 		});
 		socket.addEventListener("message", (event) => {
 			try {
 				const message = JSON.parse(String(event?.data)) as { type?: string };
 				if (message.type === "paired") {
+					// Steps stay queued until the desktop accepts the token; flushing
+					// on open would hand them to a connection the desktop may reject.
+					this.pairedAck = true;
 					void this.options.setPaired(true);
+					this.flushPendingMessages(socket);
 				} else if (message.type === "error") {
 					this.handleDisconnect(socket);
 				}
@@ -94,6 +98,7 @@ export class CompanionConnection {
 		this.cancelRetry();
 		const socket = this.socket;
 		this.socket = null;
+		this.pairedAck = false;
 		this.cancelHeartbeat();
 		socket?.close();
 		this.retryDelayMs = INITIAL_RETRY_DELAY_MS;
@@ -103,11 +108,13 @@ export class CompanionConnection {
 
 	async send(message: string): Promise<void> {
 		await this.connect();
-		if (this.socket?.readyState === 1) {
+		if (this.socket?.readyState === 1 && this.pairedAck) {
 			this.socket.send(message);
 			return;
 		}
 		if (!this.socket) return;
+		// Queued messages survive disconnects and flush only after the next
+		// paired acknowledgment, so steps are never handed to a rejected socket.
 		await new Promise<void>((resolve) => {
 			this.pendingMessages.push({ message, resolve });
 		});
@@ -116,6 +123,7 @@ export class CompanionConnection {
 	private handleDisconnect(socket: CompanionSocket): void {
 		if (this.socket !== socket) return;
 		this.socket = null;
+		this.pairedAck = false;
 		socket.close();
 		void this.options.setPaired(false);
 		this.scheduleRetry();
