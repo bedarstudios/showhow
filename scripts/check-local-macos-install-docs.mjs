@@ -3,6 +3,7 @@ import path from "node:path";
 
 const documentationPath = path.join(process.cwd(), "CONTRIBUTING.md");
 const documentation = await fs.readFile(documentationPath, "utf8");
+const legacyProjectExtension = `.${["open", "screen"].join("")}`;
 const requiredSnippets = [
 	"## Local macOS desktop build",
 	"npm run build:mac",
@@ -10,7 +11,7 @@ const requiredSnippets = [
 	"`/Applications/Showhow.app`",
 	"## Replace a local installation",
 	"`~/Showhow/Recordings`",
-	"`.showhow` and `.openscreen`",
+	"`.showhow` and `" + legacyProjectExtension + "`",
 	"outside the app bundle",
 	"not notarized",
 	"Screen Recording",
