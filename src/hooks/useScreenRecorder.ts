@@ -331,6 +331,8 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 			// Only show the "Saving…" spinner for genuine saves — not for cancel/restart
 			// flows where discardRecordingId has already been set.
 			const isDiscarded = discardRecordingId.current === activeRecordingId;
+			const finalCursorCaptureMode = getEffectiveCursorCaptureMode();
+			const finalStepCaptureReason = pendingStepCaptureReasonRef.current;
 			if (!isDiscarded) {
 				setSaving(true);
 			}
@@ -400,11 +402,9 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 								? { videoData: webcamVideoData, fileName: webcamFileName }
 								: undefined,
 						createdAt: activeRecordingId,
-						cursorCaptureMode: getEffectiveCursorCaptureMode(),
+						cursorCaptureMode: finalCursorCaptureMode,
 						durationMs: duration,
-						...(pendingStepCaptureReasonRef.current
-							? { stepCaptureReason: pendingStepCaptureReasonRef.current }
-							: {}),
+						...(finalStepCaptureReason ? { stepCaptureReason: finalStepCaptureReason } : {}),
 					});
 
 					if (!result.success) {
@@ -454,6 +454,8 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 			}
 
 			activeNativeRecording.finalizing = true;
+			const finalCursorCaptureMode = getEffectiveCursorCaptureMode();
+			const finalStepCaptureReason = pendingStepCaptureReasonRef.current;
 			if (!discard) {
 				setSaving(true);
 			}
@@ -516,10 +518,8 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 								fileName: webcamFileName,
 							},
 							createdAt: activeNativeRecording.recordingId,
-							cursorCaptureMode: getEffectiveCursorCaptureMode(),
-							...(pendingStepCaptureReasonRef.current
-								? { stepCaptureReason: pendingStepCaptureReasonRef.current }
-								: {}),
+							cursorCaptureMode: finalCursorCaptureMode,
+							...(finalStepCaptureReason ? { stepCaptureReason: finalStepCaptureReason } : {}),
 						});
 						if (stored.success && stored.session) {
 							storedSession = stored.session;
@@ -561,6 +561,8 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 			}
 
 			activeNativeRecording.finalizing = true;
+			const finalCursorCaptureMode = getEffectiveCursorCaptureMode();
+			const finalStepCaptureReason = pendingStepCaptureReasonRef.current;
 			if (!discard) {
 				setSaving(true);
 			}
@@ -606,7 +608,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 				const result = await window.electronAPI.stopNativeMacRecording(
 					discard,
 					duration,
-					pendingStepCaptureReasonRef.current,
+					finalStepCaptureReason,
 				);
 				const webcamAsset = await webcamAssetPromise;
 				if (discard || result.discarded) {
@@ -628,10 +630,8 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 						screenVideoPath: result.path,
 						recordingId: activeNativeRecording.recordingId,
 						webcam: webcamAsset,
-						cursorCaptureMode: getEffectiveCursorCaptureMode(),
-						...(pendingStepCaptureReasonRef.current
-							? { stepCaptureReason: pendingStepCaptureReasonRef.current }
-							: {}),
+						cursorCaptureMode: finalCursorCaptureMode,
+						...(finalStepCaptureReason ? { stepCaptureReason: finalStepCaptureReason } : {}),
 					});
 					if (attachResult.success) {
 						result.session = attachResult.session;

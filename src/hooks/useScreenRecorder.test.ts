@@ -19,7 +19,7 @@ const fakeRecorderHandle = {
 		requestData: vi.fn(),
 	},
 	recordedBlobPromise: Promise.resolve(new Blob([], { type: "video/webm" })),
-	isStreaming: () => false,
+	isStreaming: vi.fn(() => false),
 	discard: vi.fn().mockResolvedValue(undefined),
 };
 vi.mock("./recorderHandle", () => ({
@@ -137,6 +137,8 @@ function installMediaDevices() {
 describe("useScreenRecorder accessibility-denial regression (recorder-first fail-open)", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		fakeRecorderHandle.recordedBlobPromise = Promise.resolve(new Blob([], { type: "video/webm" }));
+		fakeRecorderHandle.isStreaming.mockReturnValue(false);
 		installMediaDevices();
 	});
 
@@ -205,6 +207,69 @@ describe("useScreenRecorder accessibility-denial regression (recorder-first fail
 		// Granted: the editable-overlay mode is preserved (no degradation).
 		expect(startupCall![2]).toBe("editable-overlay");
 		expect(result.current.recording).toBe(true);
+
+		vi.useRealTimers();
+	});
+
+	it("keeps the first recording's degraded cursor metadata while a granted retry starts", async () => {
+		let resolveFirstBlob: ((blob: Blob) => void) | undefined;
+		fakeRecorderHandle.recordedBlobPromise = new Promise<Blob>((resolve) => {
+			resolveFirstBlob = resolve;
+		});
+		fakeRecorderHandle.isStreaming.mockReturnValue(true);
+		const requestNativeMacCursorAccess = vi
+			.fn()
+			.mockResolvedValueOnce({ success: false, granted: false, status: "denied" })
+			.mockResolvedValueOnce({ success: true, granted: true, status: "granted" });
+		const storeRecordedSession = vi.fn(async () => ({
+			success: true,
+			path: "/tmp/first.showhow",
+		}));
+		installElectronApi({
+			requestNativeMacCursorAccess,
+			storeRecordedSession,
+			setCurrentVideoPath: vi.fn(async () => ({ success: true })),
+			switchToEditor: vi.fn(async () => undefined),
+		});
+		vi.useFakeTimers();
+
+		const { result } = renderHook(() => useScreenRecorder());
+
+		act(() => {
+			result.current.toggleRecording();
+		});
+		await act(async () => {
+			await vi.advanceTimersByTimeAsync(3500);
+		});
+		expect(result.current.recording).toBe(true);
+
+		act(() => {
+			result.current.toggleRecording();
+		});
+		expect(result.current.recording).toBe(false);
+
+		// A retry can begin while the first recording is still awaiting its blob.
+		// Its granted preflight resets the hook-level degradation refs.
+		act(() => {
+			result.current.toggleRecording();
+		});
+		await act(async () => {
+			await vi.advanceTimersByTimeAsync(0);
+		});
+		expect(requestNativeMacCursorAccess).toHaveBeenCalledTimes(2);
+
+		await act(async () => {
+			resolveFirstBlob?.(new Blob([], { type: "video/webm" }));
+			await Promise.resolve();
+		});
+
+		expect(storeRecordedSession).toHaveBeenCalledTimes(1);
+		expect(storeRecordedSession).toHaveBeenCalledWith(
+			expect.objectContaining({
+				cursorCaptureMode: "system",
+				stepCaptureReason: "accessibility-denied",
+			}),
+		);
 
 		vi.useRealTimers();
 	});
