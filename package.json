@@ -53,6 +53,7 @@
 		"test:wgc-full:win": "node scripts/test-windows-wgc-helper.mjs --webcam --system-audio --microphone",
 		"capture:showhow-preview": "node scripts/capture-showhow-preview.mjs",
 		"check:bridge-bundle": "node scripts/check-bridge-bundle.mjs",
+		"check:local-macos-install-docs": "node scripts/check-local-macos-install-docs.mjs",
 		"inspect:cursor-click-bounce": "node scripts/inspect-native-cursor-click-bounce.mjs",
 		"audit:showhow-bundle": "node --experimental-strip-types scripts/audit-showhow-bundle.mjs",
 		"diagnostic:run": "node scripts/diagnostic-tool/diagnostic.mjs",
