@@ -99,6 +99,12 @@ interface Window {
 			bundleDir: string,
 			update: import("../src/lib/showhow/workflowDocument").WorkflowDocumentUpdate,
 		) => Promise<{ success: boolean }>;
+		showhowRegenerateDoc: (bundleDir: string) => Promise<{
+			success: boolean;
+			stepsWritten: number;
+			transcriptAvailable: boolean;
+			entry: import("../src/lib/showhow/recordingLibrary").RecordingLibraryEntry | null;
+		}>;
 		showhowBridgeStatus: () => Promise<{
 			host: string;
 			port: number;
@@ -170,6 +176,7 @@ interface Window {
 		stopNativeMacRecording: (
 			discard?: boolean,
 			durationMs?: number,
+			stepCaptureReason?: import("../src/lib/showhow/recordingLibrary").StepCaptureReason,
 		) => Promise<{
 			success: boolean;
 			path?: string;
@@ -185,6 +192,7 @@ interface Window {
 			recordingId: number;
 			webcam: import("../src/lib/recordingSession").RecordedVideoAssetInput;
 			cursorCaptureMode?: import("../src/lib/recordingSession").CursorCaptureMode;
+			stepCaptureReason?: import("../src/lib/showhow/recordingLibrary").StepCaptureReason;
 		}) => Promise<{
 			success: boolean;
 			path?: string;

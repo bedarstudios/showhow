@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { RecordingLibraryEntry } from "@/lib/showhow/recordingLibrary";
@@ -12,6 +12,15 @@ const mockClipboardWriteText = vi.fn<(text: string) => Promise<void>>();
 const mockShowhowCopyPath = vi.fn<(bundleDir: string) => Promise<{ success: boolean }>>();
 const mockShowhowUpdateWorkflowDocument =
 	vi.fn<(bundleDir: string, update: unknown) => Promise<{ success: boolean }>>();
+const mockShowhowRegenerateDoc =
+	vi.fn<
+		(bundleDir: string) => Promise<{
+			success: boolean;
+			stepsWritten: number;
+			transcriptAvailable: boolean;
+			entry: RecordingLibraryEntry | null;
+		}>
+	>();
 
 beforeEach(() => {
 	vi.resetAllMocks();
@@ -19,11 +28,18 @@ beforeEach(() => {
 	mockClipboardWriteText.mockResolvedValue(undefined);
 	mockShowhowCopyPath.mockResolvedValue({ success: true });
 	mockShowhowUpdateWorkflowDocument.mockResolvedValue({ success: true });
+	mockShowhowRegenerateDoc.mockResolvedValue({
+		success: true,
+		stepsWritten: 0,
+		transcriptAvailable: false,
+		entry: null,
+	});
 	Object.defineProperty(window, "electronAPI", {
 		value: {
 			showhowListRecordings: mockShowhowListRecordings,
 			showhowCopyPath: mockShowhowCopyPath,
 			showhowUpdateWorkflowDocument: mockShowhowUpdateWorkflowDocument,
+			showhowRegenerateDoc: mockShowhowRegenerateDoc,
 			switchToHud: mockSwitchToHud,
 		},
 		writable: true,
@@ -447,5 +463,325 @@ describe("RecordingLibrary — workflow document view (issue #23)", () => {
 		fireEvent.loadedMetadata(secondVideo);
 
 		expect(secondVideo.currentTime).toBe(0);
+	});
+});
+
+describe("RecordingLibrary — missing-doc resilience (issue #27)", () => {
+	// A desktop recording with a valid video but no steps.json and no stepCapture:
+	// the approved missing-doc empty state with a Create workflow doc action.
+	const desktopNoDocEntry: RecordingLibraryEntry = {
+		...desktopEntry,
+		video: "video.mp4",
+	};
+
+	it("renders the approved missing-doc empty state with a Create workflow doc action when no doc exists", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopNoDocEntry]);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		expect(screen.getByTestId("missing-doc-state")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /Create workflow doc/iu })).toBeInTheDocument();
+	});
+
+	it("keeps Copy path available alongside the missing-doc state", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopNoDocEntry]);
+		render(<RecordingLibrary />);
+
+		await screen.findByTestId("missing-doc-state");
+		await userEvent.click(screen.getByRole("button", { name: /Copy path/iu }));
+		expect(mockShowhowCopyPath).toHaveBeenCalledWith(desktopNoDocEntry.bundleDir);
+	});
+
+	it("shows an observable generating state while the Create action is in flight", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopNoDocEntry]);
+		let resolveRegen: (value: { success: boolean; entry: RecordingLibraryEntry | null }) => void =
+			() => {
+				// Placeholder replaced by the in-flight regeneration promise below,
+				// before the Create action is clicked.
+			};
+		mockShowhowRegenerateDoc.mockImplementation(
+			() =>
+				new Promise((resolve) => {
+					resolveRegen = resolve;
+				}) as Promise<{ success: boolean; entry: RecordingLibraryEntry | null }>,
+		);
+		render(<RecordingLibrary />);
+
+		await screen.findByTestId("missing-doc-state");
+		await userEvent.click(screen.getByRole("button", { name: /Create workflow doc/iu }));
+
+		expect(await screen.findByTestId("generating-doc-state")).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /Create workflow doc/iu })).not.toBeInTheDocument();
+
+		// Release the in-flight regeneration.
+		await act(async () => {
+			resolveRegen({ success: true, entry: desktopDocEntry });
+		});
+	});
+
+	it("refreshes into the resulting doc on a successful Create action", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopNoDocEntry]);
+		mockShowhowRegenerateDoc.mockResolvedValue({
+			success: true,
+			stepsWritten: 3,
+			transcriptAvailable: true,
+			entry: desktopDocEntry,
+		});
+		render(<RecordingLibrary />);
+
+		await screen.findByTestId("missing-doc-state");
+		await userEvent.click(screen.getByRole("button", { name: /Create workflow doc/iu }));
+
+		// The regenerated steps now render in place of the empty state.
+		await screen.findByText("Open the products page");
+		expect(screen.queryByTestId("missing-doc-state")).not.toBeInTheDocument();
+		expect(mockShowhowRegenerateDoc).toHaveBeenCalledWith(desktopNoDocEntry.bundleDir);
+	});
+
+	it("shows a retryable failure state when the Create action fails", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopNoDocEntry]);
+		mockShowhowRegenerateDoc.mockResolvedValue({
+			success: false,
+			stepsWritten: 0,
+			transcriptAvailable: false,
+			entry: desktopNoDocEntry,
+		});
+		render(<RecordingLibrary />);
+
+		await screen.findByTestId("missing-doc-state");
+		await userEvent.click(screen.getByRole("button", { name: /Create workflow doc/iu }));
+
+		expect(await screen.findByTestId("doc-failure-state")).toBeInTheDocument();
+		// Retry action is offered.
+		const retry = screen.getByRole("button", { name: /Retry/iu });
+		expect(retry).toBeInTheDocument();
+		// Copy path remains available through the failure.
+		expect(screen.getByRole("button", { name: /Copy path/iu })).toBeInTheDocument();
+	});
+
+	it("retries regeneration from the failure state", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopNoDocEntry]);
+		mockShowhowRegenerateDoc
+			.mockResolvedValueOnce({
+				success: false,
+				stepsWritten: 0,
+				transcriptAvailable: false,
+				entry: desktopNoDocEntry,
+			})
+			.mockResolvedValueOnce({
+				success: true,
+				stepsWritten: 3,
+				transcriptAvailable: true,
+				entry: desktopDocEntry,
+			});
+		render(<RecordingLibrary />);
+
+		await screen.findByTestId("missing-doc-state");
+		await userEvent.click(screen.getByRole("button", { name: /Create workflow doc/iu }));
+		await screen.findByTestId("doc-failure-state");
+		await userEvent.click(screen.getByRole("button", { name: /Retry/iu }));
+
+		await screen.findByText("Open the products page");
+		expect(mockShowhowRegenerateDoc).toHaveBeenCalledTimes(2);
+	});
+
+	it("explains a browser companion disconnect and offers the desktop-tier fallback", async () => {
+		const browserUnpairedEntry: RecordingLibraryEntry = {
+			...browserEntry,
+			video: "video.webm",
+			stepCapture: {
+				status: "unavailable",
+				message:
+					"Browser companion disconnected mid-recording; semantic steps unavailable. Desktop tier remains usable.",
+			},
+		};
+		mockShowhowListRecordings.mockResolvedValue([browserUnpairedEntry]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("missing-doc-state");
+		// Explicit companion-disconnect explanation is shown.
+		expect(docState.textContent ?? "").toMatch(/companion disconnected/iu);
+		// Desktop-tier fallback is explicitly named.
+		expect(docState.textContent ?? "").toMatch(/desktop tier/iu);
+		// The Create action is offered to regenerate from the desktop tier.
+		expect(
+			within(docState).getByRole("button", { name: /Create workflow doc/iu }),
+		).toBeInTheDocument();
+	});
+
+	it("explains a no-click desktop recording and offers the transcript-only fallback", async () => {
+		const desktopNoClickEntry: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			stepCapture: {
+				status: "unavailable",
+				message: "No desktop clicks were captured; this bundle has a transcript-only doc.",
+			},
+		};
+		mockShowhowListRecordings.mockResolvedValue([desktopNoClickEntry]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("missing-doc-state");
+		// Explicit no-click explanation is shown.
+		expect(docState.textContent ?? "").toMatch(/no desktop clicks/iu);
+		// Transcript-only fallback is explicitly named.
+		expect(docState.textContent ?? "").toMatch(/transcript-only/iu);
+		// The Create action is offered to build the transcript-only doc.
+		expect(
+			within(docState).getByRole("button", { name: /Create workflow doc/iu }),
+		).toBeInTheDocument();
+	});
+
+	it("renders an explicit transcript-only doc state for a zero-step success, not an endless Create", async () => {
+		// steps.json exists with zero steps: the doc engine succeeded and this is
+		// a transcript-only doc. It must not fall back into the Create lifecycle.
+		const transcriptOnlyEntry: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			steps: [],
+		};
+		mockShowhowListRecordings.mockResolvedValue([transcriptOnlyEntry]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("transcript-only-doc-state");
+		// The successful zero-step doc is named explicitly.
+		expect(docState.textContent ?? "").toMatch(/transcript-only/iu);
+		// The Create lifecycle is not re-offered for a doc that already succeeded.
+		expect(screen.queryByTestId("missing-doc-state")).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /Create workflow doc/iu })).not.toBeInTheDocument();
+		// Copy path remains available in this state.
+		await userEvent.click(screen.getByRole("button", { name: /Copy path/iu }));
+		expect(mockShowhowCopyPath).toHaveBeenCalledWith(transcriptOnlyEntry.bundleDir);
+	});
+
+	it("names the degradation reason inside the transcript-only doc state", async () => {
+		const transcriptOnlyDegraded: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			steps: [],
+			stepCapture: {
+				status: "unavailable",
+				message: "No desktop clicks were captured; this bundle has a transcript-only doc.",
+			},
+		};
+		mockShowhowListRecordings.mockResolvedValue([transcriptOnlyDegraded]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("transcript-only-doc-state");
+		expect(docState.textContent ?? "").toMatch(/no desktop clicks were captured/iu);
+		expect(screen.queryByRole("button", { name: /Create workflow doc/iu })).not.toBeInTheDocument();
+	});
+
+	it("renders the degradation notice even when desktop fallback steps are usable", async () => {
+		const browserDegradedWithSteps: RecordingLibraryEntry = {
+			...browserEntry,
+			video: "video.webm",
+			steps: [{ label: "Open account settings", ts: 5_000, screenshot: "step-01.png" }],
+			stepCapture: {
+				status: "unavailable",
+				message:
+					"Browser companion disconnected mid-recording; semantic steps unavailable. Desktop tier remains usable.",
+			},
+		};
+		mockShowhowListRecordings.mockResolvedValue([browserDegradedWithSteps]);
+		render(<RecordingLibrary />);
+
+		// The desktop fallback steps still render.
+		await screen.findByText("Open account settings");
+		// The companion degradation is explained independently of the steps.
+		const notice = screen.getByTestId("step-capture-degradation-notice");
+		expect(notice.textContent ?? "").toMatch(/companion disconnected/iu);
+		expect(notice.textContent ?? "").toMatch(/desktop tier/iu);
+		// Copy path remains available alongside the notice.
+		expect(screen.getByRole("button", { name: /Copy path/iu })).toBeInTheDocument();
+	});
+
+	it("honors a structured companion reason without a legacy message", async () => {
+		const browserUnpairedReasonOnly: RecordingLibraryEntry = {
+			...browserEntry,
+			video: "video.webm",
+			// Forward-compatible shape: the backend supplies a structured `reason`
+			// alongside the legacy status/message pair.
+			stepCapture: {
+				status: "unavailable",
+				reason: "companion-unpaired",
+			} as RecordingLibraryEntry["stepCapture"],
+		};
+		mockShowhowListRecordings.mockResolvedValue([browserUnpairedReasonOnly]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("missing-doc-state");
+		expect(docState.textContent ?? "").toMatch(/companion/iu);
+		expect(docState.textContent ?? "").toMatch(/desktop tier/iu);
+		expect(
+			within(docState).getByRole("button", { name: /Create workflow doc/iu }),
+		).toBeInTheDocument();
+	});
+
+	it("explains accessibility-denied click capture with the transcript-only fallback", async () => {
+		const desktopAccessibilityDenied: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			stepCapture: {
+				status: "unavailable",
+				reason: "accessibility-denied",
+				message:
+					"Accessibility permission was not granted, so desktop clicks could not be captured.",
+			} as RecordingLibraryEntry["stepCapture"],
+		};
+		mockShowhowListRecordings.mockResolvedValue([desktopAccessibilityDenied]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("missing-doc-state");
+		expect(docState.textContent ?? "").toMatch(/accessibility permission/iu);
+		expect(docState.textContent ?? "").toMatch(/transcript-only/iu);
+		expect(
+			within(docState).getByRole("button", { name: /Create workflow doc/iu }),
+		).toBeInTheDocument();
+	});
+
+	it("does not mislabel a structured frame-extraction failure as no clicks", async () => {
+		const desktopFrameFailure: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			stepCapture: {
+				status: "unavailable",
+				reason: "frame-extraction-failed",
+				message:
+					"Desktop click frames could not be extracted; this bundle has a transcript-only doc.",
+			} as RecordingLibraryEntry["stepCapture"],
+		};
+		mockShowhowListRecordings.mockResolvedValue([desktopFrameFailure]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("missing-doc-state");
+		// A frame-extraction failure is not a "no clicks" recording.
+		expect(docState.textContent ?? "").not.toMatch(/no desktop clicks captured/iu);
+		expect(docState.textContent ?? "").toMatch(/could not be extracted/iu);
+		// The transcript-only fallback is still named, with the Create action.
+		expect(docState.textContent ?? "").toMatch(/transcript-only/iu);
+		expect(
+			within(docState).getByRole("button", { name: /Create workflow doc/iu }),
+		).toBeInTheDocument();
+	});
+
+	it("does not mislabel a legacy message-only frame-extraction failure as no clicks", async () => {
+		// Current backend payload: no structured reason, only status + message.
+		const desktopLegacyFrameFailure: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			stepCapture: {
+				status: "unavailable",
+				message:
+					"Desktop click frames could not be extracted; this bundle has a transcript-only doc.",
+			},
+		};
+		mockShowhowListRecordings.mockResolvedValue([desktopLegacyFrameFailure]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("missing-doc-state");
+		expect(docState.textContent ?? "").not.toMatch(/no desktop clicks captured/iu);
+		expect(docState.textContent ?? "").toMatch(/could not be extracted/iu);
+		expect(docState.textContent ?? "").toMatch(/transcript-only/iu);
 	});
 });

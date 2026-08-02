@@ -2,8 +2,11 @@ import type { Dirent } from "node:fs";
 import { constants } from "node:fs";
 import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import type { RecordingLibraryEntry } from "../../src/lib/showhow/recordingLibrary";
-import { SHOWHOW_RECORDINGS_ROOT } from "./bundle";
+import type {
+	RecordingLibraryEntry,
+	StepCaptureReason,
+} from "../../src/lib/showhow/recordingLibrary";
+import { regenerateDocArtifacts, SHOWHOW_RECORDINGS_ROOT } from "./bundle";
 import { createShowhowMediaUrl } from "./mediaProtocol";
 
 export type { RecordingLibraryEntry };
@@ -34,15 +37,29 @@ function isVideoName(value: unknown): value is "video.mp4" | "video.webm" {
 	return value === "video.mp4" || value === "video.webm";
 }
 
+const STEP_CAPTURE_REASONS: readonly StepCaptureReason[] = [
+	"no-clicks",
+	"frame-extraction",
+	"accessibility-denied",
+	"companion-unpaired",
+	"companion-disconnected",
+];
+
 function isStepCapture(
 	value: unknown,
-): value is { status: "available" | "unavailable"; message?: string } {
+): value is { status: "available" | "unavailable"; message?: string; reason?: StepCaptureReason } {
 	return (
 		typeof value === "object" &&
 		value !== null &&
 		"status" in value &&
 		(value.status === "available" || value.status === "unavailable") &&
-		(!("message" in value) || typeof value.message === "string")
+		(!("message" in value) || typeof value.message === "string") &&
+		// `reason` is optional; when present it must be a known reason so an
+		// unknown value never reaches the renderer. Legacy bundles without it
+		// continue to deserialize (preserve legacy reads).
+		(!("reason" in value) ||
+			(typeof value.reason === "string" &&
+				(STEP_CAPTURE_REASONS as readonly string[]).includes(value.reason)))
 	);
 }
 
@@ -189,4 +206,60 @@ export async function listRecordings(
 	return results
 		.filter((entry): entry is RecordingLibraryEntry => entry !== null)
 		.sort((a, b) => b.createdAt - a.createdAt);
+}
+
+/**
+ * Scan a single bundle directory by absolute path and return its
+ * `RecordingLibraryEntry`, or `null` when it is not a valid bundle (missing or
+ * unreadable `meta.json`, or missing required fields). Used to refresh one
+ * recording's entry after a doc-layer derivation without re-scanning the whole
+ * recordings root.
+ */
+export async function readRecordingEntry(bundleDir: string): Promise<RecordingLibraryEntry | null> {
+	return readEntryForDir(path.dirname(bundleDir), path.basename(bundleDir));
+}
+
+/**
+ * The result of regenerating a single bundle's workflow doc and refreshing its
+ * library entry. `success` mirrors `regenerateDocArtifacts`; `entry` is the
+ * re-scanned bundle (or `null` when the bundle can no longer be scanned).
+ * Never throws and never removes source video/meta/transcript -- a derivation
+ * failure is returned as `{ success: false }` with the prior artifacts and
+ * sources left intact.
+ */
+export interface RegenerateRecordingDocResult {
+	bundleDir: string;
+	success: boolean;
+	stepsWritten: number;
+	transcriptAvailable: boolean;
+	entry: RecordingLibraryEntry | null;
+}
+
+/**
+ * Regenerate a bundle's `steps.json`/`steps.md` from its stored cursor
+ * telemetry + transcript, then re-scan the bundle into a refreshed library
+ * entry. This is the re-runnable doc engine behind the renderer's Create /
+ * Retry action: it never throws and never discards the video, meta, or
+ * transcript. On failure the prior artifact pair and all sources are left
+ * untouched and `{ success: false }` is returned.
+ */
+export async function regenerateRecordingDoc(
+	bundleDir: string,
+): Promise<RegenerateRecordingDocResult> {
+	const regen = await regenerateDocArtifacts(bundleDir);
+	let entry: RecordingLibraryEntry | null = null;
+	try {
+		entry = await readRecordingEntry(bundleDir);
+	} catch (error) {
+		// A scan failure must never mask a successful regeneration or discard
+		// sources; report the regeneration outcome with a null entry.
+		console.error("[showhow] readRecordingEntry failed after regeneration:", error);
+	}
+	return {
+		bundleDir,
+		success: regen.success,
+		stepsWritten: regen.stepsWritten,
+		transcriptAvailable: regen.transcriptAvailable,
+		entry,
+	};
 }

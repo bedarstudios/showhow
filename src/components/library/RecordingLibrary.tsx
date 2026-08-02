@@ -249,6 +249,7 @@ function RecordingDetail({
 	const [editingStepIndex, setEditingStepIndex] = useState<number | null>(null);
 	const [instructionDraft, setInstructionDraft] = useState("");
 	const [revealedSteps, setRevealedSteps] = useState<Set<number>>(() => new Set());
+	const [docStatus, setDocStatus] = useState<"idle" | "generating" | "failure">("idle");
 	const isDesktop = entry.source === "desktop";
 	const sourceLabel = isDesktop ? "Desktop" : "Browser";
 	const sourceTagStyle: React.CSSProperties = {
@@ -288,6 +289,21 @@ function RecordingDetail({
 		if (!steps) return;
 		if (await persist({ type: "delete-step", index }, { ...entry, steps })) {
 			setRevealedSteps(new Set());
+		}
+	};
+	const createDoc = async () => {
+		setDocStatus("generating");
+		try {
+			const result = await window.electronAPI.showhowRegenerateDoc(entry.bundleDir);
+			if (result.success && result.entry) {
+				onEntryChange(result.entry);
+				setDocStatus("idle");
+			} else {
+				setDocStatus("failure");
+			}
+		} catch (error) {
+			console.error("[RecordingLibrary] regenerate doc failed:", error);
+			setDocStatus("failure");
 		}
 	};
 	const seekToStep = (timestampMs: number) => {
@@ -447,7 +463,9 @@ function RecordingDetail({
 				</video>
 			)}
 
-			{entry.steps && entry.steps.length > 0 && (
+			{entry.steps && entry.steps.length > 0 && <StepCaptureDegradationNotice entry={entry} />}
+
+			{entry.steps && entry.steps.length > 0 ? (
 				<section style={{ marginTop: "40px" }} aria-label="Workflow steps">
 					<h2 style={{ fontSize: "20px", margin: "0 0 18px", color: "var(--sh-color-text)" }}>
 						Steps
@@ -613,8 +631,245 @@ function RecordingDetail({
 						})}
 					</ol>
 				</section>
+			) : entry.steps === undefined ? (
+				<MissingDocSection entry={entry} docStatus={docStatus} onCreate={() => void createDoc()} />
+			) : (
+				<TranscriptOnlyDocSection entry={entry} />
 			)}
 		</div>
+	);
+}
+
+// ---- missing-doc / regeneration section (issue #27) --------------------------
+
+function MissingDocSection({
+	entry,
+	docStatus,
+	onCreate,
+}: {
+	entry: RecordingLibraryEntry;
+	docStatus: "idle" | "generating" | "failure";
+	onCreate: () => void;
+}) {
+	const { heading, explanation } = getStepCaptureCopy(entry, {
+		heading: "No workflow doc yet",
+		explanation:
+			"Create a workflow doc from this recording's video, transcript, and captured clicks.",
+	});
+
+	return (
+		<section style={{ marginTop: "40px" }} aria-label="Workflow document">
+			<h2 style={{ fontSize: "20px", margin: "0 0 18px", color: "var(--sh-color-text)" }}>
+				Workflow doc
+			</h2>
+			{docStatus === "generating" ? (
+				<div
+					data-testid="generating-doc-state"
+					style={{
+						padding: "28px 24px",
+						borderRadius: "var(--sh-radius-lg)",
+						background: "var(--sh-card-bg)",
+						color: "var(--sh-muted)",
+						fontSize: "14.5px",
+					}}
+				>
+					Generating workflow doc…
+				</div>
+			) : docStatus === "failure" ? (
+				<div
+					data-testid="doc-failure-state"
+					style={{
+						padding: "28px 24px",
+						borderRadius: "var(--sh-radius-lg)",
+						background: "var(--sh-card-bg)",
+					}}
+				>
+					<p
+						style={{
+							margin: "0 0 14px",
+							fontSize: "15px",
+							fontWeight: 600,
+							color: "var(--sh-color-text)",
+						}}
+					>
+						Couldn&apos;t generate the workflow doc
+					</p>
+					<p
+						style={{
+							margin: "0 0 18px",
+							fontSize: "14.5px",
+							color: "var(--sh-muted)",
+							lineHeight: 1.6,
+						}}
+					>
+						The recording, transcript, and any existing steps are safe. Try again to regenerate the
+						doc.
+					</p>
+					<button
+						type="button"
+						aria-label="Retry"
+						onClick={onCreate}
+						style={{
+							border: "1px solid var(--sh-color-divider)",
+							borderRadius: "8px",
+							background: "transparent",
+							color: "var(--sh-color-text)",
+							padding: "8px 14px",
+							fontSize: "13px",
+							fontWeight: 600,
+							cursor: "pointer",
+						}}
+					>
+						Retry
+					</button>
+				</div>
+			) : (
+				<div
+					data-testid="missing-doc-state"
+					style={{
+						padding: "28px 24px",
+						borderRadius: "var(--sh-radius-lg)",
+						background: "var(--sh-card-bg)",
+					}}
+				>
+					<p
+						style={{
+							margin: "0 0 8px",
+							fontSize: "15px",
+							fontWeight: 600,
+							color: "var(--sh-color-text)",
+						}}
+					>
+						{heading}
+					</p>
+					<p
+						style={{
+							margin: "0 0 18px",
+							fontSize: "14.5px",
+							color: "var(--sh-muted)",
+							lineHeight: 1.6,
+							maxWidth: "560px",
+						}}
+					>
+						{explanation}
+					</p>
+					<button
+						type="button"
+						aria-label="Create workflow doc"
+						onClick={onCreate}
+						style={{
+							border: "1px solid var(--sh-color-divider)",
+							borderRadius: "8px",
+							background: "transparent",
+							color: "var(--sh-color-text)",
+							padding: "8px 14px",
+							fontSize: "13px",
+							fontWeight: 600,
+							cursor: "pointer",
+						}}
+					>
+						Create workflow doc
+					</button>
+				</div>
+			)}
+		</section>
+	);
+}
+
+function getStepCaptureCopy(
+	entry: RecordingLibraryEntry,
+	fallback: { heading: string; explanation: string },
+) {
+	if (entry.stepCapture?.status !== "unavailable") {
+		return fallback;
+	}
+
+	const { message, reason } = entry.stepCapture;
+	const detail = message ?? "Click capture was unavailable for this recording.";
+	const frameExtractionFailed =
+		reason === "frame-extraction" || /could not be extracted/iu.test(detail);
+	if (
+		reason === "companion-unpaired" ||
+		reason === "companion-disconnected" ||
+		entry.source === "browser"
+	) {
+		return {
+			heading:
+				reason === "companion-unpaired"
+					? "Browser companion unavailable"
+					: "Browser companion disconnected",
+			explanation: `${detail} The desktop tier fallback is available for this recording.`,
+		};
+	}
+	if (reason === "accessibility-denied") {
+		return {
+			heading: "Accessibility permission unavailable",
+			explanation: `${detail} The transcript-only fallback is available.`,
+		};
+	}
+	if (frameExtractionFailed) {
+		return {
+			heading: "Click frames unavailable",
+			explanation: `${detail} The transcript-only fallback is available.`,
+		};
+	}
+	return {
+		heading: "No desktop clicks captured",
+		explanation: `${detail} The transcript-only fallback is available.`,
+	};
+}
+
+function StepCaptureDegradationNotice({ entry }: { entry: RecordingLibraryEntry }) {
+	if (entry.stepCapture?.status !== "unavailable") {
+		return null;
+	}
+	const { heading, explanation } = getStepCaptureCopy(entry, {
+		heading: "Click capture unavailable",
+		explanation: "Workflow steps remain available.",
+	});
+	return (
+		<div
+			data-testid="step-capture-degradation-notice"
+			style={{
+				marginTop: "28px",
+				padding: "14px 18px",
+				borderRadius: "var(--sh-radius-md)",
+				background: "var(--sh-card-bg)",
+				color: "var(--sh-muted)",
+				fontSize: "14px",
+				lineHeight: 1.6,
+			}}
+		>
+			<strong style={{ color: "var(--sh-color-text)" }}>{heading}. </strong>
+			{explanation}
+		</div>
+	);
+}
+
+function TranscriptOnlyDocSection({ entry }: { entry: RecordingLibraryEntry }) {
+	const { heading, explanation } = getStepCaptureCopy(entry, {
+		heading: "Transcript-only workflow doc",
+		explanation: "This workflow doc has no captured click steps.",
+	});
+	return (
+		<section style={{ marginTop: "40px" }} aria-label="Workflow document">
+			<h2 style={{ fontSize: "20px", margin: "0 0 18px", color: "var(--sh-color-text)" }}>
+				Workflow doc
+			</h2>
+			<div
+				data-testid="transcript-only-doc-state"
+				style={{
+					padding: "28px 24px",
+					borderRadius: "var(--sh-radius-lg)",
+					background: "var(--sh-card-bg)",
+				}}
+			>
+				<p style={{ margin: "0 0 8px", fontSize: "15px", fontWeight: 600 }}>{heading}</p>
+				<p style={{ margin: 0, fontSize: "14.5px", color: "var(--sh-muted)", lineHeight: 1.6 }}>
+					{explanation}
+				</p>
+			</div>
+		</section>
 	);
 }
 
