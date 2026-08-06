@@ -1,8 +1,9 @@
 name: Board Sync
 
-# The projection itself lives in bedar-workflows so every repo's board derives
-# its columns from one file. This half is what only Showhow can know: when to
-# run, and which project to write to.
+# Labels are the source of truth for the Bedar Loop; this board is a projection
+# of them. Every event recomputes the whole status from the issue's CURRENT
+# label set, so events may arrive late, out of order, or be replayed without the
+# board ever disagreeing with the labels.
 on:
   issues:
     types: [opened, reopened, closed, labeled, unlabeled]
@@ -25,11 +26,135 @@ concurrency:
   group: board-sync-${{ github.event.issue.number || github.event.inputs.issue || 'bulk' }}
   cancel-in-progress: false
 
+permissions:
+  issues: read
+
 jobs:
   sync:
-    uses: bedarstudios/bedar-workflows/.github/workflows/board-sync.yml@v1
-    with:
-      project_number: 2
-      issue: ${{ fromJSON(github.event.inputs.issue || 0) }}
-    secrets:
-      BEDAR_LOOP_PAT: ${{ secrets.BEDAR_LOOP_PAT }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recompute Status from labels
+        uses: actions/github-script@v7
+        env:
+          PROJECT_OWNER: bedarstudios
+          PROJECT_NUMBER: "2"
+        with:
+          # The default GITHUB_TOKEN cannot see user-level Projects at all: every
+          # mutation returns a null node rather than a 403, which reads like a bad
+          # id. This PAT needs the `project` scope.
+          github-token: ${{ secrets.BEDAR_LOOP_PAT }}
+          script: |
+            const { deriveStatus } = await import(
+              `${process.env.GITHUB_WORKSPACE}/.github/scripts/derive-status.mjs`
+            );
+
+            const owner = process.env.PROJECT_OWNER;
+            const number = Number(process.env.PROJECT_NUMBER);
+
+            // Resolve the project and its Status options at runtime. Editing the
+            // field's options regenerates every option id, so hardcoding them
+            // would break silently the next time the columns are touched.
+            // graphql() THROWS when the response carries an errors array, so a
+            // scope problem arrives as a stack trace rather than as the null node
+            // you would expect. Catch it and say what actually needs fixing.
+            let projectQuery;
+            try {
+              projectQuery = await github.graphql(`
+                query($owner:String!, $number:Int!) {
+                  user(login:$owner) {
+                    projectV2(number:$number) {
+                      id
+                      field(name:"Status") {
+                        ... on ProjectV2SingleSelectField {
+                          id
+                          options { id name }
+                        }
+                      }
+                    }
+                  }
+                }`, { owner, number });
+            } catch (error) {
+              const forbidden = /not accessible by personal access token|FORBIDDEN/i.test(
+                error.message ?? ""
+              );
+              core.setFailed(
+                forbidden
+                  ? `BEDAR_LOOP_PAT cannot read user-level Projects. Regenerate it as a ` +
+                    `classic PAT with the 'project' scope (repo + workflow + project) and ` +
+                    `re-set the secret. Original error: ${error.message}`
+                  : `Failed to resolve project ${owner}/#${number}: ${error.message}`
+              );
+              return;
+            }
+
+            const project = projectQuery.user?.projectV2;
+            if (!project?.field) {
+              core.setFailed(
+                `Project ${owner}/#${number} or its Status field is not visible to this ` +
+                `token, but the query did not error. Check the project number.`
+              );
+              return;
+            }
+
+            const optionByName = new Map(project.field.options.map((o) => [o.name, o.id]));
+
+            // Which issues to sync: the one that fired, one named by hand, or
+            // every open issue for a rebuild-from-labels.
+            let issueNumbers;
+            if (context.payload.issue) {
+              issueNumbers = [context.payload.issue.number];
+            } else if (context.payload.inputs?.issue) {
+              issueNumbers = [Number(context.payload.inputs.issue)];
+            } else {
+              const all = await github.paginate(github.rest.issues.listForRepo, {
+                ...context.repo, state: "all", per_page: 100,
+              });
+              issueNumbers = all.filter((i) => !i.pull_request).map((i) => i.number);
+            }
+
+            for (const issue_number of issueNumbers) {
+              // Re-read the issue. The webhook payload carries only the ONE label
+              // that changed, so trusting it would move a needs-human card out of
+              // Blocked the moment any unrelated label was added.
+              const { data: issue } = await github.rest.issues.get({
+                ...context.repo, issue_number,
+              });
+
+              const status = deriveStatus({ state: issue.state, labels: issue.labels });
+              if (status === null) {
+                core.info(`#${issue_number} is housekeeping; not board work.`);
+                continue;
+              }
+
+              const optionId = optionByName.get(status);
+              if (!optionId) {
+                core.setFailed(`No Status option named "${status}" on the board.`);
+                return;
+              }
+
+              // Add to the board if it is not on it yet, so a freshly opened
+              // issue lands in Todo without anyone dragging it.
+              const added = await github.graphql(`
+                mutation($project:ID!, $content:ID!) {
+                  addProjectV2ItemById(input:{projectId:$project, contentId:$content}) {
+                    item { id }
+                  }
+                }`, { project: project.id, content: issue.node_id });
+
+              await github.graphql(`
+                mutation($project:ID!, $item:ID!, $field:ID!, $option:String!) {
+                  updateProjectV2ItemFieldValue(input:{
+                    projectId:$project, itemId:$item, fieldId:$field,
+                    value:{ singleSelectOptionId:$option }
+                  }) { projectV2Item { id } }
+                }`, {
+                  project: project.id,
+                  item: added.addProjectV2ItemById.item.id,
+                  field: project.field.id,
+                  option: optionId,
+                });
+
+              core.info(`#${issue_number} -> ${status}`);
+            }

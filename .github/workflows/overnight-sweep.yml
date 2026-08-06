@@ -4,28 +4,103 @@ on:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
-    inputs:
-      pr_number:
-        description: Optional single open PR to sweep instead of every open PR
-        required: false
-        type: number
 
 permissions:
   pull-requests: read
   issues: write
 
 jobs:
-  # Showhow is the only repo a poller currently targets, so it is the only one
-  # that calls this. The threshold and the one-comment-per-outage rule live in
-  # the shared workflow now, not here.
+  # The poller runs on Mohamed's Mac. When that machine dies, sleeps through the
+  # night, or the launchd job silently stops, nothing local can report it --
+  # which is the whole point of checking from the cloud.
   check-poller-liveness:
-    uses: bedarstudios/bedar-workflows/.github/workflows/poller-heartbeat.yml@v1
-    secrets:
-      BEDAR_LOOP_PAT: ${{ secrets.BEDAR_LOOP_PAT }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment when the poller heartbeat is stale
+        uses: actions/github-script@v7
+        env:
+          # 20h, not 60m: the Mac sleeping overnight is normal and the poller
+          # catches up on wake. Only a full day of silence means it is dead.
+          STALE_MINUTES: "1200"
+        with:
+          github-token: ${{ secrets.BEDAR_LOOP_PAT }}
+          script: |
+            const title = 'Bedar Loop poller heartbeat';
+            const { data: found } = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open in:title "${title}"`,
+            });
+            const issue = found.items.find((i) => i.title === title);
+            if (!issue) {
+              core.warning('No heartbeat issue found. The poller has never run, or it was closed.');
+              return;
+            }
+
+            const match = /Last poll:\s*(\S+)/.exec(issue.body ?? '');
+            const last = match ? Date.parse(match[1]) : NaN;
+            if (Number.isNaN(last)) {
+              core.warning(`Heartbeat issue #${issue.number} has no parseable timestamp.`);
+              return;
+            }
+
+            const staleMinutes = Number(process.env.STALE_MINUTES);
+            const ageMinutes = Math.round((Date.now() - last) / 60000);
+            if (ageMinutes <= staleMinutes) {
+              core.info(`Poller alive: last beat ${ageMinutes}m ago.`);
+              return;
+            }
+
+            // One comment per outage: if we already commented after the last
+            // beat, the alert for this outage exists and repeating it is noise.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: issue.number,
+              per_page: 100,
+            });
+            const alreadyAlerted = comments.some(
+              (c) => c.body?.startsWith('Poller looks dead.') && Date.parse(c.created_at) > last,
+            );
+            if (alreadyAlerted) {
+              core.info('Already commented since the last beat -- skipping duplicate alert.');
+              return;
+            }
+
+            // Comment rather than reopen or relabel: this issue is the sensor,
+            // and a sensor that changes state is one more thing to reset by hand.
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: issue.number,
+              body: `Poller looks dead. Last beat \`${match[1]}\` -- ${ageMinutes} minutes ago, ` +
+                    `threshold ${staleMinutes}m.\n\nCheck:\n` +
+                    '```\nlaunchctl list | grep bedarstudios.loop.poller\n' +
+                    'tail -20 ~/.local/state/bedar-loop/poller.log\n```',
+            });
+            core.warning(`Poller heartbeat is ${ageMinutes}m old; commented on #${issue.number}.`);
 
   dispatch-cold-reviewers:
-    uses: bedarstudios/bedar-workflows/.github/workflows/overnight-sweep.yml@v1
-    with:
-      pr_number: ${{ fromJSON(github.event.inputs.pr_number || 0) }}
-    secrets:
-      BEDAR_LOOP_PAT: ${{ secrets.BEDAR_LOOP_PAT }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch cold Copilot reviewer on unfinished non-priority PRs
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.BEDAR_LOOP_PAT }}
+          script: |
+            const { data: prs } = await github.rest.pulls.list({
+              ...context.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const REVIEWER = `You are a REVIEWER. Read the full diff of this PR against \`main\`. Score it against \`.github/copilot-review-rubric.md\`. Output exactly one line \`Confidence Score: N/5\` and numbered findings with file:line. Do NOT modify any file. If the score is <5, a separate fixer run will address it.`;
+
+            for (const pr of prs) {
+              const labels = pr.labels.map(label => label.name);
+              if (['review-passed', 'needs-human', 'priority'].some(label => labels.includes(label))) {
+                core.info(`PR #${pr.number} is settled, escalated, or priority; skipping.`);
+                continue;
+              }
+
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: pr.number,
+                body: `@copilot ${REVIEWER}`,
+              });
+            }

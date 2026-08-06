@@ -510,29 +510,3 @@ derivation failure) is unchanged. No test-only production APIs were added; path 
 classifies as `no-clicks`. The start-request test was initially expected to be RED but passed immediately
 because `getEffectiveCursorCaptureMode` already reads the ref at call time; the stop-reason test was the
 genuine RED (3rd arg `undefined`) before the fix.
-
-### 2026-08-06: Loop workflows moved to bedar-workflows; local copies deleted
-
-**Superseded:** the 2026-07-28 note above chose `.mjs` + vitest for
-`.github/scripts/derive-status.mjs` so the test would run under `npm test`
-rather than be orphaned from CI. That reasoning held while the file lived here.
-It no longer does.
-
-`bedar-workflows` had zero callers -- Showhow, Kicker, and Cura each carried
-local copies of the same workflows, and they had already diverged. This repo's
-`overnight-sweep.yml` grew a `check-poller-liveness` job the shared repo never
-had, and the fix raising its threshold from 60m to 20h (plus one comment per
-outage) landed only here. `board-sync.yml` was about to become a third copy when
-Cura got a board.
-
-`board-sync.yml`, `stale.yml`, and `overnight-sweep.yml` are now callers pinned
-to `@v1`. `derive-status.mjs` and its test moved to `bedar-workflows/scripts/`
-and were converted to `node:test`, because that repo has no `package.json` and
-Cura runs jest -- the vitest import meant the copy added to Cura earlier the same
-day could not execute at all. The remaining four `.github/scripts/*.test.mjs`
-files still match the `vitest.config.ts` include, so that glob is not dead.
-
-**Behaviour change:** the shared sweep also skips draft PRs and PRs labelled
-`needs-fixes`. The local copy skipped only `review-passed`, `needs-human`, and
-`priority`, so it could dispatch a cold reviewer at a PR a fixer was mid-way
-through. The shared behaviour is the intended one.
