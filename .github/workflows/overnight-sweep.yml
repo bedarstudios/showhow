@@ -19,7 +19,9 @@ jobs:
       - name: Comment when the poller heartbeat is stale
         uses: actions/github-script@v7
         env:
-          STALE_MINUTES: "60"
+          # 20h, not 60m: the Mac sleeping overnight is normal and the poller
+          # catches up on wake. Only a full day of silence means it is dead.
+          STALE_MINUTES: "1200"
         with:
           github-token: ${{ secrets.BEDAR_LOOP_PAT }}
           script: |
@@ -44,6 +46,21 @@ jobs:
             const ageMinutes = Math.round((Date.now() - last) / 60000);
             if (ageMinutes <= staleMinutes) {
               core.info(`Poller alive: last beat ${ageMinutes}m ago.`);
+              return;
+            }
+
+            // One comment per outage: if we already commented after the last
+            // beat, the alert for this outage exists and repeating it is noise.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: issue.number,
+              per_page: 100,
+            });
+            const alreadyAlerted = comments.some(
+              (c) => c.body?.startsWith('Poller looks dead.') && Date.parse(c.created_at) > last,
+            );
+            if (alreadyAlerted) {
+              core.info('Already commented since the last beat -- skipping duplicate alert.');
               return;
             }
 
