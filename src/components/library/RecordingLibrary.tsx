@@ -246,10 +246,19 @@ function RecordingDetail({
 	const [pendingSeekMs, setPendingSeekMs] = useState<number | null>(null);
 	const [editingTitle, setEditingTitle] = useState(false);
 	const [titleDraft, setTitleDraft] = useState(entry.title);
+	const [titleStatus, setTitleStatus] = useState<"idle" | "saving" | "success" | "failure">("idle");
+	const [copyStatus, setCopyStatus] = useState<"idle" | "copying" | "success" | "failure">("idle");
 	const [editingStepIndex, setEditingStepIndex] = useState<number | null>(null);
 	const [instructionDraft, setInstructionDraft] = useState("");
 	const [revealedSteps, setRevealedSteps] = useState<Set<number>>(() => new Set());
 	const [docStatus, setDocStatus] = useState<"idle" | "generating" | "failure">("idle");
+	const isMountedRef = useRef(true);
+	useEffect(() => {
+		isMountedRef.current = true;
+		return () => {
+			isMountedRef.current = false;
+		};
+	}, []);
 	const isDesktop = entry.source === "desktop";
 	const sourceLabel = isDesktop ? "Desktop" : "Browser";
 	const sourceTagStyle: React.CSSProperties = {
@@ -262,8 +271,15 @@ function RecordingDetail({
 	};
 	const videoSrc =
 		entry.videoUrl ?? (entry.video ? fallbackBundleUrl(entry.bundleDir, entry.video) : undefined);
-	const copyPath = () => {
-		void window.electronAPI.showhowCopyPath(entry.bundleDir);
+	const copyPath = async () => {
+		setCopyStatus("copying");
+		try {
+			const result = await window.electronAPI.showhowCopyPath(entry.bundleDir);
+			if (isMountedRef.current) setCopyStatus(result.success ? "success" : "failure");
+		} catch (error) {
+			console.error("[RecordingLibrary] copy path failed:", error);
+			if (isMountedRef.current) setCopyStatus("failure");
+		}
 	};
 	const persist = async (update: WorkflowDocumentUpdate, nextEntry: RecordingLibraryEntry) => {
 		const result = await window.electronAPI.showhowUpdateWorkflowDocument(entry.bundleDir, update);
@@ -273,7 +289,29 @@ function RecordingDetail({
 	const saveTitle = async () => {
 		const title = titleDraft.trim();
 		if (title === "") return;
-		if (await persist({ type: "title", title }, { ...entry, title })) setEditingTitle(false);
+		setTitleStatus("saving");
+		try {
+			const result = await window.electronAPI.showhowUpdateWorkflowDocument(entry.bundleDir, {
+				type: "title",
+				title,
+			});
+			if (!isMountedRef.current) return;
+			if (result.success) {
+				onEntryChange({ ...entry, title });
+				setEditingTitle(false);
+				setTitleStatus("success");
+			} else {
+				setTitleStatus("failure");
+			}
+		} catch (error) {
+			console.error("[RecordingLibrary] save title failed:", error);
+			if (isMountedRef.current) setTitleStatus("failure");
+		}
+	};
+	const cancelTitleEdit = () => {
+		setTitleDraft(entry.title);
+		setTitleStatus("idle");
+		setEditingTitle(false);
 	};
 	const saveStep = async (index: number) => {
 		const label = instructionDraft.trim();
@@ -335,33 +373,65 @@ function RecordingDetail({
 				}}
 			>
 				{editingTitle ? (
-					<input
-						aria-label="Recording title"
-						value={titleDraft}
-						onChange={(event) => setTitleDraft(event.target.value)}
-						onKeyDown={(event) => {
-							if (event.key === "Enter") void saveTitle();
-							if (event.key === "Escape") setEditingTitle(false);
-						}}
-						autoFocus
-						style={{ fontSize: "30px", flex: 1 }}
-					/>
+					<>
+						<input
+							aria-label="Recording title"
+							value={titleDraft}
+							onChange={(event) => setTitleDraft(event.target.value)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") void saveTitle();
+								if (event.key === "Escape") cancelTitleEdit();
+							}}
+							autoFocus
+							style={{ fontSize: "30px", flex: 1 }}
+						/>
+						<div style={{ display: "flex", gap: "8px" }}>
+							<button
+								type="button"
+								aria-label="Save title"
+								disabled={titleStatus === "saving"}
+								onClick={() => void saveTitle()}
+							>
+								Save
+							</button>
+							<button
+								type="button"
+								aria-label="Cancel title edit"
+								disabled={titleStatus === "saving"}
+								onClick={cancelTitleEdit}
+							>
+								Cancel
+							</button>
+						</div>
+					</>
 				) : (
 					<h1 style={{ fontSize: "30px", margin: 0, color: "var(--sh-color-text)", flex: 1 }}>
 						{entry.title}
 					</h1>
 				)}
-				<button
-					type="button"
-					aria-label="Edit title"
-					onClick={() => {
-						setTitleDraft(entry.title);
-						setEditingTitle(true);
-					}}
-				>
-					Edit
-				</button>
+				{!editingTitle && (
+					<button
+						type="button"
+						aria-label="Edit title"
+						onClick={() => {
+							setTitleDraft(entry.title);
+							setTitleStatus("idle");
+							setEditingTitle(true);
+						}}
+					>
+						Edit
+					</button>
+				)}
 			</div>
+			{titleStatus !== "idle" && (
+				<p role="status" style={{ margin: "0 0 12px", color: "var(--sh-muted)", fontSize: "13px" }}>
+					{titleStatus === "saving"
+						? "Saving title…"
+						: titleStatus === "success"
+							? "Title saved"
+							: "Couldn't save title"}
+				</p>
+			)}
 
 			<div
 				style={{
@@ -427,7 +497,8 @@ function RecordingDetail({
 				</div>
 				<button
 					type="button"
-					onClick={copyPath}
+					disabled={copyStatus === "copying"}
+					onClick={() => void copyPath()}
 					style={{
 						border: "1px solid var(--sh-color-divider)",
 						borderRadius: "8px",
@@ -440,9 +511,18 @@ function RecordingDetail({
 						whiteSpace: "nowrap",
 					}}
 				>
-					Copy path
+					{copyStatus === "copying" ? "Copying…" : "Copy path"}
 				</button>
 			</div>
+			{copyStatus !== "idle" && (
+				<p role="status" style={{ margin: "8px 0 0", color: "var(--sh-muted)", fontSize: "13px" }}>
+					{copyStatus === "copying"
+						? "Copying path…"
+						: copyStatus === "success"
+							? "Path copied"
+							: "Couldn't copy path"}
+				</p>
+			)}
 
 			{videoSrc && (
 				<video
@@ -966,6 +1046,29 @@ export function RecordingLibrary() {
 						Showhow
 					</span>
 				</div>
+
+				<button
+					type="button"
+					onClick={() => window.electronAPI.switchToHud()}
+					style={{
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						gap: "8px",
+						width: "100%",
+						padding: "11px 14px",
+						border: "none",
+						borderRadius: "10px",
+						background: "var(--sh-color-accent)",
+						color: "white",
+						fontFamily: "var(--sh-font-body)",
+						fontSize: "13px",
+						fontWeight: 700,
+						cursor: "pointer",
+					}}
+				>
+					New recording
+				</button>
 
 				{/* library list */}
 				<div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
