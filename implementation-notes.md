@@ -567,3 +567,43 @@ mp4ExportSettings.test.ts updated to the computed values (4.2M, 5.7M,
 1.9M, 4M, 6M, 24M, 4M, 1.2M, 4M in existing case order); every dimension
 assertion preserved. Tests, builds, and GUI not run per coordinator
 instruction; verification pending the granted re-run of the RED suites.
+
+Trial adjustment: actual app audit export at the 4 Mbps anchor produced
+4,387,478 bytes, exceeding the 3,771,472-byte acceptance ceiling. Only
+BITRATE_REFERENCE_BPS changed, 4_000_000 to 3_000_000, as a trial pending
+actual app output/readability; formula, source 1.5 multiplier, 1-24 Mbps
+clamp, and 100 kbps rounding are unchanged. The nine expectations were
+recomputed independently from the formula: 3.1M, 4.3M, 1.4M, 3M, 4.5M,
+18M, 3M, 1M (floor-clamped from 900k), 3M. The 854x480 source case now
+sits on the 1 Mbps floor and remains under half of the 4.5 Mbps
+full-frame source budget, so the committed crop regression still passes
+by construction. No tests, builds, GUI, commits, or package commands run.
+
+Second trial adjustment: the real app 3 Mbps trial export produced
+3,941,008 bytes, still above the 3,771,472-byte acceptance ceiling, though
+frames remained readable. Only BITRATE_REFERENCE_BPS changed, 3_000_000 to
+2_400_000; formula, source 1.5 multiplier, 1-24 Mbps clamp, and 100 kbps
+rounding unchanged. The nine expectations were recomputed independently
+from the formula: 2.5M, 3.4M, 1.1M, 2.4M, 3.6M, 14.4M, 2.4M, 1M (floor
+clamped, value unchanged from prior trial), 2.4M. All four cliff cases
+round to identical values on both sides (1.1M, 2.4M, 3.6M, 6.4M) and the
+854x480 crop stays below half of the 3.6 Mbps full-frame source budget.
+Trial awaits actual app acceptance; no tests, builds, GUI, commits, or
+package commands run.
+
+Final 2.4Mbps audit acceptance produced3,594,630bytes (52.344% reduction),
+readable exact1s/13s frames and native QuickTime play/seek. Copied project
+padding49 persisted after save/reopen; original hashes still match. Final
+headless static/scroll/motion/sync exports each under1MB. The generated
+flash/beep input offset is0ms; output audio lags65ms, within the predeclared
+100ms tolerance. This is a timing measurement, not a listening claim.
+Affected browser run encountered Vite optimizing gif.js midrun, reloading
+and invalidating dynamic WebGLRenderer URL:3GIF failures,4pass,1optin skip.
+Lane-only benchmark config now prebundles gif.js; no production GIF changes.
+All processes exited; rerun awaits coordinator slot. Shared cache untouched.
+
+The short browser rerun progressed past initial dependency discovery but
+GIF worker resolution hit Vite fs.allow because node_modules is an approved
+shared symlink. Intentionally stopped Vitest with SIGTERM (exit143), preserved
+logs; lane-only config permits resolved gif.js/dist and scans only exporter
+test entries. No product GIF or shared dependency change. Rerun pending.

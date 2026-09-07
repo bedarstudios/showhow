@@ -26,3 +26,29 @@
 - [passed] Isolated-config TypeScript check exits 0 using shared ws types.
 - [passed] Targeted Biome checks 7 changed files without fixes.
 - [passed] GREEN batch processes exited; test slot released.
+- [failed] 4Mbps app audit export: 4,387,478 bytes; misses 50% target.
+- [failed] 3Mbps app audit export: 3,941,008 bytes; misses 50% target.
+- [passed] Save As copy reopened; original effective zoom scales retained.
+- [passed] 2.4Mbps app export: 3,594,630 bytes, 52.34% below baseline.
+- [passed] Final app export retains 1920x1080, 60fps, 18.933333 seconds.
+- [passed] Exact 1s/13s output frames retain readable Calculator text.
+- [passed] QuickTime output plays through 18s and seeks back to 13s.
+- [passed] Copy padding changed 50 to 49, saved and reopened at 49.
+- [passed] Original reload remains at padding 50; all original hashes match.
+- [passed] Owned dev PIDs exited; port 5177 gone; lane52 untouched.
+- [untested] Silent Calculator original cannot establish audio sync.
+- [passed] Final 2.4Mbps fixture batch: four exports in 9.18s, each under 1MB.
+- [passed] Final static/scroll/motion sampled text remains readable.
+- [passed] Input flash/beep offset 0ms; exported offset +65ms, within 100ms.
+- [passed] Final exporter unit suite: 99 tests across 13 files.
+- [failed] Browser GIF tests hit Vite midrun gif.js dependency reload.
+- [passed] Other browser tests: 4 pass; opt-in benchmark skipped.
+- [passed] Final isolated TypeScript exit 0; Biome 7 files pass.
+- [passed] Final batch exited and released; disk remains above 100MiB floor.
+- [failed] First rerun blocked GIF worker outside symlink fs.allow; stopped143.
+- [passed] Corrected lane config: browser7 pass,1 benchmark skip; exit0.
+- [passed] Browser rerun child processes exited; test slot released.
+- [passed] Fresh app launch reopened edited copy at padding 49.
+- [passed] Reopened edited copy exports 3,566,928 bytes at 1080p60.
+- [passed] Copy export duration 18.933333s; save-to-mtime 9.416s.
+- [passed] Final original hashes unchanged; owned app/server exited.

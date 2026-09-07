@@ -14,10 +14,11 @@ interface SourceCropRegion {
 const MEDIUM_SHORT_SIDE = 720;
 const HIGH_SHORT_SIDE = 1080;
 
-// Smooth pixel-proportional MP4 video budget, anchored at the benchmark-selected
-// 4 Mbps for 1920x1080 and clamped so tiny crops stay usable and huge sources bounded.
+// Smooth pixel-proportional MP4 video budget, anchored at the 2.4 Mbps budget
+// measured against the Calculator app export (artifacts/67/app-trial-24mbps.json)
+// and clamped so tiny crops stay usable and huge sources bounded.
 const BITRATE_REFERENCE_PIXELS = 1920 * 1080;
-const BITRATE_REFERENCE_BPS = 4_000_000;
+const BITRATE_REFERENCE_BPS = 2_400_000;
 const SOURCE_BITRATE_MULTIPLIER = 1.5;
 const MIN_BITRATE_BPS = 1_000_000;
 const MAX_BITRATE_BPS = 24_000_000;

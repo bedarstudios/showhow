@@ -7,6 +7,7 @@ import { VideoExporter } from "./videoExporter";
 declare module "vitest/browser" {
 	interface BrowserCommands {
 		recordMp4Measurement(name: string, measurement: string, frame: string): Promise<void>;
+		saveMp4Acceptance(name: string, data: string): Promise<void>;
 	}
 }
 
@@ -42,8 +43,13 @@ it.skipIf(import.meta.env.VITE_MP4_BENCHMARK !== "1")(
 		console.log("MP4_BENCHMARK_START");
 		const batchStart = performance.now();
 		let totalBytes = 0;
+		const acceptance = import.meta.env.VITE_MP4_ACCEPTANCE === "1";
 		const smoke = import.meta.env.VITE_MP4_BENCHMARK_SMOKE === "1";
-		for (const fixture of smoke ? ["static"] : ["static", "scroll", "motion"]) {
+		for (const fixture of smoke
+			? ["static"]
+			: acceptance
+				? ["static", "scroll", "motion", "sync"]
+				: ["static", "scroll", "motion"]) {
 			const settings = calculateMp4ExportSettings({
 				quality: "good",
 				sourceWidth: 1920,
@@ -51,7 +57,9 @@ it.skipIf(import.meta.env.VITE_MP4_BENCHMARK !== "1")(
 				aspectRatioValue: 16 / 9,
 			});
 			const sizes: number[] = [];
-			for (const bitrate of smoke ? [settings.bitrate] : [settings.bitrate, 2_000_000, 4_000_000]) {
+			for (const bitrate of smoke || acceptance
+				? [settings.bitrate]
+				: [settings.bitrate, 2_000_000, 4_000_000]) {
 				expect(performance.now() - batchStart).toBeLessThan(180_000);
 				console.log(`MP4_BENCHMARK_EXPORT_START ${fixture} ${bitrate}`);
 				const start = performance.now();
@@ -109,9 +117,16 @@ it.skipIf(import.meta.env.VITE_MP4_BENCHMARK !== "1")(
 				} finally {
 					input.dispose();
 				}
+				if (acceptance) {
+					const bytes = new Uint8Array(await blob.arrayBuffer());
+					let binary = "";
+					for (let i = 0; i < bytes.length; i += 8192)
+						binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+					await commands.saveMp4Acceptance(`${fixture}-${bitrate}`, btoa(binary));
+				}
 				sizes.push(blob.size);
 			}
-			if (!smoke) {
+			if (!smoke && !acceptance) {
 				expect(sizes[1]).toBeLessThanOrEqual(sizes[2]);
 				expect(sizes[2]).toBeLessThanOrEqual(sizes[0]);
 			}
