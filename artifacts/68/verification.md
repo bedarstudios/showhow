@@ -1,9 +1,16 @@
 ## Verification
-Environment: macOS 26.5.2; Node 22.22.1; npm 10.9.4; Electron GUI pending.
-- [passed] All nine original files match the preserved lane copy hashes.
-- [passed] RED detects missing full length and incorrect partial status 200.
-- [passed] Protocol range and strict-trust regressions pass: 33 tests.
-- [passed] Affected Showhow/library suites pass: 202 tests across 8 files.
-- [passed] TypeScript passes with the isolated read-only ws type mapping.
-- [passed] Biome checks four affected TS/JSON files without changes.
-- [untested] Real Electron seeking awaits the coordinated GUI slot.
+Environment: macOS 26.5.2; Node 22.22.1; Electron dev code `e62d394`; PID 43581, lane cwd and `localhost:5178` verified, then cleanly shut down.
+
+- [passed] Genuine RED detects missing length and partial status 200.
+- [passed] All 33 protocol tests and 202 affected tests across 8 files pass.
+- [passed] TypeScript passes with the read-only ws mapping; Biome passes.
+- [passed] Real Range 0-99 returns 206, correct range/length, and 100 bytes.
+- [passed] Workflow 0:13 and 0:18 reach 13.197s and 18.516s.
+- [passed] Native scrubber reaches 9.466666s; full duration is seekable.
+- [passed] A timestamp clicked at readyState0 applies at 13.197s after load.
+- [passed] Native Home+Play reaches 18.933333s, ended=true, with no error.
+- [passed] All three workflow screenshots load at 460px natural width.
+- [passed] Sparse 16 MiB media streams in bounded chunks and cancels safely.
+- [passed] Malformed paths, nonmedia files, and symlink escapes are rejected.
+- [passed] All nine original source hashes remain unchanged after verification.
+- [untested] Windows/Linux Electron runtime; this GUI audit ran on macOS.

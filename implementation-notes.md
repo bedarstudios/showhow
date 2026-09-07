@@ -538,3 +538,16 @@ attempt failed before tests. The ignored local configs now copy the repository
 configs with an explicit lane directory and local cache; no production config
 changed. The retry reached real assertions: full Content-Length was null and
 range status was 200 instead of 206 (2 failed, 3 passed), before production edits.
+
+
+Issue 68 acceptance passed on real Electron dev code `e62d394` after 33 protocol
+and 202 affected tests, TypeScript with the isolated ws mapping, and Biome.
+The first production pass exposed arbitrary MP4 paths; two real regressions
+caught this, and the executor restricted the whitelist to the bundle video and
+direct raster screenshots. Both failed and corrected results remain in evidence.
+
+The native GUI audit temporarily unloaded/restored only the page's video URL to
+exercise a timestamp clicked before metadata. It did not change any source file
+or project. Actual timestamp/scrubber positions, full playback, range headers,
+screenshot decoding, runtime PID/cwd, hashes and clean shutdown are recorded in
+`artifacts/68`. User-required inline uploads accompany the committed evidence.

@@ -60,4 +60,36 @@ and the corrected result (33/33 passed). `affected-tests.txt` records 202 passin
 tests across eight files, and `typecheck.txt` / `biome.txt` record successful
 checks. The final protocol uses 64 KiB reads, approves only canonical bundle
 video files and direct raster screenshots, and enforces canonical bundle/root
-containment. `verification.md` is the current assertion list; GUI is still pending.
+containment. `verification.md` is the final observed assertion list.
+
+## Real Electron acceptance
+
+The verified code commit is `e62d394`. The dev process was PID 43581 with this
+lane as cwd and renderer `localhost:5178/?windowType=library`. The prior lane
+app was quit cleanly before launch. The unrelated ticket 52 Electron process
+remained untouched. `runtime.txt` records exact launch, measurements, original
+hash verification, and clean shutdown; no source bundle was edited.
+
+Native computer use activated workflow 0:13 and 0:18 and the video scrubber.
+DevTools measured 13.197s, 18.516s and 9.466666s respectively, and the seekable
+interval was `[0, 18.933333]`. The actual range fetch returned 206,
+`Content-Range: bytes 0-99/1621607`, `Content-Length: 100`, and 100 body bytes.
+
+The early-metadata case temporarily removed only the video element's source,
+called `load()`, clicked the actual workflow timestamp at readyState0, then
+restored the same URL. It reached 13.197s at readyState4. Native scrubber Home
+and Play then played the entire recording to 18.933333s with ended=true and
+no media error. All three screenshots decoded successfully.
+
+AFTER evidence: `after-scrubber.png` shows native player position plus runtime
+range/seek diagnostics. `after-range-and-seek-13.png`, `after-seek-18.png`,
+`after-early-metadata.png`, and `after-full-playback.png` preserve the other
+observed checkpoints. BEFORE and AFTER files are committed and also attached
+inline to the issue/PR as explicitly requested.
+
+No packaging, new recording, source regeneration, dependency install, or HOME
+override was performed. Vite's normal dev launch compiled the Electron main
+and preload and used a 42 MiB local optimizer cache. Disk remained above
+300 MiB during verification. TypeScript used the coordinator's temporary
+read-only ws declarations; the checked-in manifests and shared dependencies
+were not modified.
