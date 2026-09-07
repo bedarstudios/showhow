@@ -136,8 +136,15 @@ export function resolveShowhowMediaPath(recordingsRoot: string, requestUrl: stri
 	return resolvedPath.startsWith(`${resolvedRoot}${path.sep}`) ? resolvedPath : null;
 }
 
-function registerAbortHandler(request: ShowhowMediaRequest, onAbort: () => void): void {
-	request.signal?.addEventListener("abort", onAbort, { once: true });
+function createAbortError(reason: unknown): Error {
+	const error: Error & { cause?: unknown } = new Error("Showhow media request aborted");
+	error.name = "AbortError";
+	error.cause = reason;
+	return error;
+}
+
+function isAbortError(error: unknown): boolean {
+	return error instanceof Error && error.name === "AbortError";
 }
 
 /**
@@ -222,28 +229,42 @@ function notFoundResponse(): Response {
 	return new Response("Not found", { status: 404 });
 }
 
+type MediaFileStream = {
+	stream: ReadableStream<Uint8Array>;
+	/**
+	 * Errors the stream controller so a locked reader rejects with the given
+	 * error; a no-op once the stream already finished. Never calls
+	 * `stream.cancel()`, which would throw on a locked stream.
+	 */
+	error: (error: Error) => void;
+};
+
 /**
  * Streams `byteLength` bytes starting at `start` directly from an open file
  * descriptor. Each pull reads at most {@link MAX_STREAM_CHUNK_BYTES}, and the
- * descriptor is closed exactly once on end, error, or cancellation.
+ * passed cleanup runs exactly once on end, error, or cancellation.
  */
 function createMediaFileStream(
 	handle: FileHandle,
 	start: number,
 	byteLength: number,
-	releaseHandle: () => void,
-): ReadableStream<Uint8Array> {
+	cleanup: () => void,
+): MediaFileStream {
 	let position = start;
 	let remaining = byteLength;
 	let finished = false;
+	let streamController: ReadableStreamDefaultController<Uint8Array> | null = null;
 	const finish = (): void => {
 		if (finished) {
 			return;
 		}
 		finished = true;
-		releaseHandle();
+		cleanup();
 	};
-	return new ReadableStream<Uint8Array>({
+	const stream = new ReadableStream<Uint8Array>({
+		start(controller): void {
+			streamController = controller;
+		},
 		async pull(controller): Promise<void> {
 			if (remaining <= 0) {
 				finish();
@@ -271,13 +292,23 @@ function createMediaFileStream(
 			finish();
 		},
 	});
+	return {
+		stream,
+		error(error: Error): void {
+			finish();
+			streamController?.error(error);
+		},
+	};
 }
 
 /**
  * Serves one media request for the recordings root without any Electron
- * `net.fetch` / file-URL indirection. Every failure path resolves to a clean
- * 404, so malformed or untrusted URLs can never throw into the protocol
- * handler.
+ * `net.fetch` / file-URL indirection. Cancellation is honored end to end: a
+ * request whose signal is already aborted, or aborts during path resolution or
+ * descriptor acquisition, rejects with an `AbortError` instead of answering,
+ * and an abort during streaming errors the active stream and releases the
+ * descriptor. Every other failure path resolves to a clean 404, so malformed
+ * or untrusted URLs can never throw into the protocol handler.
  */
 export async function fetchShowhowMedia(
 	recordingsRoot: string,
@@ -285,7 +316,10 @@ export async function fetchShowhowMedia(
 ): Promise<Response> {
 	try {
 		return await serveShowhowMedia(recordingsRoot, request);
-	} catch {
+	} catch (error) {
+		if (isAbortError(error)) {
+			throw error;
+		}
 		return notFoundResponse();
 	}
 }
@@ -303,104 +337,180 @@ async function serveShowhowMedia(
 		return notFoundResponse();
 	}
 
-	const resolvedRoot = path.resolve(recordingsRoot);
-	let rootRealPath = "";
-	let targetRealPath = "";
-	let bundleRealPath = "";
+	const signal = request.signal;
+	if (signal?.aborted) {
+		throw createAbortError(signal.reason);
+	}
+
+	// Cancellation state shared by the abort listener, the phase checks, and
+	// the deterministic single cleanup below.
+	let acquiredHandle: FileHandle | null = null;
+	let handleClosed = false;
+	let handleTransferred = false;
+	let listenerRegistered = signal !== undefined;
+	let abortError: Error | null = null;
+	let failActiveStream: ((error: Error) => void) | null = null;
+
+	const releaseHandle = (): void => {
+		if (handleClosed || acquiredHandle === null) {
+			return;
+		}
+		handleClosed = true;
+		void acquiredHandle.close().catch(() => undefined);
+	};
+
+	const onAbort = (): void => {
+		abortError = createAbortError(signal?.reason);
+		// `{ once: true }` already detached the listener.
+		listenerRegistered = false;
+		releaseHandle();
+		if (failActiveStream !== null && abortError !== null) {
+			failActiveStream(abortError);
+		}
+	};
+
+	const removeAbortListener = (): void => {
+		if (!listenerRegistered || signal === undefined) {
+			return;
+		}
+		listenerRegistered = false;
+		signal.removeEventListener("abort", onAbort);
+	};
+
+	const cleanup = (): void => {
+		releaseHandle();
+		removeAbortListener();
+	};
+
+	const throwIfAborted = (): void => {
+		if (abortError !== null) {
+			throw abortError;
+		}
+	};
+
+	// Registered before any async filesystem work so an abort at any later
+	// point is observed exactly once.
+	if (signal !== undefined) {
+		signal.addEventListener("abort", onAbort, { once: true });
+	}
+
 	try {
-		rootRealPath = await fs.realpath(resolvedRoot);
+		const resolvedRoot = path.resolve(recordingsRoot);
+		let rootRealPath = "";
+		let targetRealPath = "";
+		let bundleRealPath = "";
+		try {
+			rootRealPath = await fs.realpath(resolvedRoot);
+		} catch {
+			throwIfAborted();
+			return notFoundResponse();
+		}
+		throwIfAborted();
 		const candidatePath = path.resolve(
 			resolvedRoot,
 			components.bundleName,
 			...components.relativeSegments,
 		);
-		targetRealPath = await fs.realpath(candidatePath);
-		bundleRealPath = await fs.realpath(path.resolve(resolvedRoot, components.bundleName));
-	} catch {
-		return notFoundResponse();
-	}
-	// Canonical containment: the resolved file must live under the real
-	// recordings root AND under the real bundle directory, so symlinks cannot
-	// escape either boundary even when they stay inside the root.
-	if (
-		!isWithinDirectory(rootRealPath, targetRealPath) ||
-		!isWithinDirectory(bundleRealPath, targetRealPath)
-	) {
-		return notFoundResponse();
-	}
-
-	let handle: FileHandle;
-	try {
-		handle = await fs.open(targetRealPath, "r");
-	} catch {
-		return notFoundResponse();
-	}
-	let released = false;
-	const releaseHandle = (): void => {
-		if (released) {
-			return;
+		try {
+			targetRealPath = await fs.realpath(candidatePath);
+		} catch {
+			throwIfAborted();
+			return notFoundResponse();
 		}
-		released = true;
-		void handle.close().catch(() => undefined);
-	};
-	let activeStream: ReadableStream<Uint8Array> | null = null;
-	registerAbortHandler(request, () => {
-		releaseHandle();
-		activeStream?.cancel().catch(() => undefined);
-	});
+		throwIfAborted();
+		try {
+			bundleRealPath = await fs.realpath(path.resolve(resolvedRoot, components.bundleName));
+		} catch {
+			throwIfAborted();
+			return notFoundResponse();
+		}
+		throwIfAborted();
+		// Canonical containment: the resolved file must live under the real
+		// recordings root AND under the real bundle directory, so symlinks cannot
+		// escape either boundary even when they stay inside the root.
+		if (
+			!isWithinDirectory(rootRealPath, targetRealPath) ||
+			!isWithinDirectory(bundleRealPath, targetRealPath)
+		) {
+			return notFoundResponse();
+		}
 
-	let stats;
-	try {
-		stats = await handle.stat();
-	} catch {
-		releaseHandle();
-		return notFoundResponse();
-	}
-	if (!stats.isFile()) {
-		releaseHandle();
-		return notFoundResponse();
-	}
+		throwIfAborted();
+		let handle: FileHandle;
+		try {
+			handle = await fs.open(targetRealPath, "r");
+		} catch {
+			throwIfAborted();
+			return notFoundResponse();
+		}
+		acquiredHandle = handle;
+		throwIfAborted();
 
-	const size = stats.size;
-	const metadataHeaders: Record<string, string> = {
-		"content-type": contentType,
-		"content-length": String(size),
-		"accept-ranges": "bytes",
-	};
+		let stats;
+		try {
+			stats = await handle.stat();
+		} catch {
+			throwIfAborted();
+			releaseHandle();
+			return notFoundResponse();
+		}
+		throwIfAborted();
+		if (!stats.isFile()) {
+			releaseHandle();
+			return notFoundResponse();
+		}
 
-	// HEAD describes the full representation, ignores Range, and never opens a
-	// streaming body; the descriptor is closed immediately.
-	if (request.method?.toUpperCase() === "HEAD") {
-		releaseHandle();
-		return new Response(null, { status: 200, headers: metadataHeaders });
-	}
+		const size = stats.size;
+		const metadataHeaders: Record<string, string> = {
+			"content-type": contentType,
+			"content-length": String(size),
+			"accept-ranges": "bytes",
+		};
 
-	const range = decideByteRange(request.headers.get("range"), size);
-	if (range === "unsatisfiable") {
-		releaseHandle();
-		return new Response(null, {
-			status: 416,
+		// HEAD describes the full representation, ignores Range, and never opens a
+		// streaming body; the descriptor is closed immediately.
+		if (request.method?.toUpperCase() === "HEAD") {
+			releaseHandle();
+			return new Response(null, { status: 200, headers: metadataHeaders });
+		}
+
+		const range = decideByteRange(request.headers.get("range"), size);
+		if (range === "unsatisfiable") {
+			releaseHandle();
+			return new Response(null, {
+				status: 416,
+				headers: {
+					"content-type": contentType,
+					"accept-ranges": "bytes",
+					"content-range": `bytes */${size}`,
+				},
+			});
+		}
+		if (range === "full") {
+			handleTransferred = true;
+			const mediaStream = createMediaFileStream(handle, 0, size, cleanup);
+			failActiveStream = mediaStream.error;
+			return new Response(mediaStream.stream, { status: 200, headers: metadataHeaders });
+		}
+
+		const { start, end } = range;
+		const byteLength = end - start + 1;
+		handleTransferred = true;
+		const mediaStream = createMediaFileStream(handle, start, byteLength, cleanup);
+		failActiveStream = mediaStream.error;
+		return new Response(mediaStream.stream, {
+			status: 206,
 			headers: {
-				"content-type": contentType,
-				"accept-ranges": "bytes",
-				"content-range": `bytes */${size}`,
+				...metadataHeaders,
+				"content-length": String(byteLength),
+				"content-range": `bytes ${start}-${end}/${size}`,
 			},
 		});
+	} finally {
+		// Once ownership transferred to a stream, the stream's own finish path
+		// owns the single cleanup; otherwise clean up deterministically here.
+		if (!handleTransferred) {
+			cleanup();
+		}
 	}
-	if (range === "full") {
-		activeStream = createMediaFileStream(handle, 0, size, releaseHandle);
-		return new Response(activeStream, { status: 200, headers: metadataHeaders });
-	}
-
-	const { start, end } = range;
-	const byteLength = end - start + 1;
-	activeStream = createMediaFileStream(handle, start, byteLength, releaseHandle);
-	return new Response(activeStream, {
-		status: 206,
-		headers: {
-			...metadataHeaders,
-			"content-length": String(byteLength),
-			"content-range": `bytes ${start}-${end}/${size}`,
-		},
-	});
 }

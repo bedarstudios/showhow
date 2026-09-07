@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createShowhowMediaUrl, fetchShowhowMedia } from "./mediaProtocol";
 
 describe("createShowhowMediaUrl", () => {
@@ -220,6 +220,113 @@ describe("media range and trust boundaries", () => {
 			await response.body?.cancel();
 		} finally {
 			await fs.rm(outside, { recursive: true, force: true });
+		}
+	});
+
+	it("does not open media for a request aborted before handling", async () => {
+		const abort = new AbortController();
+		abort.abort();
+		const open = vi.spyOn(fs, "open");
+		try {
+			await expect(
+				fetchShowhowMedia(root, new Request(url, { signal: abort.signal })),
+			).rejects.toMatchObject({ name: "AbortError" });
+			expect(open).not.toHaveBeenCalled();
+		} finally {
+			open.mockRestore();
+		}
+	});
+
+	it("does not open media when cancellation happens during path resolution", async () => {
+		const abort = new AbortController();
+		const realpath = fs.realpath.bind(fs);
+		const resolve = vi.spyOn(fs, "realpath").mockImplementationOnce(async (file) => {
+			const resolved = await realpath(file);
+			abort.abort();
+			return resolved;
+		});
+		const open = vi.spyOn(fs, "open");
+		try {
+			await expect(
+				fetchShowhowMedia(root, new Request(url, { signal: abort.signal })),
+			).rejects.toMatchObject({ name: "AbortError" });
+			expect(open).not.toHaveBeenCalled();
+		} finally {
+			resolve.mockRestore();
+			open.mockRestore();
+		}
+	});
+
+	it("closes a real descriptor when cancellation happens during open", async () => {
+		const abort = new AbortController();
+		const openFile = fs.open.bind(fs);
+		let handle: Awaited<ReturnType<typeof fs.open>> | undefined;
+		const open = vi.spyOn(fs, "open").mockImplementationOnce(async (...args) => {
+			handle = await openFile(...args);
+			abort.abort();
+			return handle;
+		});
+		try {
+			await expect(
+				fetchShowhowMedia(root, new Request(url, { signal: abort.signal })),
+			).rejects.toMatchObject({ name: "AbortError" });
+			expect(handle).toBeDefined();
+			await expect(handle?.stat()).rejects.toMatchObject({ code: "EBADF" });
+		} finally {
+			open.mockRestore();
+			await handle?.close();
+		}
+	});
+
+	it("aborting a locked response errors its reader and closes the real file", async () => {
+		const file = await fs.open(path.join(bundle, "video.mp4"), "r+");
+		await file.truncate(16 * 1024 * 1024);
+		await file.close();
+		const abort = new AbortController();
+		const openFile = fs.open.bind(fs);
+		let handle: Awaited<ReturnType<typeof fs.open>> | undefined;
+		const open = vi.spyOn(fs, "open").mockImplementationOnce(async (...args) => {
+			handle = await openFile(...args);
+			return handle;
+		});
+		try {
+			const response = await fetchShowhowMedia(root, new Request(url, { signal: abort.signal }));
+			if (!response.body) throw new Error("Expected media stream");
+			const reader = response.body.getReader();
+			expect((await reader.read()).done).toBe(false);
+			abort.abort();
+			await expect(reader.read()).rejects.toMatchObject({ name: "AbortError" });
+			expect(handle).toBeDefined();
+			await expect(handle?.stat()).rejects.toMatchObject({ code: "EBADF" });
+		} finally {
+			open.mockRestore();
+			await handle?.close();
+		}
+	});
+
+	it.each([
+		"complete",
+		"cancel",
+		"HEAD",
+		"missing",
+	])("detaches its abort listener after %s", async (ending) => {
+		const request = new Request(url, { method: ending === "HEAD" ? "HEAD" : "GET" });
+		const add = vi.spyOn(request.signal, "addEventListener");
+		const remove = vi.spyOn(request.signal, "removeEventListener");
+		try {
+			if (ending === "missing") await fs.unlink(path.join(bundle, "video.mp4"));
+			const response = await fetchShowhowMedia(root, request);
+			if (ending === "cancel") await response.body?.cancel();
+			else await response.arrayBuffer();
+			const abortListeners = add.mock.calls.filter(([event]) => event === "abort");
+			for (const [, listener] of abortListeners) {
+				expect(
+					remove.mock.calls.some(([event, removed]) => event === "abort" && removed === listener),
+				).toBe(true);
+			}
+		} finally {
+			add.mockRestore();
+			remove.mockRestore();
 		}
 	});
 

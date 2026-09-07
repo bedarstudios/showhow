@@ -93,3 +93,65 @@ and preload and used a 42 MiB local optimizer cache. Disk remained above
 300 MiB during verification. TypeScript used the coordinator's temporary
 read-only ws declarations; the checked-in manifests and shared dependencies
 were not modified.
+
+## Reproduce the review checks from any checkout
+
+The current `typecheck-config.json` extends `../../tsconfig.json` and uses
+checkout-relative paths. It preserves the repository alias and first resolves
+`ws` from the declared `node_modules/@types/ws` dependency. The original absolute
+config remains only as historical context in `typecheck-config.original.txt`.
+The review log will name the committed config actually executed.
+
+Run these commands from the repository root with its declared dependencies
+already available:
+
+```sh
+node node_modules/vitest/vitest.mjs run electron/showhow/mediaProtocol.test.ts --no-cache --config artifacts/68/vitest.config.ts --configLoader runner
+node node_modules/vitest/vitest.mjs run electron/showhow src/components/library/RecordingLibrary.test.tsx --no-cache --config artifacts/68/vitest.config.ts --configLoader runner --maxWorkers 1 --no-file-parallelism
+node node_modules/typescript/bin/tsc --noEmit -p artifacts/68/typecheck-config.json
+node node_modules/@biomejs/biome/bin/biome check electron/showhow/mediaProtocol.ts electron/showhow/mediaProtocol.test.ts electron/main.ts artifacts/68/typecheck-config.json artifacts/68/vitest.config.ts
+```
+
+`vitest.config.ts` here preserves the repository's jsdom/include/exclude/alias
+contract but resolves paths from its own URL, making the runner loader portable.
+Its cache stays in the checkout's ignored `.local/issue-68` directory.
+
+This audit could not install missing packages or modify shared dependencies.
+Only when the normal declared `@types/ws` package is absent, the config permits
+an ignored `.local/issue-68/types/ws/index.d.ts` fallback. This lane links that
+fallback read-only to the coordinator-supplied `/tmp/showhow-ticket66-types/ws`
+(@types/ws 8.18.1). It is unnecessary in a normal installed checkout. To reuse an
+already available declaration directory elsewhere, set `existing_ws_types_dir`
+to its path and run:
+
+```sh
+mkdir -p .local/issue-68/types
+ln -s "$existing_ws_types_dir" .local/issue-68/types/ws
+```
+
+No declarations are stubbed, no checks are disabled, and no dependencies are
+installed by these commands. The historical logs record the old local config;
+`review-typecheck.txt` and `review-green.txt` record the portable rerun.
+
+## First review verification batch
+
+The cancellation patch passed all 41 protocol tests and 210 affected tests
+across eight files (both exit 0). The committed portable TypeScript command
+ran with the read-only local ws fallback and found TS2554 in the new Error
+constructor (exit 2); it did not report ws resolution errors. Biome checked
+five files and reported formatting in the test and JSON config (exit 1).
+The review logs retain these outcomes; a follow-up check is required after
+the compatibility and formatting corrections. No build or GUI was run.
+
+The follow-up rerun passed: 41 protocol tests, 210 affected tests across eight
+files, the committed portable TypeScript config, and Biome on all five files
+(each exit 0). All processes exited before slot release. Free disk stayed above
+100 MiB (171188 KiB before, 169416 KiB after). The original failures remain in
+the append-only review logs. The constructor correction preserves AbortError
+and its cause without requiring a newer TypeScript library target.
+
+Current cancellation-code Electron smoke passed normal13/18 and rapid timestamp
+seeks, real206 fetch, request/body AbortError, and navigation out/back without
+a crash. `review-runtime.txt` identifies source SHA256, PID/cwd/URL and clean
+shutdown; `after-review-abort.png` captures the live result. All nine original
+hashes match. Deterministic tests, rather than GUI, prove descriptor internals.

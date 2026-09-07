@@ -551,3 +551,22 @@ exercise a timestamp clicked before metadata. It did not change any source file
 or project. Actual timestamp/scrubber positions, full playback, range headers,
 screenshot decoding, runtime PID/cwd, hashes and clean shutdown are recorded in
 `artifacts/68`. User-required inline uploads accompany the committed evidence.
+
+### 2026-09-08: Issue 68 — Greptile cancellation and evidence review
+
+Read both unresolved review threads with pagination and `isResolved`, and the
+latest 4/5 summary. The early-cancellation finding was independently reproduced:
+three deterministic tests for pre-abort, abort during realpath, and abort while
+opening a real file all returned 200 instead of AbortError before the correction.
+The executor owns the production lifetime fix; verifier owns tests and evidence.
+
+The original absolute typecheck artifact was not reproducible elsewhere. Its
+contents are retained as historical text, while the actual config now extends
+the repository relatively and prefers its declared @types/ws dependency. An
+optional ignored local fallback links only the coordinator-supplied real types
+read-only; no stubs or weaker compiler options were introduced. A committed
+portable Vitest config preserves the repository test contract and avoids writes
+to shared node_modules. Review logs name these committed configs directly.
+
+The issue uses in-progress plus needs-fixes while fixing; the PR card remains
+Reviewing. The semantic PR title was corrected as metadata, not a product fix.
