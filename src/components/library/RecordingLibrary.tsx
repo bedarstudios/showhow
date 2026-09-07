@@ -295,12 +295,12 @@ function RecordingDetail({
 				type: "title",
 				title,
 			});
-			if (!isMountedRef.current) return;
 			if (result.success) {
 				onEntryChange({ ...entry, title });
+				if (!isMountedRef.current) return;
 				setEditingTitle(false);
 				setTitleStatus("success");
-			} else {
+			} else if (isMountedRef.current) {
 				setTitleStatus("failure");
 			}
 		} catch (error) {

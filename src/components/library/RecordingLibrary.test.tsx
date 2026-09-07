@@ -337,6 +337,41 @@ describe("RecordingLibrary — workflow document editing (issue #26)", () => {
 		expect(await screen.findByText("Couldn't save title")).toBeInTheDocument();
 	});
 
+	it("reconciles a saved title after navigating to another recording", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry, browserDocEntry]);
+		const update = deferred<{ success: boolean }>();
+		mockShowhowUpdateWorkflowDocument.mockReturnValue(update.promise);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1, name: desktopDocEntry.title });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		const titleInput = screen.getByRole("textbox", { name: "Recording title" });
+		await userEvent.clear(titleInput);
+		await userEvent.type(titleInput, "Renamed desktop recording");
+		await userEvent.click(screen.getByRole("button", { name: "Save title" }));
+
+		const browserRow = screen
+			.getAllByRole("button")
+			.find((button) => button.textContent?.includes(browserDocEntry.title));
+		expect(browserRow).toBeDefined();
+		await userEvent.click(browserRow!);
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(browserDocEntry.title);
+
+		await act(async () => update.resolve({ success: true }));
+		expect(screen.getByText("Renamed desktop recording")).toBeInTheDocument();
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(browserDocEntry.title);
+		expect(screen.queryByText("Title saved")).not.toBeInTheDocument();
+
+		const renamedDesktopRow = screen
+			.getAllByRole("button")
+			.find((button) => button.textContent?.includes("Renamed desktop recording"));
+		expect(renamedDesktopRow).toBeDefined();
+		await userEvent.click(renamedDesktopRow!);
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+			"Renamed desktop recording",
+		);
+	});
+
 	it("edits the title and instruction inline, then persists both changes", async () => {
 		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
 		render(<RecordingLibrary />);

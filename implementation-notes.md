@@ -5,6 +5,28 @@ logged as they're discovered mid-build. Nothing is deleted from this file.
 
 ## Deviations
 
+### 2026-09-08: Issue 52 unit verification used a capped worker count
+
+**What changed:** The unit suite ran with `--maxWorkers=2` for the root shared-lane resource budget.
+
+**Why:** The default test configuration is unbounded in this shared lane.
+
+**What was done instead:** The worker count was capped without changing tests or their behavior.
+
+### 2026-09-08: Issue 52 native navigation verification used temporary renderer instrumentation
+
+**What changed:** Native GUI verification temporarily delayed `saveTitle` only when the bundle directory
+ended with `/qa52-navigation-a`, awaiting 20 seconds before the genuine
+`showhowUpdateWorkflowDocument` IPC call.
+
+**Why:** The delay made it possible to navigate to the second metadata-only QA recording while the first
+recording's real title write was pending, exercising reconciliation after the keyed detail unmounted.
+
+**What was done instead:** The shim mocked neither IPC success nor data, was removed exactly after the
+navigation capture, and its removal was verified from the HTTP-served source. The QA bundles were expendable,
+metadata-only, and removed after the run; a before/after SHA-256 inventory confirmed the pre-existing recording
+files were unchanged.
+
 ### 2026-07-31: Issue 35 gain-only correction was disproven by orchestrator-owned runtime evidence
 
 **What changed:** The ticket orchestrator reran the exact Electron generator at 21:14:30 after gain
