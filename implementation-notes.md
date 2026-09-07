@@ -526,3 +526,9 @@ removed only this lane's 43 MB partial node_modules with coordinator approval.
 Coordinator approved symlink to /Users/mohamedb/dev/projects/showhow/node_modules
 because manifests match. Never install into or mutate shared dependencies.
 Tests, builds and GUI wait for a coordinator slot while issue 66 verifies.
+
+Baseline GUI slot granted and released after Load Project ->1080p export.
+New export matches original byte count but differs in SHA-256; no byte-identical
+claim. Original file hashes still match. Editor timer advances while preview
+appears stuck, consistent with coordinator-owned mediaProtocol issue; excluded
+from MP4 changes and not represented as a passing playback check.
