@@ -1,17 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-	app,
-	BrowserWindow,
-	ipcMain,
-	Menu,
-	nativeImage,
-	net,
-	protocol,
-	session,
-	Tray,
-} from "electron";
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, protocol, session, Tray } from "electron";
 import { ShortcutBinding } from "../src/lib/shortcuts";
 import { createAppWindowReadinessGate } from "./appWindowReadiness";
 import { isDiagnosticModeEnabled, mainLogBuffer } from "./diagnostics/main-log-buffer";
@@ -528,11 +518,7 @@ const appReady = hasSingleInstanceLock ? app.whenReady() : null;
 
 appReady?.then(async () => {
 	protocol.handle(SHOWHOW_MEDIA_SCHEME, (request) => {
-		return fetchShowhowMedia(
-			path.join(app.getPath("home"), "Showhow", "Recordings"),
-			request,
-			(input, init) => net.fetch(input, init),
-		);
+		return fetchShowhowMedia(path.join(app.getPath("home"), "Showhow", "Recordings"), request);
 	});
 	if (isDiagnosticModeEnabled()) {
 		mainLogBuffer.install();

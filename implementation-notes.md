@@ -510,3 +510,31 @@ derivation failure) is unchanged. No test-only production APIs were added; path 
 classifies as `no-clicks`. The start-request test was initially expected to be RED but passed immediately
 because `getEffectiveCursorCaptureMode` already reads the ref at call time; the stop-reason test was the
 genuine RED (3rd arg `undefined`) before the fix.
+
+### 2026-09-07: Issue 68 — serialized verification and nested writer recovery
+
+The coordinator supplied installed-app BEFORE evidence and required preserving the
+source Calculator recording. This lane copied all nine source files and verified
+SHA-256 hashes before changes. Real Electron acceptance will read the original
+bundle without edits, after cleanly quitting the installed app; CLI tests use
+isolated temporary fixtures. No simultaneous installed/dev instances are allowed.
+
+After ENOSPC in another lane, dependency installation is prohibited. This lane
+uses the matching main checkout node_modules symlink read-only, disables Vitest
+caching, and uses local Vite/Vitest config wrappers with local cache directories
+and the runner config loader. TypeScript uses a local config extending this lane
+and the coordinator-supplied read-only `/tmp/showhow-ticket66-types/ws` mapping;
+`artifacts/68/typecheck-config.json` records it. No dependency manifests change.
+
+The nested RED writer reported activity without delivering a file, so the lane
+released its unused test slot. A replacement wrote two tests just before its
+cancellation; the verifier retained that diff, added missing full-response header
+assertions and took ownership of test execution, as the coordinator authorized.
+The executor retains ownership of the subsequent production fix. The delivery
+snare is logged once as BL-044 in the canonical OS loop-issues log.
+
+The Vite runner config loader does not inject `__dirname`, so the first RED
+attempt failed before tests. The ignored local configs now copy the repository
+configs with an explicit lane directory and local cache; no production config
+changed. The retry reached real assertions: full Content-Length was null and
+range status was 200 instead of 206 (2 failed, 3 passed), before production edits.
