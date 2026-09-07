@@ -510,3 +510,19 @@ derivation failure) is unchanged. No test-only production APIs were added; path 
 classifies as `no-clicks`. The start-request test was initially expected to be RED but passed immediately
 because `getEffectiveCursorCaptureMode` already reads the ref at call time; the stop-reason test was the
 genuine RED (3rd arg `undefined`) before the fix.
+
+
+# Issue 67 implementation notes
+
+Attempt 1. Supplied topology honored: w1P:p1 executor, w1P:p2 orchestrator,
+w1C:p7 coordinator callback. No additional worktree or orchestrator.
+
+Coordinator owns installed-app GUI. Baseline evidence supplied by coordinator
+is preserved before any production edit; local GUI reproduction waits for a
+granted slot. Headless CLI inspection only so far.
+
+Dependency deviation: npm ci failed with ENOSPC before tests. Installer exited;
+removed only this lane's 43 MB partial node_modules with coordinator approval.
+Coordinator approved symlink to /Users/mohamedb/dev/projects/showhow/node_modules
+because manifests match. Never install into or mutate shared dependencies.
+Tests, builds and GUI wait for a coordinator slot while issue 66 verifies.
