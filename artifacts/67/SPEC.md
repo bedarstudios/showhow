@@ -45,3 +45,11 @@ w1C:p7 via Herdr, then perform the required baseline and updated-app interaction
 Only open the PR after acceptance, with priority at creation, inline before/after
 attachments, committed evidence, identical issue/PR Verification blocks,
 Reviewing board state and confirmed durable watcher. Never merge.
+
+## Resource limits after disk-pressure coordination
+
+Initial generated fixtures: 3 seconds each, static text, scrolling text, and
+moving content with audio. Run sequentially, start with at most 2-3 candidate
+budgets, cap batch at 8 minutes and new files at 30 MB. No frame dumps, browser
+downloads or dependency installs. Coordinator test queue: 68 then 67 then 66.
+Run only when the explicit test slot arrives; GUI follows issue 68 seeking check.

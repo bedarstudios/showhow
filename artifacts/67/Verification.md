@@ -14,3 +14,10 @@
 - [passed] Installed app returned to idle recorder; GUI slot released.
 - [passed] Headless Chromium supports 1080p60 H.264 VBR and stereo AAC.
 - [passed] RED: all five scaling tests fail on excessive existing budgets.
+- [failed] First browser benchmark stalled before export measurements.
+- [passed] Metal smoke: real 1080p60 H.264/AAC export passed in 8.08s.
+- [passed] Nine real exports: valid 1080p H.264/AAC, monotone output sizes.
+- [passed] Sampled 4Mbps static, scrolling and moving text remains readable.
+- [untested] Synthetic AAC stream presence does not prove perceptual audio sync.
+- [passed] Browser RED: 1,414,031.25 B/s exceeds measured 779,446 ceiling.
+- [passed] Browser RED reaches size assertion after valid H.264/AAC checks.
