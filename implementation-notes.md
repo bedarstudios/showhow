@@ -607,3 +607,123 @@ GIF worker resolution hit Vite fs.allow because node_modules is an approved
 shared symlink. Intentionally stopped Vitest with SIGTERM (exit143), preserved
 logs; lane-only config permits resolved gif.js/dist and scans only exporter
 test entries. No product GIF or shared dependency change. Rerun pending.
+
+PR72 follow-up: Greptile latest summary moved to5/5 on unchanged32ef356
+(updated2026-09-07T23:00:50Z) while explicitly retaining2unresolved validation
+threads. Not accepted as completion. Existing Ubuntu CI has704unit pass/1skip,
+2browser timeouts amid dependency reload,14JSON evidence formatting errors,
+and a nonsemantic title. Title metadata corrected; checks remain historical red.
+Executor fix-1 delivered no test diff, was cancelled to terminal/error and
+reconciled; user authorized verifier test-only takeover (existingBL-044 pattern,
+no duplicate central entry). Production remains unchanged and executor-owned.
+Verifier authored paired encoder comparison, native4K glyph/motion fixture,
+blurred negative control and six bounded crop sink images. RED uses an isolated
+Vite load plugin with the genuine7b88854 source, never mutating production.
+First granted batch stopped at preflight:132440KiB free (~129MiB) versus100MiB
+floor and<=35MB estimated growth. No test/fixture run or cleanup performed;
+slot released. Await coordinated headroom, preserving original acceptance.
+
+### Same-encoder control diagnostic: incomplete at resource cap
+
+- [passed] Targeted Biome and isolated tsc exited 0 (suffixed logs).
+- [passed] Unencoded reference: 42/42, contrast ratio 1 at frames 15 and 45.
+- [failed] 80 Mbps control exceeded 5 MB cap: 5,238,219 bytes.
+- [untested] Control decoded scores/config identity: cap stopped before checks.
+- Candidate 14.4 Mbps output: 1,954,941 bytes; frame 15 (0.25 s) and
+  frame 45 (0.75 s) each scored 40/42 with unchanged first-row templates.
+  Frame 15 row 30 mismatches: B→8 at (443,1263), E→8 at (538,1263).
+  Frame 45 row 30 mismatches: D→0 at (536,1263), E→8 at (568,1263).
+  All rectangles are 24×30. Contrast ratios: 0.752525 and 0.839024.
+  Diagnostic matched-row templates scored 42/42 at both times; this alone
+  does not distinguish bitrate loss from classifier sensitivity.
+- Fixture SHA256: 1c254d14ac3faa813829e2544309d110d980c0be823ec8d7250bd8a62d92b135.
+- Vitest PID 84190 exited 1 in 14.1 s. Runner accepted expected exit 1, but
+  manual classification is incomplete diagnostic/resource-cap failure, NOT
+  expected quality RED. Only two of four decoded measurements exist.
+- Six small crops and explicit JSON preserved, including earlier failures.
+  No output MP4 was persisted. Production SHA256 remains
+  669c2c342a54d5a9c389ab2b2daf7c97608a922f4733e131b484c1c8eeb80c4c.
+  Process inspection found no remaining Vitest/Vite/runner; slot released.
+- Next diagnostic needs a separately approved resource-bound adjustment;
+  no scorer, threshold, production budget, or branch update is justified yet.
+
+### Complete 64 Mbps diagnostic (review-control-1)
+
+- [passed] Targeted format and isolated tsc exited 0.
+- [passed] Four NEW scores: identical source SHA/config except bitrate/times.
+- [passed] Candidate 1,954,941 bytes; control 4,980,880 bytes, both below 5 MB.
+- [failed] Unchanged first-row scorer: 40/42 in all four decoded samples.
+- [passed] Blurred negative: 2/42 in all four samples.
+- [passed] Diagnostic matched-row scorer: 42/42 in all four samples.
+
+Both budgets produce exactly the same mismatches at the same coordinates:
+frame15 B→8 / E→8; frame45 D→0 / E→8, all on row30 (coordinates in JSON).
+Candidate contrast ratios .752525/.839024; control .747475/.829268.
+Shared source SHA256 within this batch:
+9aacc7a6a1a27e41164779889eec27df6aee69f6a69a5b2e0b52cf904afae7be.
+The fixture was generated once for this batch; its container hash differs from
+prior batch, so only within-batch SHA identity is claimed. Both comparisons
+used sample timestamps .25/.75 and identical final hardware-preferred H264
+encoder config except bitrate. These results support row-phase classifier
+sensitivity, not an inference that the 14.4 Mbps budget caused these errors.
+They are not a general lossless-quality claim. The 64 Mbps control was only
+19,120 bytes below the cap; no future cap-compliance guarantee is inferred.
+
+Vitest PID87167 exited1 after14.1s at the actual40-vs42 assertion; the runner
+verified all4 new measurements and exited0. This is a completed diagnostic
+with an unchanged failing quality scorer, distinct from the prior incomplete
+80 Mbps cap failure. No production/scorer/threshold changes. No test/Vite
+processes remained; slot released to coordinator for73. Suffixed logs, JSON
+and eight bounded crops preserve history.
+
+### Authorized row-reference correction authored (not run)
+
+Default templates now come from the corresponding reference row. All42 glyphs
+and the .5 minimum contrast criterion are unchanged. Historical first-row mode
+remains explicit and is recorded alongside corrected scores; old40/42 and80M
+incomplete evidence are untouched. Exact-reference calibration at frames15/45
+now additionally requires contrast ratio1, no mismatches, and rejection of an
+8px-blurred reference. Encoded regression already requires all42 at both times
+and independently rejects blurred decoded frames. Thus reverting the row choice
+reintroduces the observed40/42 failure without lowering any acceptance metric.
+Rationale is the complete14.4M/64M comparison: identical glyph errors using the
+first-row templates,42/42 using corresponding rows, and known differing raster
+phases. This is reference calibration, not proof of losslessness or a production
+budget correction. Control runner now expects exit0 for corrected quality.
+
+Prepared slot request: format, types, oracle, red-paired, red-quality, green,
+unit, browser via review-check.py, sequential180s each and100MiB floor. RED
+paired uses isolated audited7b88854 injection; production file stays untouched.
+Normal GREEN has no injection or diagnostic high-budget flag. Browser directory
+has all benchmark/acceptance/evidence flags unset. Bounded PNG/JSON evidence only;
+no retained output MP4 or frame dumps; same5MB blob guard and cache reuse.
+
+### Row-corrected RED/GREEN segment verified
+
+- [passed] Format and isolated types: exit0 (review-format-3/types-3).
+- [passed] Oracle: 1passed, 1filtered skip; both frame phases calibrated.
+- [passed] Paired legacy RED fails actual4374070 < 4374070 byte assertion.
+- [passed] Quality negative RED fails blurred3 vs42 assertion.
+- [passed] GREEN: 2files,3tests passed; no skipped tests.
+- [passed] Corrected4K:42/42 at both times, contrast .752525/.839024.
+- [passed] Corrected blur:3/42 and2/42 rejected; historical scores40/42 both.
+- [passed] Production SHA unchanged after isolated legacy module injection.
+- [untested] Affected full directory suites await separate coordinated slot.
+
+All child processes exited (GREEN PID89151 exit0,13.1s). Process inspection
+found no remaining Vitest/Vite/review runner. Free253636KiB on release to73.
+No production edits, savedMP4, cap changes, or extra directory runs.
+
+### Affected suites and final scoped checks
+
+- [passed] Exporter unit directory:99passed,0failed,0skipped;13files.
+- [passed] Exporter browser directory:9passed,0failed;4files passed.
+- [untested] Opt-in benchmark:1test/1file skipped with flags unset as intended.
+- [passed] Final scoped Biome:58files,no fixes; JSON values unchanged.
+- [passed] No source change since successful isolated tsc; repeat unnecessary.
+- [passed] Production hash669c2c34... unchanged; all owned children exited.
+
+Unit child90468 exit0; browser child90554 exit0 (17.1s); formatter child90919
+exit0. Fresh process inspection found no Vitest/Vite/runner/tsc. Slot released
+to73. Free171208KiB; no cleanup. Commit hooks await explicit coordinated slot.
+Fresh-head remote CI remains pending; local Mac results do not prove Ubuntu.
