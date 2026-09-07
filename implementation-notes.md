@@ -608,6 +608,66 @@ shared symlink. Intentionally stopped Vitest with SIGTERM (exit143), preserved
 logs; lane-only config permits resolved gif.js/dist and scans only exporter
 test entries. No product GIF or shared dependency change. Rerun pending.
 
+### 2026-09-07: Issue 68 — serialized verification and nested writer recovery
+
+The coordinator supplied installed-app BEFORE evidence and required preserving the
+source Calculator recording. This lane copied all nine source files and verified
+SHA-256 hashes before changes. Real Electron acceptance will read the original
+bundle without edits, after cleanly quitting the installed app; CLI tests use
+isolated temporary fixtures. No simultaneous installed/dev instances are allowed.
+
+After ENOSPC in another lane, dependency installation is prohibited. This lane
+uses the matching main checkout node_modules symlink read-only, disables Vitest
+caching, and uses local Vite/Vitest config wrappers with local cache directories
+and the runner config loader. TypeScript uses a local config extending this lane
+and the coordinator-supplied read-only `/tmp/showhow-ticket66-types/ws` mapping;
+`artifacts/68/typecheck-config.json` records it. No dependency manifests change.
+
+The nested RED writer reported activity without delivering a file, so the lane
+released its unused test slot. A replacement wrote two tests just before its
+cancellation; the verifier retained that diff, added missing full-response header
+assertions and took ownership of test execution, as the coordinator authorized.
+The executor retains ownership of the subsequent production fix. The delivery
+snare is logged once as BL-044 in the canonical OS loop-issues log.
+
+The Vite runner config loader does not inject `__dirname`, so the first RED
+attempt failed before tests. The ignored local configs now copy the repository
+configs with an explicit lane directory and local cache; no production config
+changed. The retry reached real assertions: full Content-Length was null and
+range status was 200 instead of 206 (2 failed, 3 passed), before production edits.
+
+
+Issue 68 acceptance passed on real Electron dev code `e62d394` after 33 protocol
+and 202 affected tests, TypeScript with the isolated ws mapping, and Biome.
+The first production pass exposed arbitrary MP4 paths; two real regressions
+caught this, and the executor restricted the whitelist to the bundle video and
+direct raster screenshots. Both failed and corrected results remain in evidence.
+
+The native GUI audit temporarily unloaded/restored only the page's video URL to
+exercise a timestamp clicked before metadata. It did not change any source file
+or project. Actual timestamp/scrubber positions, full playback, range headers,
+screenshot decoding, runtime PID/cwd, hashes and clean shutdown are recorded in
+`artifacts/68`. User-required inline uploads accompany the committed evidence.
+
+### 2026-09-08: Issue 68 — Greptile cancellation and evidence review
+
+Read both unresolved review threads with pagination and `isResolved`, and the
+latest 4/5 summary. The early-cancellation finding was independently reproduced:
+three deterministic tests for pre-abort, abort during realpath, and abort while
+opening a real file all returned 200 instead of AbortError before the correction.
+The executor owns the production lifetime fix; verifier owns tests and evidence.
+
+The original absolute typecheck artifact was not reproducible elsewhere. Its
+contents are retained as historical text, while the actual config now extends
+the repository relatively and prefers its declared @types/ws dependency. An
+optional ignored local fallback links only the coordinator-supplied real types
+read-only; no stubs or weaker compiler options were introduced. A committed
+portable Vitest config preserves the repository test contract and avoids writes
+to shared node_modules. Review logs name these committed configs directly.
+
+The issue uses in-progress plus needs-fixes while fixing; the PR card remains
+Reviewing. The semantic PR title was corrected as metadata, not a product fix.
+
 PR72 follow-up: Greptile latest summary moved to5/5 on unchanged32ef356
 (updated2026-09-07T23:00:50Z) while explicitly retaining2unresolved validation
 threads. Not accepted as completion. Existing Ubuntu CI has704unit pass/1skip,
