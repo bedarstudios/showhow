@@ -14,6 +14,15 @@ interface SourceCropRegion {
 const MEDIUM_SHORT_SIDE = 720;
 const HIGH_SHORT_SIDE = 1080;
 
+// Smooth pixel-proportional MP4 video budget, anchored at the benchmark-selected
+// 4 Mbps for 1920x1080 and clamped so tiny crops stay usable and huge sources bounded.
+const BITRATE_REFERENCE_PIXELS = 1920 * 1080;
+const BITRATE_REFERENCE_BPS = 4_000_000;
+const SOURCE_BITRATE_MULTIPLIER = 1.5;
+const MIN_BITRATE_BPS = 1_000_000;
+const MAX_BITRATE_BPS = 24_000_000;
+const BITRATE_ROUNDING_STEP_BPS = 100_000;
+
 function even(value: number) {
 	return Math.floor(value / 2) * 2;
 }
@@ -95,17 +104,11 @@ function calculateSourceDimensions(
 }
 
 function calculateBitrate(width: number, height: number, quality: ExportQuality) {
-	const totalPixels = width * height;
-
-	if (quality === "source") {
-		if (totalPixels > 2560 * 1440) return 80_000_000;
-		if (totalPixels > 1920 * 1080) return 50_000_000;
-		return 30_000_000;
-	}
-
-	if (totalPixels <= 1280 * 720) return 10_000_000;
-	if (totalPixels <= 1920 * 1080) return 20_000_000;
-	return 30_000_000;
+	const qualityMultiplier = quality === "source" ? SOURCE_BITRATE_MULTIPLIER : 1;
+	const proportional =
+		(width * height * BITRATE_REFERENCE_BPS * qualityMultiplier) / BITRATE_REFERENCE_PIXELS;
+	const rounded = Math.round(proportional / BITRATE_ROUNDING_STEP_BPS) * BITRATE_ROUNDING_STEP_BPS;
+	return Math.min(MAX_BITRATE_BPS, Math.max(MIN_BITRATE_BPS, rounded));
 }
 
 export function calculateMp4ExportSettings({

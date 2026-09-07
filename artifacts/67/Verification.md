@@ -21,3 +21,8 @@
 - [untested] Synthetic AAC stream presence does not prove perceptual audio sync.
 - [passed] Browser RED: 1,414,031.25 B/s exceeds measured 779,446 ceiling.
 - [passed] Browser RED reaches size assertion after valid H.264/AAC checks.
+- [passed] GREEN: 11 focused unit tests pass after the bitrate curve change.
+- [passed] GREEN: real browser output-size regression passes in 2.15s.
+- [passed] Isolated-config TypeScript check exits 0 using shared ws types.
+- [passed] Targeted Biome checks 7 changed files without fixes.
+- [passed] GREEN batch processes exited; test slot released.

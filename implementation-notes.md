@@ -544,3 +544,26 @@ System FFmpeg lacks drawtext; fixture generator uses existing sharp-rendered SVG
 text. Generated three complete 3-second fixtures total15MB; conservative10MB
 generator guard fired after final write. Benchmark blobs stay in memory; no
 frame dumps or browser downloads. Investigative generator guard to be tightened.
+
+First browser benchmark stopped after about3min with no export logs and high
+SwiftShader CPU. No benchmark result or bitrate selection inferred. Retry config
+uses macOS Metal and lane-local cache instead of shared-node_modules Vite cache.
+Browser config only; production rendering unchanged. All owned processes exited.
+
+Browser setup root cause: installed @vitest/browser-playwright4.1.5 expects
+launchOptions; inherited launch key was ignored. Isolated benchmark config
+corrected; one real export passed in8.08s (10.05s full run). No production change.
+
+Production bitrate change applied after genuine RED evidence (browser
+regression artifacts/67/red-browser.log: 1,414,031.25 B/s exceeds the
+779,446 B/s measured ceiling; five unit failures committed in 7b88854).
+calculateBitrate in src/lib/exporter/mp4ExportSettings.ts now returns the
+100 kbps-rounded, 1_000_000-24_000_000-clamped pixel-proportional budget
+(width * height * 4_000_000 / 2_073_600, times 1.5 for source quality),
+anchored on the benchmark-selected 4 Mbps at 1920x1080/60. Dimension,
+upscale, crop, encoder VBR quality/fallback, capture, and persistence
+behavior are untouched. Nine stale bitrate expectations in
+mp4ExportSettings.test.ts updated to the computed values (4.2M, 5.7M,
+1.9M, 4M, 6M, 24M, 4M, 1.2M, 4M in existing case order); every dimension
+assertion preserved. Tests, builds, and GUI not run per coordinator
+instruction; verification pending the granted re-run of the RED suites.
