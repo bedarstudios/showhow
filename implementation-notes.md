@@ -532,3 +532,15 @@ New export matches original byte count but differs in SHA-256; no byte-identical
 claim. Original file hashes still match. Editor timer advances while preview
 appears stuck, consistent with coordinator-owned mediaProtocol issue; excluded
 from MP4 changes and not represented as a passing playback check.
+
+Shared ENOSPC loop snare logged centrally by issue66 as BL-042 in
+/Users/mohamedb/dev/OS/references/bedar-loop-issues.md; coordinator confirmed
+no duplicate entry needed. First test slot released after actual encoder
+capability preflight while executor authors bounded benchmark.
+
+Verifier authored mp4BitrateScaling.test.ts after executor evidence authoring
+stalled. Five genuine assertion failures observed before any production edit.
+System FFmpeg lacks drawtext; fixture generator uses existing sharp-rendered SVG
+text. Generated three complete 3-second fixtures total15MB; conservative10MB
+generator guard fired after final write. Benchmark blobs stay in memory; no
+frame dumps or browser downloads. Investigative generator guard to be tightened.

@@ -12,3 +12,5 @@
 - [passed] Baseline original export/source/project hashes remain unchanged.
 - [untested] Editor seek/play: timer advances but preview appears stuck.
 - [passed] Installed app returned to idle recorder; GUI slot released.
+- [passed] Headless Chromium supports 1080p60 H.264 VBR and stereo AAC.
+- [passed] RED: all five scaling tests fail on excessive existing budgets.
