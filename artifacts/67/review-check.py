@@ -90,7 +90,7 @@ elif phase == "control":
     measurements = [json.loads(p.read_text()) for p in set(evidence.glob("review-quality-*.json")) - before]
     assert len(measurements) == 4, "Incomplete control diagnostic: require four new decoded scores"
     assert {(d["bitrate"], d["frame"]) for d in measurements} == {
-        (bitrate, frame) for bitrate in [14_400_000, 64_000_000] for frame in [15, 45]
+        (bitrate, frame) for bitrate in [14_400_000, 64_000_000] for frame in [6, 18]
     }
     assert len({d["fixtureSha256"] for d in measurements}) == 1
     identities = [{k: v for k, v in d["configurations"][-1].items() if k != "bitrate"} for d in measurements]

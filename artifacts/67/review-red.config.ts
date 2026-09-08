@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { mergeConfig } from "vitest/config";
-import config from "../../vitest.browser.config";
+import config from "./review-evidence.config";
 
 const settingsPath = path.resolve(
 	import.meta.dirname,

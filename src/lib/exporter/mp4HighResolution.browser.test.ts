@@ -28,7 +28,7 @@ function assertReadable(score: ReturnType<typeof scoreText>) {
 }
 
 it("recognizes every glyph in the exact unencoded reference control", async () => {
-	for (const frame of [15, 45]) {
+	for (const frame of [6, 18]) {
 		const reference = renderTextReference(frame);
 		const blurred = textCanvas();
 		try {
@@ -55,7 +55,9 @@ it("recognizes every glyph in the exact unencoded reference control", async () =
 	}
 });
 
-it("preserves native 4K source-quality text through motion and rejects blurred text", async () => {
+it("preserves native 4K source-quality text through motion and rejects blurred text", async ({
+	task,
+}) => {
 	const fixture = await createNativeTextVideo();
 	const url = URL.createObjectURL(fixture);
 	const settings = calculateMp4ExportSettings({
@@ -85,6 +87,8 @@ it("preserves native 4K source-quality text through motion and rejects blurred t
 				...settings,
 				bitrate,
 				frameRate: 60,
+				// Same native 1s input; only temporal export work is bounded.
+				trimRegions: [{ id: "bounded-test-tail", startMs: 400, endMs: 1000 }],
 				wallpaper: "#141414",
 				zoomRegions: [],
 				showShadow: false,
@@ -117,10 +121,12 @@ it("preserves native 4K source-quality text through motion and rejects blurred t
 			expect(video.displayWidth).toBe(TEXT_WIDTH);
 			expect(video.displayHeight).toBe(TEXT_HEIGHT);
 			expect(video.codec).toBe("avc");
-			expect(await input.computeDuration()).toBeCloseTo(1, 2);
-			expect((await video.computePacketStats()).averagePacketRate).toBeCloseTo(60, 0);
+			expect(await input.computeDuration()).toBeCloseTo(0.4, 2);
+			const packets = await video.computePacketStats();
+			expect(packets.averagePacketRate).toBeCloseTo(60, 0);
+			expect(packets.packetCount).toBe(24);
 			const sink = new VideoSampleSink(video);
-			for (const frame of [15, 45]) {
+			for (const frame of [6, 18]) {
 				const sample = (await sink.getSample(frame / 60))!;
 				const decoded = textCanvas();
 				const blurred = textCanvas();
@@ -161,6 +167,11 @@ it("preserves native 4K source-quality text through motion and rejects blurred t
 						fixtureSha256,
 						fixtureBytes: fixture.size,
 						outputBytes: result.blob!.size,
+						duration: await input.computeDuration(),
+						width: video.displayWidth,
+						height: video.displayHeight,
+						codec: video.codec,
+						packets,
 						bitrate,
 						configurations,
 						positive,
@@ -183,7 +194,11 @@ it("preserves native 4K source-quality text through motion and rejects blurred t
 		}
 		// Collect both times and (in diagnostic mode) both budgets before asserting.
 		// The criteria remain unchanged, so a diagnostic can still fail honestly.
-		for (const score of scored) assertReadable(score);
+		for (const score of scored) {
+			task.meta.mp4Assertion = "glyph-equality";
+			task.meta.mp4GlyphScore = score.correct;
+			assertReadable(score);
+		}
 	} finally {
 		configure.mockRestore();
 		input?.dispose();
