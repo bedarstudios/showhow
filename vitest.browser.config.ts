@@ -2,8 +2,12 @@ import { realpathSync } from "node:fs";
 import path from "node:path";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
+import { traceExportPlugin } from "./artifacts/67/trace-export-plugin";
 
 export default defineConfig({
+	// Diagnostic observation only on the failing platform; no codec/render
+	// preference changes. Remove after the CI boundary failure is located.
+	plugins: process.env.CI && process.platform === "linux" ? [traceExportPlugin()] : [],
 	// Keep generated caches out of node_modules when dependencies are shared.
 	cacheDir: path.resolve(__dirname, ".vitest-cache/browser"),
 	optimizeDeps: {
