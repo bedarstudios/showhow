@@ -103,9 +103,11 @@ elif phase == "green":
     env["VITE_MP4_REVIEW_EVIDENCE"] = "1"
     run(["node", "node_modules/vitest/vitest.mjs", "--config", "artifacts/67/review-evidence.config.ts", "--run", paired, high])
 elif phase == "browser":
-    run(browser + ["src/lib/exporter"])
+    run(browser + ["src/lib/exporter", "--maxWorkers=1", "--no-cache"])
 elif phase == "unit":
-    run(["node", "node_modules/vitest/vitest.mjs", "--run", "src/lib/exporter"])
+    run(["node", "node_modules/vitest/vitest.mjs", "--run", "src/lib/exporter", "--maxWorkers=1", "--no-cache"])
+elif phase == "imported":
+    run(["node", "node_modules/vitest/vitest.mjs", "--run", "electron/showhow/mediaProtocol.test.ts", "src/components/library/RecordingLibrary.test.tsx", "--maxWorkers=1", "--no-cache"])
 elif phase == "types":
     run(["node", "node_modules/typescript/bin/tsc", "--noEmit", "-p", "artifacts/67/typecheck-config.json"])
 elif phase == "format":
