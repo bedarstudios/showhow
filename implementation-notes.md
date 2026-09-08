@@ -592,3 +592,26 @@ to shared node_modules. Review logs name these committed configs directly.
 
 The issue uses in-progress plus needs-fixes while fixing; the PR card remains
 Reviewing. The semantic PR title was corrected as metadata, not a product fix.
+
+## Issue 73 RED wrapper deviation (2026-09-08)
+
+The first regression run reached the expected late-title assertion, but its
+zsh wrapper assigned read-only `status`, so it did not record the test exit.
+The full first output was preserved. An identical authorized retry used
+`test_exit_code` and recorded exit 1 with the same assertion failure. This is
+an execution-log wrapper snare, not a configuration, fixture, or extra product
+failure. OS loop log BL-047 records it. No production changes were applied.
+
+## Pre-fix GUI timing and app targeting
+
+First attempt missed the 20-second window; `timing-miss.png` is retained and
+is not failure evidence. The second attempt batched native Computer Use
+interactions with fresh accessibility state between actions and reproduced
+the bug within the original delay. No extension or mocked result was used.
+Initial app-name lookup opened an incidental default Electron window through
+the old52 dependency symlink. Full-path targeting selected the verified issue73
+runtime; both owned runtime and incidental window were closed afterward.
+Source bytes were restored exactly. An immediate HTTP check before HMR caught
+cached instrumented source, so served-shim removal is not claimed for this
+pre-fix run; the runtime then shut down. The after-fix ordinary save will
+require verified uninstrumented served source.
