@@ -47,12 +47,16 @@
 		"screens": "화면 ({{count}}개)",
 		"windows": "창 ({{count}}개)",
 		"defaultSourceName": "화면",
+		"selectSource": "녹화 소스 선택: {{source}}",
 		"emptyTitle": "화면 또는 창을 찾을 수 없음",
 		"emptyDescription": "화면 녹화 권한을 방금 허용했다면 이 선택기를 새로고침하세요. macOS에서는 Showhow를 다시 열어야 할 수 있습니다.",
 		"loadFailedDescription": "Showhow에서 캡처 소스를 불러오지 못했습니다. 이 선택기를 새로고침한 후 다시 시도하세요."
 	},
 	"recording": {
 		"selectSource": "녹화할 소스를 선택해 주세요",
+		"start": "녹화 시작",
+		"stop": "녹화 정지",
+		"restart": "녹화 다시 시작",
 		"saving": "저장 중..."
 	},
 	"language": "언어",

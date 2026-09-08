@@ -592,3 +592,37 @@ to shared node_modules. Review logs name these committed configs directly.
 
 The issue uses in-progress plus needs-fixes while fixing; the PR card remains
 Reviewing. The semantic PR title was corrected as metadata, not a product fix.
+
+## Issue69 BEFORE resource deviation (September8)
+
+Fresh installed1.6.0 recording startup was asynchronous. Immediate post-Return AX
+remained idle; Tab/Space intended for Pause opened Notes. Native close returned to
+active HUD; paused at observed00:18, resumed and stopped promptly. Thus active
+capture lasted19.009s (saved metadata), exceeding granted15s. No extra capture was attempted. App quit, children
+exited; all586 original recording hashes unchanged, free disk128400KiB and total
+observed incremental disk8260KiB. Root notified. BEFORE provenance is installed1.6.0,
+source-correlated to unchanged493965e; never represented as currentmainruntime.
+
+## Issue69 reversible disk recovery (September8, coordinator-owned)
+
+Root applied worktree-only sparse checkout patterns `/*` and `!/docs/evidence/`
+to exclude40,788KiB of unchanged historical evidence copies from this newly created
+lane. Before exclusion root verified no modifications, untracked/ignored files,
+symlinks or open handles in the exact target; main and lane Git evidence trees
+matcheda8eeaf6e. Git reports no deletions; issue69 source/tests/locales/artifacts
+remain intact. Main retains40,788KiB of original evidence and no sparse config.
+Reported disk124840->165868KiB. No old52 dependencies were touched. Restore with
+`git sparse-checkout disable` in THIS ticket worktree when headroom permits.
+
+## Issue69 AFTER narrower resource-budget deviation
+
+Patched native Start/Pause/Resume/Stop and Studio keyboard behavior was observed,
+including transient saving. Initial free207108KiB; after owned capture entered
+editor, a sample reached163284KiB (43824KiB,42.80MiB observed growth), exceeding
+the subsequently accepted narrower35MiB budget while remaining above130MiB
+operational and100MiB hard floors. Stopped further interaction immediately and
+quit owned Electron. Vite exited automatically with app, exit0; attempted TERM
+found its PID already gone. Restart/Cancel names were observed but their native
+activation was not attempted. Optimizer remained10516KiB, main/preload348KiB;
+growth was not all attributable to those lane outputs, and no unsupported cause
+claim is made. Root notified; no repeated capture without a new grant.
