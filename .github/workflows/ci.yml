@@ -32,31 +32,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: npm run test
-      - id: browser-install
-        run: npm run test:browser:install
-      # Temporary PR72 controls; remove after remote RED/GREEN evidence.
-      - name: Observe PR72 export controls
-        id: mp4-controls
-        if: github.event_name == 'pull_request' && github.event.pull_request.number == 72 && github.head_ref == 'ticket/67-optimize-mp4-size'
-        timeout-minutes: 16
-        run: |
-          git fetch --no-tags --depth=1 origin 7b8885497986829d4498e70c7c1c8ec876f77222
-          mp4_controls_exit_code=0
-          for phase in oracle red-paired red-quality green-paired green-quality; do
-            python3 artifacts/67/ci-controls.py "$phase" || mp4_controls_exit_code=1
-          done
-          exit "$mp4_controls_exit_code"
-      - name: Preserve PR72 control evidence
-        if: always() && github.event_name == 'pull_request' && github.event.pull_request.number == 72 && github.head_ref == 'ticket/67-optimize-mp4-size'
-        uses: actions/upload-artifact@v4
-        with:
-          name: mp4-controls-${{ github.run_id }}-${{ github.run_attempt }}
-          path: artifacts/67/ci-validation/
-          retention-days: 7
-          if-no-files-found: warn
-      # Preserve the normal suite even when an observation step failed.
-      - if: ${{ !cancelled() && steps.browser-install.outcome == 'success' }}
-        run: npm run test:browser
+      - run: npm run test:browser:install
+      - run: npm run test:browser
 
   build:
     name: Build
