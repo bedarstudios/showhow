@@ -85,6 +85,12 @@ interface ClickSample {
 	cx: number;
 	cy: number;
 	interactionType?: string;
+	/**
+	 * Whether the click landed inside the recorded window. Legacy samples omit
+	 * it; only an explicit `false` (an outside click, e.g. on the Stop control)
+	 * is excluded from steps.
+	 */
+	visible?: boolean;
 }
 
 export interface StepFrame {
@@ -404,6 +410,7 @@ function clickSamplesFromTelemetry(raw: string): ClickSample[] {
 				typeof sample === "object" &&
 				sample !== null &&
 				(sample as ClickSample).interactionType === "click" &&
+				(sample as ClickSample).visible !== false &&
 				typeof (sample as ClickSample).timeMs === "number" &&
 				typeof (sample as ClickSample).cx === "number" &&
 				typeof (sample as ClickSample).cy === "number",
@@ -580,9 +587,11 @@ export interface WriteDocArtifactsSeam {
  * Read the stored cursor telemetry from an existing bundle and reconstruct the
  * click ordering + `step-NN.png` screenshot filenames, then deterministically
  * regenerate `steps.json` and `steps.md` from the bundle's current
- * `transcript.txt`. Screenshot references are always the deterministic
- * source-derived `step-NN.png` filenames -- they are NOT blanked based on
- * filesystem existence, because determinism derives from immutable inputs.
+ * `transcript.txt`. Screenshot references reuse the filename the click's PRIOR
+ * step already referenced (matched by the immutable ts + coords association);
+ * clicks with no matching prior step get deterministic source-derived
+ * `step-NN.png` filenames. Refs are never blanked based on filesystem
+ * existence, because determinism derives from immutable inputs.
  *
  * This is the re-runnable doc engine: production calls it after the caption
  * pipeline writes `transcript.txt` (which happens AFTER `createRecordingBundle`
@@ -617,7 +626,8 @@ export async function regenerateDocArtifacts(
 			return result;
 		}
 		// Reconstruct stepFrames from the stored cursor telemetry, reusing the
-		// stored click ordering and the canonical step-NN.png filenames.
+		// stored click ordering and associating each retained click with its
+		// prior step's screenshot filename (deterministic numbering as fallback).
 		const stepFrames = await stepFramesFromBundle(bundleDir);
 		const { stepsWritten, transcriptAvailable } = await writeDocArtifacts(
 			bundleDir,
@@ -760,6 +770,14 @@ export async function persistBrowserSteps(
  * - A valid Showhow meta that explicitly omits `cursorTelemetry` (no cursor
  *   tracking was recorded).
  * - A valid telemetry record with `samples: []`.
+ *
+ * Screenshot filenames: regeneration never re-extracts frames, so a retained
+ * click must keep the screenshot filename its PRIOR step already references
+ * (matched by the immutable ts + coords association) rather than being
+ * renumbered onto another click's extracted image -- e.g. after hidden
+ * (visible:false) clicks are filtered out of a pre-fix bundle. Clicks with no
+ * matching prior step fall back to deterministic `step-NN.png` numbering,
+ * skipping filenames already claimed by matched clicks.
  */
 async function stepFramesFromBundle(bundleDir: string): Promise<StepFrame[]> {
 	// meta.json is a required source: missing, unreadable, unparseable, or
@@ -808,12 +826,72 @@ async function stepFramesFromBundle(bundleDir: string): Promise<StepFrame[]> {
 		throw new Error(`regenerateDocArtifacts: cursor telemetry is unreadable: ${String(error)}`);
 	}
 	const clicks = clickSamplesFromTelemetryStrict(raw);
-	return clicks.map((click, index) => ({
+	// Attempt-2 (#66): renumbering retained clicks after filtering would point a
+	// retained step at a DIFFERENT click's extracted image (regeneration never
+	// re-extracts frames). Reuse the prior step's screenshot filename, matched
+	// by ts + coords -- the immutable per-click identity carried verbatim in
+	// both telemetry samples and Step records. Unmatched clicks fall back to
+	// deterministic step-NN.png numbering, skipping claimed filenames.
+	const priorSteps = await readPriorDesktopSteps(bundleDir);
+	const claimed = new Set<string>();
+	const consumed = new Set<number>();
+	const outputPathFor = (click: ClickSample): string => {
+		if (priorSteps !== null) {
+			for (const [index, step] of priorSteps.entries()) {
+				if (consumed.has(index)) continue;
+				if (
+					step.ts === click.timeMs &&
+					step.coords.cx === click.cx &&
+					step.coords.cy === click.cy
+				) {
+					consumed.add(index);
+					claimed.add(step.screenshot);
+					return step.screenshot;
+				}
+			}
+		}
+		let n = 1;
+		while (claimed.has(`step-${String(n).padStart(2, "0")}.png`)) n += 1;
+		const filename = `step-${String(n).padStart(2, "0")}.png`;
+		claimed.add(filename);
+		return filename;
+	};
+	return clicks.map((click) => ({
 		timeMs: click.timeMs,
 		cx: click.cx,
 		cy: click.cy,
-		outputPath: `step-${String(index + 1).padStart(2, "0")}.png`,
+		outputPath: outputPathFor(click),
 	}));
+}
+
+/**
+ * Leniently read a prior desktop-tier `steps.json` for screenshot-filename
+ * association during regeneration. Returns null when the file is absent,
+ * unparseable, or not an array of step-shaped records with numeric coords --
+ * callers then fall back to deterministic numbering. Browser-tier bundles
+ * never reach this path (`regenerateDocArtifacts` preserves them before
+ * reconstructing frames).
+ */
+async function readPriorDesktopSteps(bundleDir: string): Promise<Step[] | null> {
+	try {
+		const parsed: unknown = JSON.parse(
+			await fs.readFile(path.join(bundleDir, "steps.json"), "utf-8"),
+		);
+		if (!Array.isArray(parsed)) return null;
+		if (
+			!parsed.every(
+				(value) =>
+					isEditableStep(value) &&
+					typeof (value as Step).coords.cx === "number" &&
+					typeof (value as Step).coords.cy === "number",
+			)
+		) {
+			return null;
+		}
+		return parsed as Step[];
+	} catch {
+		return null;
+	}
 }
 
 /**
@@ -840,6 +918,7 @@ function clickSamplesFromTelemetryStrict(raw: string): ClickSample[] {
 			typeof sample === "object" &&
 			sample !== null &&
 			(sample as ClickSample).interactionType === "click" &&
+			(sample as ClickSample).visible !== false &&
 			typeof (sample as ClickSample).timeMs === "number" &&
 			typeof (sample as ClickSample).cx === "number" &&
 			typeof (sample as ClickSample).cy === "number",
@@ -850,8 +929,10 @@ function clickSamplesFromTelemetryStrict(raw: string): ClickSample[] {
  * Shared doc-artifact writer used by both `createRecordingBundle` (initial pass)
  * and `regenerateDocArtifacts` (re-run after transcript arrives). Reads
  * `transcript.txt` from the bundle if present, builds steps from the given
- * stepFrames (screenshot refs are always the deterministic source-derived
- * `step-NN.png` filenames), and writes deterministic `steps.json` + `steps.md`.
+ * stepFrames (screenshot refs are the `outputPath` filenames carried on each
+ * frame -- deterministic `step-NN.png` numbering at initial generation, and
+ * prior-step-associated filenames at regeneration), and writes deterministic
+ * `steps.json` + `steps.md`.
  *
  * Paired writes are rollback-safe: both artifact strings are generated first,
  * then staged to temp files within the bundle dir; only if BOTH stage
