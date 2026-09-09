@@ -35,6 +35,12 @@
 	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+/* Keyboard focus ring for the radio-role source cards (roving tabIndex). */
+.sourceCard:focus-visible {
+	outline: 2px solid #34b27b;
+	outline-offset: 2px;
+}
+
 .selected {
 	border-color: rgba(52, 178, 123, 0.68);
 	background: linear-gradient(145deg, rgba(52, 178, 123, 0.13), rgba(255, 255, 255, 0.045));

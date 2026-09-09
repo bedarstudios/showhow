@@ -858,3 +858,89 @@ Ticket cfa51f8 verified byte-for-byte. Independent Codex local review cycle 1 at
 - Coordinator explicitly routed unmilestoned issue 66 to maintenance mode for this rerun. This user authorization resolves the phase-mode blocker without inventing a manifest default. Resume the concrete local-review correction; native acceptance and committed-evidence gates remain open.
 - Independent Codex local review cycle 2 confirmed correction (bundle.ts SHA256 0d5be071be75684525cd6595e3737557b40331308ea86db775b4e59193f8546d; bundle.test.ts SHA256 3a25c9341f9192e1812d42b2072c8c0ba9cd74202da30d2ce8a25a08e00210fb): no remaining blocking code findings. Nonblocking: public regenerateDocArtifacts comment at bundle.ts:592 should clarify fallback succeeds only without existing-image conflict. Recorded without further edits.
 - Genuine RED observed by orchestrator before production edits (review-fix-red-orchestrator.log); final 67 bundle tests and 178 affected tests pass, final targeted Biome passes, temporary-declaration TypeScript passes. Initial Biome formatting failed despite wrapper incorrectly annotating exit 0; only the later successful check is accepted. No new native/GUI claim. Required committed visuals and real inside-click evidence remain blockers; PR stays draft.
+
+## Issue 75 keyboard source cards (2026-09-09)
+
+Implemented the approved `artifacts/75/PLAN.md` radio-group pattern in
+`src/components/launch/SourceSelector.tsx`: each category list is a
+`role="radiogroup"`; cards are named radios (`role="radio"`,
+`aria-label`, `aria-checked`) with a roving tabIndex (selected card, else
+first card of the category, is the single Tab stop); Space/Enter select the
+focused card; ArrowRight/ArrowDown move focus+selection forward and
+ArrowLeft/ArrowUp backward, wrapping at the group ends; Tab/Shift+Tab are
+never preventDefault'd so focus leaves the group unaided. Click still selects
+and now also focuses the card. A `:focus-visible` outline was added in
+SourceSelector.module.css. Share/Cancel, refresh, selected-source
+`selectSource` IPC, thumbnails, category tabs, and capture behavior are
+unchanged. RED evidence in `artifacts/75/red.txt` was not altered.
+
+Verification: `npx vitest run src/components/launch/SourceSelector.test.tsx`
+6/6 GREEN (empty/retry, Space+ArrowDown+Share IPC single-tab-stop, ArrowRight,
+Enter activation + IPC, ArrowLeft/ArrowUp wrap + roving tab stop,
+empty-state reload); `npx tsc --noEmit` emits only 3 pre-existing `ws`
+errors in `electron/showhow/bridgeServer.ts`; Biome check clean on the
+three touched files.
+
+### Nonblocking limitations
+
+- The plan's "refresh retains the selected source and its roving Tab stop"
+  and "selected source disappears -> selection clears, first remaining card
+  becomes Tab stop without being selected" transitions are implemented by
+  the existing `fetchSources` selection-retention plus the tab-stop
+  derivation, but are not directly test-covered: the populated picker
+  exposes no refetch trigger (fetchSources runs only on mount and from the
+  empty-state Reload button), so the transition is not reachable through
+  the public UI seam. Only the empty->reload transition is asserted.
+- `npx tsc --noEmit` exits 2 with 3 errors in `electron/showhow/bridgeServer.ts`
+  (`ws` module typing). Pre-existing and environment-caused: this lane uses
+  the read-only main-checkout node_modules symlink, which lacks the declared
+  `@types/ws`, and dependency installation is prohibited (ENOSPC history).
+  Verified pre-existing by stashing this diff and rerunning: identical 3
+  errors with zero contribution from the touched files.
+- Tab/Shift+Tab exiting the group without trapping is guaranteed by
+  construction (no Tab handling, no preventDefault) rather than by an
+  assertion; jsdom does not move focus on Tab keydown, so a traversal test
+  would only assert jsdom behavior. Real focus-ring visibility
+  (`.sourceCard:focus-visible`) is CSS-only and needs native smoke evidence
+  per AGENTS.md; not claimed as tested here.
+
+### Verification correction
+
+The orchestrator replaced only its lane-created shared `node_modules` symlink with a locked local
+`npm ci` install after confirming 9.6 GiB remained. With the declared `@types/ws` present,
+`npx tsc --noEmit` passed with no errors. Native Electron verification then confirmed keyboard
+focus left the radio group for the dialog actions and that the focus ring was visible.
+
+### 2026-09-09 local review cycle 1 -- public seam clarification
+
+The populated picker exposes exactly one public refetch seam: the existing `Reload` button,
+which is rendered only by the empty/load-failed state. `fetchSources` also runs once on mount;
+there is no refresh control while sources are listed, so the plan's "refresh retains the
+selected source" and "selected source disappears" transitions run behind that seam but are not
+separately reachable picker actions. `artifacts/75/PLAN.md` now names this seam explicitly.
+Test coverage follows the seam: `SourceSelector.test.tsx`'s reload test drives the public
+`Reload` button from the empty state and asserts the reloaded list renders as an unchecked
+radio group -- the first named radio is the group's Tab stop (`tabindex="0"`), nothing is
+`checked`, and Share remains disabled until a source is activated. No production code,
+`red.txt`, commits, or GitHub state were touched in this cycle.
+
+### 2026-09-09 local review cycle 1 amendment
+
+Amendment applied to `artifacts/75/PLAN.md`: deleted the two populated-refresh bullets
+("refresh retains the selected source and its roving Tab stop" / "if a selected source
+disappears, selection clears and the first remaining source becomes the Tab stop") and removed
+the sentence claiming those transitions run behind the empty-state `Reload` seam. Those
+behaviors exist in `fetchSources`/tab-stop derivation but have no reachable public picker
+action, so the plan no longer states them. What remains is the real contract: the only public
+refetch seam is the empty/load-failed `Reload` button; reloading loads each category as an
+unchecked radio group whose first named radio is the Tab stop with Share disabled, which is
+exactly what the strengthened reload test asserts.
+
+### 2026-09-09 correction retraction
+
+Retract the prior statement that the populated refresh transitions (selection retention /
+disappearance fallback) "run behind the empty-state Reload seam": they do not. The empty-state
+`Reload` cannot have an existing selection to retain (the list is empty or failed at that
+point), and no populated refetch action exists in the picker. Those transitions are internal
+`fetchSources`/derivation behavior with no public seam, which is why the corresponding PLAN.md
+bullets were deleted.
