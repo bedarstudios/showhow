@@ -35,10 +35,12 @@
 	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-/* Keyboard focus ring for the radio-role source cards (roving tabIndex). */
+/* Keyboard focus ring for the radio-role source cards (roving tabIndex).
+   The 2px outline is drawn inside the card so it cannot be clipped by the
+   scroll container's overflow. */
 .sourceCard:focus-visible {
 	outline: 2px solid #34b27b;
-	outline-offset: 2px;
+	outline-offset: -2px;
 }
 
 .selected {

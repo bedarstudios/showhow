@@ -21,6 +21,7 @@ Environment: macOS, patched ticket worktree (uncommitted verification build)
 - [passed] No recording file changed during keyboard verification
 - [passed] Reload produced an unchecked named radio and disabled Share
 - [passed] Independent Codex review cycle 2 found no findings
+- [passed] Current-head inset focus ring remained visible on Calculator
 
 Routing: coordinator explicitly assigned unmilestoned issue #75 to maintenance mode.
 

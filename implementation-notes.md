@@ -944,3 +944,15 @@ disappearance fallback) "run behind the empty-state Reload seam": they do not. T
 point), and no populated refetch action exists in the picker. Those transitions are internal
 `fetchSources`/derivation behavior with no public seam, which is why the corresponding PLAN.md
 bullets were deleted.
+
+### 2026-09-09 Greptile round 1 fix (PR #79) -- focus ring drawn inside the card
+
+Validated finding: `.sourceCard:focus-visible` used `outline-offset: 2px`, drawing the 2px
+focus ring 2px outside the card edge. The source grids are
+`overflow-y-auto` scroll containers, so an outside ring on cards at the grid's edge can be
+clipped by the scroll container instead of rendering fully around the focused radio.
+
+Correction: `outline-offset` changed from `2px` to `-2px` in
+`src/components/launch/SourceSelector.module.css`, so the 2px outline is rendered inside the
+card and can never be clipped by the grid's overflow. CSS-only; layout, keyboard behavior,
+roving tabIndex, and all tests are untouched. No RED test was made per instruction.
