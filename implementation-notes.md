@@ -851,3 +851,10 @@ Source bytes were restored exactly. An immediate HTTP check before HMR caught
 cached instrumented source, so served-shim removal is not claimed for this
  pre-fix run; the runtime then shut down. The after-fix ordinary save will
  require verified uninstrumented served source.
+
+## Issue 66 draft PR 78 re-evaluation — 2026-09-09
+
+Ticket cfa51f8 verified byte-for-byte. Independent Codex local review cycle 1 at 49811dce (base 3fcdad09) found blocking screenshot fallback defect at bundle.ts:853 when prior mapping is absent/deleted; no nonblocking findings. Exact-head CI green. Phase mode unresolved (milestone null), native inside-click acceptance still unverified, visual evidence uncommitted. Historical Copilot score ignored; review-passed removed, priority/needs-human added; PR kept draft, card Blocked, no watcher. Full local report artifacts/66/checkpoint-78-review.md. No production changes or new GUI actions.
+- Coordinator explicitly routed unmilestoned issue 66 to maintenance mode for this rerun. This user authorization resolves the phase-mode blocker without inventing a manifest default. Resume the concrete local-review correction; native acceptance and committed-evidence gates remain open.
+- Independent Codex local review cycle 2 confirmed correction (bundle.ts SHA256 0d5be071be75684525cd6595e3737557b40331308ea86db775b4e59193f8546d; bundle.test.ts SHA256 3a25c9341f9192e1812d42b2072c8c0ba9cd74202da30d2ce8a25a08e00210fb): no remaining blocking code findings. Nonblocking: public regenerateDocArtifacts comment at bundle.ts:592 should clarify fallback succeeds only without existing-image conflict. Recorded without further edits.
+- Genuine RED observed by orchestrator before production edits (review-fix-red-orchestrator.log); final 67 bundle tests and 178 affected tests pass, final targeted Biome passes, temporary-declaration TypeScript passes. Initial Biome formatting failed despite wrapper incorrectly annotating exit 0; only the later successful check is accepted. No new native/GUI claim. Required committed visuals and real inside-click evidence remain blockers; PR stays draft.

@@ -777,7 +777,15 @@ export async function persistBrowserSteps(
  * renumbered onto another click's extracted image -- e.g. after hidden
  * (visible:false) clicks are filtered out of a pre-fix bundle. Clicks with no
  * matching prior step fall back to deterministic `step-NN.png` numbering,
- * skipping filenames already claimed by matched clicks.
+ * skipping filenames already claimed by matched clicks -- but a fallback
+ * filename that ALREADY EXISTS on disk is unproven (it may hold another
+ * click's extracted frame, e.g. a hidden click's image in a pre-fix bundle
+ * whose prior mapping was removed by step deletion or whose prior steps.json
+ * is absent/unreadable). In that case regeneration fails safely (throws,
+ * reported as `success: false` with the prior artifact pair and all
+ * media/telemetry/screenshots untouched) rather than risking a wrong-image
+ * reference. A missing screenshots directory has nothing to collide with, so
+ * fresh no-prior bundles keep deterministic numbering.
  */
 async function stepFramesFromBundle(bundleDir: string): Promise<StepFrame[]> {
 	// meta.json is a required source: missing, unreadable, unparseable, or
@@ -833,6 +841,22 @@ async function stepFramesFromBundle(bundleDir: string): Promise<StepFrame[]> {
 	// both telemetry samples and Step records. Unmatched clicks fall back to
 	// deterministic step-NN.png numbering, skipping claimed filenames.
 	const priorSteps = await readPriorDesktopSteps(bundleDir);
+	// Existing extracted screenshot files. A fallback (unproven) filename that
+	// already exists on disk may hold ANOTHER click's extracted frame, so it
+	// must not be handed out (review cycle-2, draft PR #78 P2): fail safely
+	// instead. An absent screenshots directory has nothing to collide with.
+	// A directory that exists but cannot be read is a required-source failure.
+	let existingScreenshots: Set<string>;
+	try {
+		existingScreenshots = new Set(await fs.readdir(path.join(bundleDir, "screenshots")));
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+			throw new Error(
+				`regenerateDocArtifacts: screenshots directory is unreadable: ${String(error)}`,
+			);
+		}
+		existingScreenshots = new Set();
+	}
 	const claimed = new Set<string>();
 	const consumed = new Set<number>();
 	const outputPathFor = (click: ClickSample): string => {
@@ -853,6 +877,15 @@ async function stepFramesFromBundle(bundleDir: string): Promise<StepFrame[]> {
 		let n = 1;
 		while (claimed.has(`step-${String(n).padStart(2, "0")}.png`)) n += 1;
 		const filename = `step-${String(n).padStart(2, "0")}.png`;
+		if (existingScreenshots.has(filename)) {
+			// The screenshot association for this retained click cannot be
+			// proven (prior mapping absent/unreadable/removed by step deletion),
+			// and the deterministic filename is already an extracted image --
+			// possibly another click's frame. Refuse to rewrite doc artifacts.
+			throw new Error(
+				`regenerateDocArtifacts: screenshot association for a retained click cannot be proven and ${filename} already exists; refusing to rewrite doc artifacts`,
+			);
+		}
 		claimed.add(filename);
 		return filename;
 	};
