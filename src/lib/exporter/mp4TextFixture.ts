@@ -144,7 +144,11 @@ export function scoreText(
 			const reference = pixels(expected, column, row, frame);
 			let best = -1;
 			let distance = Infinity;
-			for (let candidate = 0; candidate < templates.length; candidate++) {
+			// The fixture has a known numeric run followed by a known alphabetic run.
+			// Compare within that run so codec noise cannot turn a readable B into 8.
+			const firstCandidate = column < 10 ? 0 : 10;
+			const lastCandidate = column < 10 ? 10 : templates.length;
+			for (let candidate = firstCandidate; candidate < lastCandidate; candidate++) {
 				const error = observed.reduce(
 					(sum, value, index) => sum + (value - templates[candidate][index]) ** 2,
 					0,

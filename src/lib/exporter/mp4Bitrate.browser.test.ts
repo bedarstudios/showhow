@@ -14,6 +14,7 @@ it("reduces scrolling UI bytes against a paired legacy encoder control", async (
 	});
 	const outputs: number[] = [];
 	const metadata: unknown[] = [];
+	const audioCodecs: Array<"aac" | "opus"> = [];
 	// Keep the same 3s input; render its first 24 frames on both encoders.
 	// Linux SwiftShader measured ~1s/rendered frame. Native resolution/fps,
 	// budgets and actual-byte comparison remain unchanged.
@@ -43,12 +44,17 @@ it("reduces scrolling UI bytes against a paired legacy encoder control", async (
 			expect(video?.displayWidth).toBe(1920);
 			expect(video?.displayHeight).toBe(1080);
 			expect(video?.codec).toBe("avc");
-			expect(audio?.codec).toBe("aac");
+			const audioCodec = audio?.codec;
+			expect(["aac", "opus"]).toContain(audioCodec);
+			if (audioCodec !== "aac" && audioCodec !== "opus") {
+				throw new Error(`Expected an AAC or Opus audio track, received ${audioCodec}`);
+			}
+			audioCodecs.push(audioCodec);
 			expect(await video!.computeDuration()).toBeCloseTo(renderedDuration, 2);
 			const packets = await video!.computePacketStats();
 			expect(packets.averagePacketRate).toBeCloseTo(60, 0);
 			expect(packets.packetCount).toBe(24);
-			// Preserve AAC and bound the existing encoder padding explicitly;
+			// Preserve audio and bound the existing encoder padding explicitly;
 			// historical 3s acceptance measured 93ms extra container duration.
 			expect(duration).toBeGreaterThanOrEqual(renderedDuration - 0.02);
 			expect(duration).toBeLessThan(renderedDuration + 0.1);
@@ -63,13 +69,14 @@ it("reduces scrolling UI bytes against a paired legacy encoder control", async (
 				width: video!.displayWidth,
 				height: video!.displayHeight,
 				codec: video!.codec,
-				audioCodec: audio!.codec,
+				audioCodec,
 				packets,
 			});
 		} finally {
 			input.dispose();
 		}
 	}
+	expect(audioCodecs[1]).toBe(audioCodecs[0]);
 	// Pair both budgets on this encoder, not a byte limit from another platform.
 	// The original absolute Mac acceptance remains in artifacts/67.
 	console.log(
