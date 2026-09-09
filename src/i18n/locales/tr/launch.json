@@ -47,12 +47,16 @@
 		"screens": "Ekranlar ({{count}})",
 		"windows": "Pencereler ({{count}})",
 		"defaultSourceName": "Ekran",
+		"selectSource": "Kayıt kaynağını seç: {{source}}",
 		"emptyTitle": "Ekran veya pencere bulunamadı",
 		"emptyDescription": "Ekran kaydı iznini yeni verdiyseniz bu seçiciyi yeniden yükleyin. macOS’ta Showhow’u yeniden açmanız gerekebilir.",
 		"loadFailedDescription": "Showhow yakalama kaynaklarını yükleyemedi. Bu seçiciyi yeniden yükleyip tekrar deneyin."
 	},
 	"recording": {
 		"selectSource": "Lütfen kayıt için bir kaynak seçin",
+		"start": "Kaydı başlat",
+		"stop": "Kaydı durdur",
+		"restart": "Kaydı yeniden başlat",
 		"saving": "Kaydediliyor..."
 	},
 	"language": "Dil",

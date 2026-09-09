@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import jaLaunch from "../../i18n/locales/ja-JP/launch.json";
 import { TooltipProvider } from "../ui/tooltip";
 import { LaunchWindow } from "./LaunchWindow";
 
@@ -117,9 +118,18 @@ vi.mock("@/i18n/loader", () => ({
 
 vi.mock("@/contexts/I18nContext", () => ({
 	useI18n: () => i18nState.value,
-	useScopedT: () => (key: string) => {
+	useScopedT: () => (key: string, params?: Record<string, string | number>) => {
 		const translations: Record<string, string> = {
 			"sourceSelector.defaultSourceName": "Screen",
+			"sourceSelector.selectSource": "Select recording source: {{source}}",
+			"recording.start": "Start recording",
+			"recording.stop": "Stop recording",
+			"recording.restart": "Restart recording",
+			"recording.saving": "Saving...",
+			"tooltips.pauseRecording": "Pause recording",
+			"tooltips.resumeRecording": "Resume recording",
+			"tooltips.restartRecording": "Restart recording",
+			"tooltips.cancelRecording": "Cancel recording",
 			"recording.selectSource": "Please select a source to record",
 			"tooltips.useVerticalTray": "Use vertical tray",
 			"tooltips.useHorizontalTray": "Use horizontal tray",
@@ -146,7 +156,22 @@ vi.mock("@/contexts/I18nContext", () => ({
 			"systemLanguagePrompt.keepDefault": "Keep current language",
 			"systemLanguagePrompt.switch": "Switch to English",
 		};
-		return translations[key] ?? key;
+		const localized =
+			i18nState.value.locale === "ja-JP"
+				? key
+						.split(".")
+						.reduce<unknown>(
+							(value, part) =>
+								value && typeof value === "object"
+									? (value as Record<string, unknown>)[part]
+									: undefined,
+							jaLaunch,
+						)
+				: translations[key];
+		return (typeof localized === "string" ? localized : key).replace(
+			/\{\{(\w+)\}\}/g,
+			(match, name: string) => (params?.[name] === undefined ? match : String(params[name])),
+		);
 	},
 }));
 
@@ -223,9 +248,17 @@ function emitSourceSelectorClosed() {
 
 function resetLaunchMocks() {
 	vi.stubGlobal("ResizeObserver", StubResizeObserver);
-	recorderState.value.toggleRecording.mockClear();
+	recorderState.value.recording = false;
+	recorderState.value.paused = false;
+	recorderState.value.saving = false;
+	recorderState.value.canPauseRecording = false;
+	recorderState.value.toggleRecording.mockReset();
+	recorderState.value.togglePaused.mockReset();
+	recorderState.value.restartRecording.mockReset();
+	recorderState.value.cancelRecording.mockReset();
 	selectedSourceChangedListeners = [];
 	sourceSelectorClosedListeners = [];
+	i18nState.value.locale = "en";
 	i18nState.value.systemLocaleSuggestion = null;
 	i18nState.value.acceptSystemLocaleSuggestion.mockClear();
 	i18nState.value.dismissSystemLocaleSuggestion.mockClear();
@@ -400,6 +433,155 @@ describe("LaunchWindow record button", () => {
 			expect(screen.getByTestId("browser-companion-status")).toHaveTextContent("Browser: Paired");
 		});
 		expect(screen.queryByRole("button", { name: /browser.*record/i })).not.toBeInTheDocument();
+	});
+});
+
+describe("LaunchWindow accessible recorder actions", () => {
+	beforeEach(() => {
+		platformState.value = "darwin";
+		resetLaunchMocks();
+	});
+
+	afterEach(() => {
+		cleanup();
+		vi.unstubAllGlobals();
+	});
+
+	it("distinguishes source selection from starting a recording without a source", async () => {
+		renderLaunchWindow();
+		await waitForSourceSelectionSubscription();
+
+		const source = screen.getByRole("button", { name: /select recording source.*Screen/i });
+		const start = screen.getByRole("button", { name: /^Start recording$/i });
+		expect(source).toHaveTextContent("Screen");
+		expect(source).toBeEnabled();
+		expect(start).toBeEnabled();
+		expect(source).not.toBe(start);
+		fireEvent.click(source);
+		await waitFor(() => expect(window.electronAPI.openSourceSelector).toHaveBeenCalledTimes(1));
+		expect(recorderState.value.toggleRecording).not.toHaveBeenCalled();
+		fireEvent.click(start);
+		await waitFor(() => expect(window.electronAPI.openSourceSelector).toHaveBeenCalledTimes(2));
+		emitSelectedSourceChanged(displayOneSource);
+		expect(recorderState.value.toggleRecording).toHaveBeenCalledTimes(1);
+	});
+
+	it("keeps the visible selected source in its name and names the Studio action", async () => {
+		stubElectronAPI(vi.fn(async () => displayOneSource));
+		renderLaunchWindow();
+
+		const source = await screen.findByRole("button", {
+			name: /select recording source.*Display 1/i,
+		});
+		expect(source).toHaveTextContent("Display 1");
+		expect(source).toBeEnabled();
+		expect(screen.getByRole("button", { name: /^Start recording$/i })).toBeEnabled();
+		fireEvent.click(screen.getByRole("button", { name: "Open Studio" }));
+		expect(window.electronAPI.switchToLibrary).toHaveBeenCalledTimes(1);
+	});
+
+	it("updates Start to Stop and Pause to Resume through recorder state transitions", async () => {
+		stubElectronAPI(vi.fn(async () => displayOneSource));
+		recorderState.value.canPauseRecording = true;
+		recorderState.value.toggleRecording.mockImplementation(() => {
+			recorderState.value.recording = !recorderState.value.recording;
+		});
+		recorderState.value.togglePaused.mockImplementation(() => {
+			recorderState.value.paused = !recorderState.value.paused;
+		});
+		const view = renderLaunchWindow();
+		const refresh = () =>
+			view.rerender(
+				<TooltipProvider>
+					<LaunchWindow />
+				</TooltipProvider>,
+			);
+		await screen.findByRole("button", { name: /select recording source.*Display 1/i });
+
+		fireEvent.click(screen.getByRole("button", { name: /^Start recording$/i }));
+		refresh();
+		expect(screen.queryByRole("button", { name: /^Start recording$/i })).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /^Stop recording$/i })).toBeEnabled();
+		expect(
+			screen.getByRole("button", { name: /select recording source.*Display 1/i }),
+		).toBeDisabled();
+		expect(screen.queryByRole("button", { name: "Open Studio" })).not.toBeInTheDocument();
+		fireEvent.click(screen.getByRole("button", { name: "Pause recording" }));
+		refresh();
+		expect(screen.queryByRole("button", { name: "Pause recording" })).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /^Stop recording$/i })).toBeEnabled();
+		fireEvent.click(screen.getByRole("button", { name: "Resume recording" }));
+		refresh();
+		expect(screen.getByRole("button", { name: "Pause recording" })).toBeEnabled();
+		expect(screen.queryByRole("button", { name: "Resume recording" })).not.toBeInTheDocument();
+		fireEvent.click(screen.getByRole("button", { name: /^Stop recording$/i }));
+		refresh();
+		expect(screen.getByRole("button", { name: /^Start recording$/i })).toBeEnabled();
+		expect(screen.queryByRole("button", { name: /^Stop recording$/i })).not.toBeInTheDocument();
+	});
+
+	it("distinguishes actual Japanese Resume and Restart action names", async () => {
+		i18nState.value.locale = "ja-JP";
+		recorderState.value.recording = true;
+		recorderState.value.paused = true;
+		recorderState.value.canPauseRecording = true;
+		renderLaunchWindow();
+		await waitForSourceSelectionSubscription();
+
+		const resume = screen.getByRole("button", { name: "録画を再開" });
+		const restart = screen.getByRole("button", { name: "録画を最初からやり直す" });
+		expect(resume).not.toBe(restart);
+		fireEvent.click(resume);
+		expect(recorderState.value.togglePaused).toHaveBeenCalledTimes(1);
+		expect(recorderState.value.restartRecording).not.toHaveBeenCalled();
+		fireEvent.click(restart);
+		expect(recorderState.value.restartRecording).toHaveBeenCalledTimes(1);
+	});
+
+	it.each([false, true])("names restart and cancel while paused=%s", async (paused) => {
+		recorderState.value.recording = true;
+		recorderState.value.paused = paused;
+		recorderState.value.canPauseRecording = true;
+		renderLaunchWindow();
+		await waitForSourceSelectionSubscription();
+
+		fireEvent.click(screen.getByRole("button", { name: "Restart recording" }));
+		expect(recorderState.value.restartRecording).toHaveBeenCalledTimes(1);
+		fireEvent.click(screen.getByRole("button", { name: "Cancel recording" }));
+		expect(recorderState.value.cancelRecording).toHaveBeenCalledTimes(1);
+		expect(screen.getByRole("button", { name: /^Stop recording$/i })).toBeEnabled();
+	});
+
+	it.each([
+		false,
+		true,
+	])("preserves saving names and disabled controls while recording=%s", async (recording) => {
+		recorderState.value.recording = recording;
+		recorderState.value.saving = true;
+		recorderState.value.canPauseRecording = true;
+		renderLaunchWindow();
+		await waitForSourceSelectionSubscription();
+
+		const saving = screen.getByRole("button", { name: "Saving..." });
+		expect(saving).toBeDisabled();
+		expect(saving).toHaveTextContent("Saving...");
+		expect(screen.getByRole("button", { name: /select recording source.*Screen/i })).toBeDisabled();
+		fireEvent.click(saving);
+		expect(recorderState.value.toggleRecording).not.toHaveBeenCalled();
+		expect(
+			screen.queryByRole("button", { name: /^(Start|Stop) recording$/i }),
+		).not.toBeInTheDocument();
+		for (const name of recording
+			? ["Pause recording", "Restart recording", "Cancel recording"]
+			: ["Open Studio"]) {
+			const button = screen.getByRole("button", { name });
+			expect(button).toBeDisabled();
+			fireEvent.click(button);
+		}
+		expect(recorderState.value.togglePaused).not.toHaveBeenCalled();
+		expect(recorderState.value.restartRecording).not.toHaveBeenCalled();
+		expect(recorderState.value.cancelRecording).not.toHaveBeenCalled();
+		expect(window.electronAPI.switchToLibrary).not.toHaveBeenCalled();
 	});
 });
 

@@ -47,12 +47,16 @@
 		"screens": "Écrans ({{count}})",
 		"windows": "Fenêtres ({{count}})",
 		"defaultSourceName": "Écran",
+		"selectSource": "Sélectionner la source d’enregistrement : {{source}}",
 		"emptyTitle": "Aucun écran ni aucune fenêtre trouvé",
 		"emptyDescription": "Si vous venez d’autoriser l’enregistrement de l’écran, rechargez ce sélecteur. Sous macOS, vous devrez peut-être rouvrir Showhow.",
 		"loadFailedDescription": "Showhow n’a pas pu charger les sources de capture. Rechargez ce sélecteur et réessayez."
 	},
 	"recording": {
 		"selectSource": "Veuillez sélectionner une source à enregistrer",
+		"start": "Démarrer l’enregistrement",
+		"stop": "Arrêter l’enregistrement",
+		"restart": "Redémarrer l’enregistrement",
 		"saving": "Sauvegarde..."
 	},
 	"language": "Langue",

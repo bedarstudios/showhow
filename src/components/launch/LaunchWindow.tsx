@@ -922,7 +922,7 @@ export function LaunchWindow() {
 					onClick={openSourceSelector}
 					disabled={recording || saving}
 					title={selectedSource}
-					aria-label={selectedSource}
+					aria-label={t("sourceSelector.selectSource", { source: selectedSource })}
 				>
 					{getIcon("monitor", "text-white/80")}
 					<span
@@ -1048,9 +1048,9 @@ export function LaunchWindow() {
 						aria-label={
 							saving
 								? t("recording.saving")
-								: hasSelectedSource || recording
-									? selectedSource
-									: t("recording.selectSource")
+								: recording
+									? t("recording.stop")
+									: t("recording.start")
 						}
 						style={{ flex: "0 0 auto" }}
 					>
@@ -1092,6 +1092,7 @@ export function LaunchWindow() {
 							>
 								<button
 									className={hudAuxIconBtnClasses}
+									aria-label={paused ? t("tooltips.resumeRecording") : t("tooltips.pauseRecording")}
 									onClick={() => !saving && togglePaused()}
 									disabled={saving}
 								>
@@ -1105,6 +1106,7 @@ export function LaunchWindow() {
 						<Tooltip content={t("tooltips.restartRecording")}>
 							<button
 								className={hudAuxIconBtnClasses}
+								aria-label={t("recording.restart")}
 								onClick={() => !saving && restartRecording()}
 								disabled={saving}
 							>
@@ -1114,6 +1116,7 @@ export function LaunchWindow() {
 						<Tooltip content={t("tooltips.cancelRecording")}>
 							<button
 								className={hudAuxIconBtnClasses}
+								aria-label={t("tooltips.cancelRecording")}
 								onClick={() => !saving && cancelRecording()}
 								disabled={saving}
 							>
@@ -1142,6 +1145,7 @@ export function LaunchWindow() {
 						<button
 							data-testid="launch-open-studio-button"
 							disabled={saving}
+							aria-label={t("tooltips.openStudio")}
 							className={`${hudIconBtnClasses} ${styles.electronNoDrag} ${saving ? "opacity-30 cursor-not-allowed pointer-events-none" : ""}`}
 							onClick={() => !saving && window.electronAPI.switchToLibrary()}
 						>

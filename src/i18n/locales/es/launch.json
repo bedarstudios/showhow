@@ -47,12 +47,16 @@
 		"screens": "Pantallas ({{count}})",
 		"windows": "Ventanas ({{count}})",
 		"defaultSourceName": "Pantalla",
+		"selectSource": "Seleccionar fuente de grabación: {{source}}",
 		"emptyTitle": "No se encontraron pantallas ni ventanas",
 		"emptyDescription": "Si acabas de conceder permiso para grabar la pantalla, vuelve a cargar este selector. En macOS puede que tengas que volver a abrir Showhow.",
 		"loadFailedDescription": "Showhow no pudo cargar las fuentes de captura. Vuelve a cargar este selector e inténtalo de nuevo."
 	},
 	"recording": {
 		"selectSource": "Por favor selecciona una fuente para grabar",
+		"start": "Iniciar grabación",
+		"stop": "Detener grabación",
+		"restart": "Reiniciar grabación",
 		"saving": "Guardando..."
 	},
 	"language": "Idioma",

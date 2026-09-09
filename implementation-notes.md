@@ -518,3 +518,336 @@ genuine RED (3rd arg `undefined`) before the fix.
 - Preserve source video and cursor telemetry byte-for-byte.
 - Unit coverage includes mixed visibility, hidden-only captures, legacy samples, screenshot association, and repeat regeneration stability.
 - Earlier native automation proved outside-click filtering but could not produce trustworthy inside-click telemetry because the system pointer did not move with the accessibility action. Native inside-click retention remains the final acceptance gate.
+
+# Issue 67 implementation notes
+
+Attempt 1. Supplied topology honored: w1P:p1 executor, w1P:p2 orchestrator,
+w1C:p7 coordinator callback. No additional worktree or orchestrator.
+
+Coordinator owns installed-app GUI. Baseline evidence supplied by coordinator
+is preserved before any production edit; local GUI reproduction waits for a
+granted slot. Headless CLI inspection only so far.
+
+Dependency deviation: npm ci failed with ENOSPC before tests. Installer exited;
+removed only this lane's 43 MB partial node_modules with coordinator approval.
+Coordinator approved symlink to /Users/mohamedb/dev/projects/showhow/node_modules
+because manifests match. Never install into or mutate shared dependencies.
+Tests, builds and GUI wait for a coordinator slot while issue 66 verifies.
+
+Baseline GUI slot granted and released after Load Project ->1080p export.
+New export matches original byte count but differs in SHA-256; no byte-identical
+claim. Original file hashes still match. Editor timer advances while preview
+appears stuck, consistent with coordinator-owned mediaProtocol issue; excluded
+from MP4 changes and not represented as a passing playback check.
+
+Shared ENOSPC loop snare logged centrally by issue66 as BL-042 in
+/Users/mohamedb/dev/OS/references/bedar-loop-issues.md; coordinator confirmed
+no duplicate entry needed. First test slot released after actual encoder
+capability preflight while executor authors bounded benchmark.
+
+Verifier authored mp4BitrateScaling.test.ts after executor evidence authoring
+stalled. Five genuine assertion failures observed before any production edit.
+System FFmpeg lacks drawtext; fixture generator uses existing sharp-rendered SVG
+text. Generated three complete 3-second fixtures total15MB; conservative10MB
+generator guard fired after final write. Benchmark blobs stay in memory; no
+frame dumps or browser downloads. Investigative generator guard to be tightened.
+
+First browser benchmark stopped after about3min with no export logs and high
+SwiftShader CPU. No benchmark result or bitrate selection inferred. Retry config
+uses macOS Metal and lane-local cache instead of shared-node_modules Vite cache.
+Browser config only; production rendering unchanged. All owned processes exited.
+
+Browser setup root cause: installed @vitest/browser-playwright4.1.5 expects
+launchOptions; inherited launch key was ignored. Isolated benchmark config
+corrected; one real export passed in8.08s (10.05s full run). No production change.
+
+Production bitrate change applied after genuine RED evidence (browser
+regression artifacts/67/red-browser.log: 1,414,031.25 B/s exceeds the
+779,446 B/s measured ceiling; five unit failures committed in 7b88854).
+calculateBitrate in src/lib/exporter/mp4ExportSettings.ts now returns the
+100 kbps-rounded, 1_000_000-24_000_000-clamped pixel-proportional budget
+(width * height * 4_000_000 / 2_073_600, times 1.5 for source quality),
+anchored on the benchmark-selected 4 Mbps at 1920x1080/60. Dimension,
+upscale, crop, encoder VBR quality/fallback, capture, and persistence
+behavior are untouched. Nine stale bitrate expectations in
+mp4ExportSettings.test.ts updated to the computed values (4.2M, 5.7M,
+1.9M, 4M, 6M, 24M, 4M, 1.2M, 4M in existing case order); every dimension
+assertion preserved. Tests, builds, and GUI not run per coordinator
+instruction; verification pending the granted re-run of the RED suites.
+
+Trial adjustment: actual app audit export at the 4 Mbps anchor produced
+4,387,478 bytes, exceeding the 3,771,472-byte acceptance ceiling. Only
+BITRATE_REFERENCE_BPS changed, 4_000_000 to 3_000_000, as a trial pending
+actual app output/readability; formula, source 1.5 multiplier, 1-24 Mbps
+clamp, and 100 kbps rounding are unchanged. The nine expectations were
+recomputed independently from the formula: 3.1M, 4.3M, 1.4M, 3M, 4.5M,
+18M, 3M, 1M (floor-clamped from 900k), 3M. The 854x480 source case now
+sits on the 1 Mbps floor and remains under half of the 4.5 Mbps
+full-frame source budget, so the committed crop regression still passes
+by construction. No tests, builds, GUI, commits, or package commands run.
+
+Second trial adjustment: the real app 3 Mbps trial export produced
+3,941,008 bytes, still above the 3,771,472-byte acceptance ceiling, though
+frames remained readable. Only BITRATE_REFERENCE_BPS changed, 3_000_000 to
+2_400_000; formula, source 1.5 multiplier, 1-24 Mbps clamp, and 100 kbps
+rounding unchanged. The nine expectations were recomputed independently
+from the formula: 2.5M, 3.4M, 1.1M, 2.4M, 3.6M, 14.4M, 2.4M, 1M (floor
+clamped, value unchanged from prior trial), 2.4M. All four cliff cases
+round to identical values on both sides (1.1M, 2.4M, 3.6M, 6.4M) and the
+854x480 crop stays below half of the 3.6 Mbps full-frame source budget.
+Trial awaits actual app acceptance; no tests, builds, GUI, commits, or
+package commands run.
+
+Final 2.4Mbps audit acceptance produced3,594,630bytes (52.344% reduction),
+readable exact1s/13s frames and native QuickTime play/seek. Copied project
+padding49 persisted after save/reopen; original hashes still match. Final
+headless static/scroll/motion/sync exports each under1MB. The generated
+flash/beep input offset is0ms; output audio lags65ms, within the predeclared
+100ms tolerance. This is a timing measurement, not a listening claim.
+Affected browser run encountered Vite optimizing gif.js midrun, reloading
+and invalidating dynamic WebGLRenderer URL:3GIF failures,4pass,1optin skip.
+Lane-only benchmark config now prebundles gif.js; no production GIF changes.
+All processes exited; rerun awaits coordinator slot. Shared cache untouched.
+
+The short browser rerun progressed past initial dependency discovery but
+GIF worker resolution hit Vite fs.allow because node_modules is an approved
+shared symlink. Intentionally stopped Vitest with SIGTERM (exit143), preserved
+logs; lane-only config permits resolved gif.js/dist and scans only exporter
+test entries. No product GIF or shared dependency change. Rerun pending.
+
+### 2026-09-07: Issue 68 — serialized verification and nested writer recovery
+
+The coordinator supplied installed-app BEFORE evidence and required preserving the
+source Calculator recording. This lane copied all nine source files and verified
+SHA-256 hashes before changes. Real Electron acceptance will read the original
+bundle without edits, after cleanly quitting the installed app; CLI tests use
+isolated temporary fixtures. No simultaneous installed/dev instances are allowed.
+
+After ENOSPC in another lane, dependency installation is prohibited. This lane
+uses the matching main checkout node_modules symlink read-only, disables Vitest
+caching, and uses local Vite/Vitest config wrappers with local cache directories
+and the runner config loader. TypeScript uses a local config extending this lane
+and the coordinator-supplied read-only `/tmp/showhow-ticket66-types/ws` mapping;
+`artifacts/68/typecheck-config.json` records it. No dependency manifests change.
+
+The nested RED writer reported activity without delivering a file, so the lane
+released its unused test slot. A replacement wrote two tests just before its
+cancellation; the verifier retained that diff, added missing full-response header
+assertions and took ownership of test execution, as the coordinator authorized.
+The executor retains ownership of the subsequent production fix. The delivery
+snare is logged once as BL-044 in the canonical OS loop-issues log.
+
+The Vite runner config loader does not inject `__dirname`, so the first RED
+attempt failed before tests. The ignored local configs now copy the repository
+configs with an explicit lane directory and local cache; no production config
+changed. The retry reached real assertions: full Content-Length was null and
+range status was 200 instead of 206 (2 failed, 3 passed), before production edits.
+
+
+Issue 68 acceptance passed on real Electron dev code `e62d394` after 33 protocol
+and 202 affected tests, TypeScript with the isolated ws mapping, and Biome.
+The first production pass exposed arbitrary MP4 paths; two real regressions
+caught this, and the executor restricted the whitelist to the bundle video and
+direct raster screenshots. Both failed and corrected results remain in evidence.
+
+The native GUI audit temporarily unloaded/restored only the page's video URL to
+exercise a timestamp clicked before metadata. It did not change any source file
+or project. Actual timestamp/scrubber positions, full playback, range headers,
+screenshot decoding, runtime PID/cwd, hashes and clean shutdown are recorded in
+`artifacts/68`. User-required inline uploads accompany the committed evidence.
+
+### 2026-09-08: Issue 68 — Greptile cancellation and evidence review
+
+Read both unresolved review threads with pagination and `isResolved`, and the
+latest 4/5 summary. The early-cancellation finding was independently reproduced:
+three deterministic tests for pre-abort, abort during realpath, and abort while
+opening a real file all returned 200 instead of AbortError before the correction.
+The executor owns the production lifetime fix; verifier owns tests and evidence.
+
+The original absolute typecheck artifact was not reproducible elsewhere. Its
+contents are retained as historical text, while the actual config now extends
+the repository relatively and prefers its declared @types/ws dependency. An
+optional ignored local fallback links only the coordinator-supplied real types
+read-only; no stubs or weaker compiler options were introduced. A committed
+portable Vitest config preserves the repository test contract and avoids writes
+to shared node_modules. Review logs name these committed configs directly.
+
+The issue uses in-progress plus needs-fixes while fixing; the PR card remains
+Reviewing. The semantic PR title was corrected as metadata, not a product fix.
+
+PR72 follow-up: Greptile latest summary moved to5/5 on unchanged32ef356
+(updated2026-09-07T23:00:50Z) while explicitly retaining2unresolved validation
+threads. Not accepted as completion. Existing Ubuntu CI has704unit pass/1skip,
+2browser timeouts amid dependency reload,14JSON evidence formatting errors,
+and a nonsemantic title. Title metadata corrected; checks remain historical red.
+Executor fix-1 delivered no test diff, was cancelled to terminal/error and
+reconciled; user authorized verifier test-only takeover (existingBL-044 pattern,
+no duplicate central entry). Production remains unchanged and executor-owned.
+Verifier authored paired encoder comparison, native4K glyph/motion fixture,
+blurred negative control and six bounded crop sink images. RED uses an isolated
+Vite load plugin with the genuine7b88854 source, never mutating production.
+First granted batch stopped at preflight:132440KiB free (~129MiB) versus100MiB
+floor and<=35MB estimated growth. No test/fixture run or cleanup performed;
+slot released. Await coordinated headroom, preserving original acceptance.
+
+### Same-encoder control diagnostic: incomplete at resource cap
+
+- [passed] Targeted Biome and isolated tsc exited 0 (suffixed logs).
+- [passed] Unencoded reference: 42/42, contrast ratio 1 at frames 15 and 45.
+- [failed] 80 Mbps control exceeded 5 MB cap: 5,238,219 bytes.
+- [untested] Control decoded scores/config identity: cap stopped before checks.
+- Candidate 14.4 Mbps output: 1,954,941 bytes; frame 15 (0.25 s) and
+  frame 45 (0.75 s) each scored 40/42 with unchanged first-row templates.
+  Frame 15 row 30 mismatches: B→8 at (443,1263), E→8 at (538,1263).
+  Frame 45 row 30 mismatches: D→0 at (536,1263), E→8 at (568,1263).
+  All rectangles are 24×30. Contrast ratios: 0.752525 and 0.839024.
+  Diagnostic matched-row templates scored 42/42 at both times; this alone
+  does not distinguish bitrate loss from classifier sensitivity.
+- Fixture SHA256: 1c254d14ac3faa813829e2544309d110d980c0be823ec8d7250bd8a62d92b135.
+- Vitest PID 84190 exited 1 in 14.1 s. Runner accepted expected exit 1, but
+  manual classification is incomplete diagnostic/resource-cap failure, NOT
+  expected quality RED. Only two of four decoded measurements exist.
+- Six small crops and explicit JSON preserved, including earlier failures.
+  No output MP4 was persisted. Production SHA256 remains
+  669c2c342a54d5a9c389ab2b2daf7c97608a922f4733e131b484c1c8eeb80c4c.
+  Process inspection found no remaining Vitest/Vite/runner; slot released.
+- Next diagnostic needs a separately approved resource-bound adjustment;
+  no scorer, threshold, production budget, or branch update is justified yet.
+
+### Complete 64 Mbps diagnostic (review-control-1)
+
+- [passed] Targeted format and isolated tsc exited 0.
+- [passed] Four NEW scores: identical source SHA/config except bitrate/times.
+- [passed] Candidate 1,954,941 bytes; control 4,980,880 bytes, both below 5 MB.
+- [failed] Unchanged first-row scorer: 40/42 in all four decoded samples.
+- [passed] Blurred negative: 2/42 in all four samples.
+- [passed] Diagnostic matched-row scorer: 42/42 in all four samples.
+
+Both budgets produce exactly the same mismatches at the same coordinates:
+frame15 B→8 / E→8; frame45 D→0 / E→8, all on row30 (coordinates in JSON).
+Candidate contrast ratios .752525/.839024; control .747475/.829268.
+Shared source SHA256 within this batch:
+9aacc7a6a1a27e41164779889eec27df6aee69f6a69a5b2e0b52cf904afae7be.
+The fixture was generated once for this batch; its container hash differs from
+prior batch, so only within-batch SHA identity is claimed. Both comparisons
+used sample timestamps .25/.75 and identical final hardware-preferred H264
+encoder config except bitrate. These results support row-phase classifier
+sensitivity, not an inference that the 14.4 Mbps budget caused these errors.
+They are not a general lossless-quality claim. The 64 Mbps control was only
+19,120 bytes below the cap; no future cap-compliance guarantee is inferred.
+
+Vitest PID87167 exited1 after14.1s at the actual40-vs42 assertion; the runner
+verified all4 new measurements and exited0. This is a completed diagnostic
+with an unchanged failing quality scorer, distinct from the prior incomplete
+80 Mbps cap failure. No production/scorer/threshold changes. No test/Vite
+processes remained; slot released to coordinator for73. Suffixed logs, JSON
+and eight bounded crops preserve history.
+
+### Authorized row-reference correction authored (not run)
+
+Default templates now come from the corresponding reference row. All42 glyphs
+and the .5 minimum contrast criterion are unchanged. Historical first-row mode
+remains explicit and is recorded alongside corrected scores; old40/42 and80M
+incomplete evidence are untouched. Exact-reference calibration at frames15/45
+now additionally requires contrast ratio1, no mismatches, and rejection of an
+8px-blurred reference. Encoded regression already requires all42 at both times
+and independently rejects blurred decoded frames. Thus reverting the row choice
+reintroduces the observed40/42 failure without lowering any acceptance metric.
+Rationale is the complete14.4M/64M comparison: identical glyph errors using the
+first-row templates,42/42 using corresponding rows, and known differing raster
+phases. This is reference calibration, not proof of losslessness or a production
+budget correction. Control runner now expects exit0 for corrected quality.
+
+Prepared slot request: format, types, oracle, red-paired, red-quality, green,
+unit, browser via review-check.py, sequential180s each and100MiB floor. RED
+paired uses isolated audited7b88854 injection; production file stays untouched.
+Normal GREEN has no injection or diagnostic high-budget flag. Browser directory
+has all benchmark/acceptance/evidence flags unset. Bounded PNG/JSON evidence only;
+no retained output MP4 or frame dumps; same5MB blob guard and cache reuse.
+
+### Row-corrected RED/GREEN segment verified
+
+- [passed] Format and isolated types: exit0 (review-format-3/types-3).
+- [passed] Oracle: 1passed, 1filtered skip; both frame phases calibrated.
+- [passed] Paired legacy RED fails actual4374070 < 4374070 byte assertion.
+- [passed] Quality negative RED fails blurred3 vs42 assertion.
+- [passed] GREEN: 2files,3tests passed; no skipped tests.
+- [passed] Corrected4K:42/42 at both times, contrast .752525/.839024.
+- [passed] Corrected blur:3/42 and2/42 rejected; historical scores40/42 both.
+- [passed] Production SHA unchanged after isolated legacy module injection.
+- [untested] Affected full directory suites await separate coordinated slot.
+
+All child processes exited (GREEN PID89151 exit0,13.1s). Process inspection
+found no remaining Vitest/Vite/review runner. Free253636KiB on release to73.
+No production edits, savedMP4, cap changes, or extra directory runs.
+
+### Affected suites and final scoped checks
+
+- [passed] Exporter unit directory:99passed,0failed,0skipped;13files.
+- [passed] Exporter browser directory:9passed,0failed;4files passed.
+- [untested] Opt-in benchmark:1test/1file skipped with flags unset as intended.
+- [passed] Final scoped Biome:58files,no fixes; JSON values unchanged.
+- [passed] No source change since successful isolated tsc; repeat unnecessary.
+- [passed] Production hash669c2c34... unchanged; all owned children exited.
+
+Unit child90468 exit0; browser child90554 exit0 (17.1s); formatter child90919
+exit0. Fresh process inspection found no Vitest/Vite/runner/tsc. Slot released
+to73. Free171208KiB; no cleanup. Commit hooks await explicit coordinated slot.
+Fresh-head remote CI remains pending; local Mac results do not prove Ubuntu.
+
+ ## Issue69 BEFORE resource deviation (September8)
+
+Fresh installed1.6.0 recording startup was asynchronous. Immediate post-Return AX
+remained idle; Tab/Space intended for Pause opened Notes. Native close returned to
+active HUD; paused at observed00:18, resumed and stopped promptly. Thus active
+capture lasted19.009s (saved metadata), exceeding granted15s. No extra capture was attempted. App quit, children
+exited; all586 original recording hashes unchanged, free disk128400KiB and total
+observed incremental disk8260KiB. Root notified. BEFORE provenance is installed1.6.0,
+source-correlated to unchanged493965e; never represented as currentmainruntime.
+
+## Issue69 reversible disk recovery (September8, coordinator-owned)
+
+Root applied worktree-only sparse checkout patterns `/*` and `!/docs/evidence/`
+to exclude40,788KiB of unchanged historical evidence copies from this newly created
+lane. Before exclusion root verified no modifications, untracked/ignored files,
+symlinks or open handles in the exact target; main and lane Git evidence trees
+matcheda8eeaf6e. Git reports no deletions; issue69 source/tests/locales/artifacts
+remain intact. Main retains40,788KiB of original evidence and no sparse config.
+Reported disk124840->165868KiB. No old52 dependencies were touched. Restore with
+`git sparse-checkout disable` in THIS ticket worktree when headroom permits.
+
+## Issue69 AFTER narrower resource-budget deviation
+
+Patched native Start/Pause/Resume/Stop and Studio keyboard behavior was observed,
+including transient saving. Initial free207108KiB; after owned capture entered
+editor, a sample reached163284KiB (43824KiB,42.80MiB observed growth), exceeding
+the subsequently accepted narrower35MiB budget while remaining above130MiB
+operational and100MiB hard floors. Stopped further interaction immediately and
+quit owned Electron. Vite exited automatically with app, exit0; attempted TERM
+found its PID already gone. Restart/Cancel names were observed but their native
+activation was not attempted. Optimizer remained10516KiB, main/preload348KiB;
+growth was not all attributable to those lane outputs, and no unsupported cause
+claim is made. Root notified; no repeated capture without a new grant.
+
+ ## Issue 73 RED wrapper deviation (2026-09-08)
+
+The first regression run reached the expected late-title assertion, but its
+zsh wrapper assigned read-only `status`, so it did not record the test exit.
+The full first output was preserved. An identical authorized retry used
+`test_exit_code` and recorded exit 1 with the same assertion failure. This is
+an execution-log wrapper snare, not a configuration, fixture, or extra product
+failure. OS loop log BL-047 records it. No production changes were applied.
+
+## Pre-fix GUI timing and app targeting
+
+First attempt missed the 20-second window; `timing-miss.png` is retained and
+is not failure evidence. The second attempt batched native Computer Use
+interactions with fresh accessibility state between actions and reproduced
+the bug within the original delay. No extension or mocked result was used.
+Initial app-name lookup opened an incidental default Electron window through
+the old52 dependency symlink. Full-path targeting selected the verified issue73
+runtime; both owned runtime and incidental window were closed afterward.
+Source bytes were restored exactly. An immediate HTTP check before HMR caught
+cached instrumented source, so served-shim removal is not claimed for this
+ pre-fix run; the runtime then shut down. The after-fix ordinary save will
+ require verified uninstrumented served source.

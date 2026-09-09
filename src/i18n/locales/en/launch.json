@@ -49,10 +49,14 @@
 		"emptyTitle": "No screens or windows found",
 		"emptyDescription": "If you just granted screen recording permission, reload this picker. On macOS you may need to reopen Showhow.",
 		"loadFailedDescription": "Showhow could not load capture sources. Reload this picker and try again.",
-		"defaultSourceName": "Screen"
+		"defaultSourceName": "Screen",
+		"selectSource": "Select recording source: {{source}}"
 	},
 	"recording": {
 		"selectSource": "Please select a source to record",
+		"start": "Start recording",
+		"stop": "Stop recording",
+		"restart": "Restart recording",
 		"saving": "Saving..."
 	},
 	"language": "Language",

@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { RecordingLibraryEntry } from "@/lib/showhow/recordingLibrary";
 import { RecordingLibrary } from "./RecordingLibrary";
@@ -70,6 +71,16 @@ const browserEntry: RecordingLibraryEntry = {
 	durationMs: 154_000,
 };
 
+function deferred<T>() {
+	let resolve: (value: T) => void = () => undefined;
+	let reject: (reason?: unknown) => void = () => undefined;
+	const promise = new Promise<T>((promiseResolve, promiseReject) => {
+		resolve = promiseResolve;
+		reject = promiseReject;
+	});
+	return { promise, resolve, reject };
+}
+
 // ---- Issue #23: workflow document view ---------------------------------------
 //
 // The Phase 2 doc engine writes `steps.json` (see `electron/showhow/bundle.ts`)
@@ -115,6 +126,19 @@ const browserDocEntry: WorkflowDocumentEntry = {
 };
 
 describe("RecordingLibrary", () => {
+	it("returns to the configured recorder tray from the prominent New recording action", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopEntry]);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "New recording" }));
+
+		expect(mockSwitchToHud).toHaveBeenCalledTimes(1);
+		expect(mockShowhowUpdateWorkflowDocument).not.toHaveBeenCalled();
+		expect(mockShowhowCopyPath).not.toHaveBeenCalled();
+		expect(mockShowhowRegenerateDoc).not.toHaveBeenCalled();
+	});
+
 	it("renders the approved empty state when no recordings exist", async () => {
 		mockShowhowListRecordings.mockResolvedValue([]);
 		render(<RecordingLibrary />);
@@ -234,6 +258,189 @@ describe("RecordingLibrary", () => {
 });
 
 describe("RecordingLibrary — workflow document editing (issue #26)", () => {
+	it("shows explicit Save and Cancel controls while editing a title", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+
+		expect(screen.getByRole("button", { name: "Save title" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Cancel title edit" })).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Edit title" })).not.toBeInTheDocument();
+	});
+
+	it("cancels a title edit without persisting and restores the saved title", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		const titleInput = screen.getByRole("textbox", { name: "Recording title" });
+		await userEvent.clear(titleInput);
+		await userEvent.type(titleInput, "Unsaved title");
+		await userEvent.click(screen.getByRole("button", { name: "Cancel title edit" }));
+
+		expect(mockShowhowUpdateWorkflowDocument).not.toHaveBeenCalled();
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(desktopDocEntry.title);
+		expect(screen.queryByRole("textbox", { name: "Recording title" })).not.toBeInTheDocument();
+	});
+
+	it("keeps title save pending until its IPC operation resolves", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		const update = deferred<{ success: boolean }>();
+		mockShowhowUpdateWorkflowDocument.mockReturnValue(update.promise);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		const titleInput = screen.getByRole("textbox", { name: "Recording title" });
+		await userEvent.clear(titleInput);
+		await userEvent.type(titleInput, "Create a product");
+		await userEvent.click(screen.getByRole("button", { name: "Save title" }));
+
+		expect(screen.getByText("Saving title…")).toBeInTheDocument();
+		expect(screen.queryByText("Title saved")).not.toBeInTheDocument();
+
+		await act(async () => update.resolve({ success: true }));
+		expect(await screen.findByText("Title saved")).toBeInTheDocument();
+	});
+
+	it("shows title save success after a deferred IPC resolves in Strict Mode", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		const update = deferred<{ success: boolean }>();
+		mockShowhowUpdateWorkflowDocument.mockReturnValue(update.promise);
+		render(
+			<StrictMode>
+				<RecordingLibrary />
+			</StrictMode>,
+		);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		await userEvent.click(screen.getByRole("button", { name: "Save title" }));
+		expect(screen.getByText("Saving title…")).toBeInTheDocument();
+
+		await act(async () => update.resolve({ success: true }));
+		expect(await screen.findByText("Title saved")).toBeInTheDocument();
+	});
+
+	it.each([
+		[
+			"resolves false",
+			() => mockShowhowUpdateWorkflowDocument.mockResolvedValue({ success: false }),
+		],
+		[
+			"rejects",
+			() => mockShowhowUpdateWorkflowDocument.mockRejectedValue(new Error("write unavailable")),
+		],
+	])("shows title save failure when its IPC operation %s", async (_outcome, configureFailure) => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		configureFailure();
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		const titleInput = screen.getByRole("textbox", { name: "Recording title" });
+		await userEvent.clear(titleInput);
+		await userEvent.type(titleInput, "Unsaved replacement title");
+		await userEvent.click(screen.getByRole("button", { name: "Save title" }));
+
+		expect(await screen.findByText("Couldn't save title")).toBeInTheDocument();
+		expect(screen.getByText(desktopDocEntry.title)).toBeInTheDocument();
+		expect(screen.queryByText("Unsaved replacement title")).not.toBeInTheDocument();
+		expect(screen.queryByText("Title saved")).not.toBeInTheDocument();
+	});
+
+	it("reconciles a saved title after navigating to another recording", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry, browserDocEntry]);
+		const update = deferred<{ success: boolean }>();
+		mockShowhowUpdateWorkflowDocument.mockReturnValue(update.promise);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1, name: desktopDocEntry.title });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		const titleInput = screen.getByRole("textbox", { name: "Recording title" });
+		await userEvent.clear(titleInput);
+		await userEvent.type(titleInput, "Renamed desktop recording");
+		await userEvent.click(screen.getByRole("button", { name: "Save title" }));
+
+		const browserRow = screen
+			.getAllByRole("button")
+			.find((button) => button.textContent?.includes(browserDocEntry.title));
+		expect(browserRow).toBeDefined();
+		await userEvent.click(browserRow!);
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(browserDocEntry.title);
+
+		await act(async () => update.resolve({ success: true }));
+		expect(screen.getByText("Renamed desktop recording")).toBeInTheDocument();
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(browserDocEntry.title);
+		expect(screen.queryByText("Title saved")).not.toBeInTheDocument();
+
+		const renamedDesktopRow = screen
+			.getAllByRole("button")
+			.find((button) => button.textContent?.includes("Renamed desktop recording"));
+		expect(renamedDesktopRow).toBeDefined();
+		await userEvent.click(renamedDesktopRow!);
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+			"Renamed desktop recording",
+		);
+	});
+
+	it("preserves newer document state when a pending title save resolves", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry, browserDocEntry]);
+		const titleUpdate = deferred<{ success: boolean }>();
+		mockShowhowUpdateWorkflowDocument.mockImplementation((_bundleDir, update) => {
+			if (
+				typeof update === "object" &&
+				update !== null &&
+				"type" in update &&
+				update.type === "title"
+			) {
+				return titleUpdate.promise;
+			}
+			return Promise.resolve({ success: true });
+		});
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1, name: desktopDocEntry.title });
+		await userEvent.click(screen.getByRole("button", { name: "Edit title" }));
+		const titleInput = screen.getByRole("textbox", { name: "Recording title" });
+		await userEvent.clear(titleInput);
+		await userEvent.type(titleInput, "Saved title");
+		await userEvent.click(screen.getByRole("button", { name: "Save title" }));
+
+		const browserRow = screen
+			.getAllByRole("button")
+			.find((button) => button.textContent?.includes(browserDocEntry.title));
+		expect(browserRow).toBeDefined();
+		await userEvent.click(browserRow!);
+		const desktopRow = screen
+			.getAllByRole("button")
+			.find((button) => button.textContent?.includes(desktopDocEntry.title));
+		expect(desktopRow).toBeDefined();
+		await userEvent.click(desktopRow!);
+
+		await userEvent.click(screen.getByRole("button", { name: "Edit step 1" }));
+		const instructionInput = screen.getByRole("textbox", { name: "Step 1 instruction" });
+		await userEvent.clear(instructionInput);
+		await userEvent.type(instructionInput, "Newer step label");
+		await userEvent.keyboard("{Enter}");
+		expect(await screen.findByText("Newer step label")).toBeInTheDocument();
+		expect(mockShowhowUpdateWorkflowDocument).toHaveBeenCalledWith(desktopDocEntry.bundleDir, {
+			type: "step",
+			index: 0,
+			label: "Newer step label",
+		});
+
+		await act(async () => titleUpdate.resolve({ success: true }));
+		expect(
+			await screen.findByRole("heading", { level: 1, name: "Saved title" }),
+		).toBeInTheDocument();
+		expect(screen.getByText("Newer step label")).toBeInTheDocument();
+		expect(screen.queryByText(desktopDocEntry.steps[0].label)).not.toBeInTheDocument();
+	});
+
 	it("edits the title and instruction inline, then persists both changes", async () => {
 		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
 		render(<RecordingLibrary />);
@@ -347,6 +554,51 @@ describe("RecordingLibrary — workflow document editing (issue #26)", () => {
 });
 
 describe("RecordingLibrary — workflow document view (issue #23)", () => {
+	it("keeps Copy path pending until its IPC operation resolves, then shows success", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		const copy = deferred<{ success: boolean }>();
+		mockShowhowCopyPath.mockReturnValue(copy.promise);
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Copy path" }));
+
+		expect(screen.getByText("Copying path…")).toBeInTheDocument();
+		expect(screen.queryByText("Path copied")).not.toBeInTheDocument();
+
+		await act(async () => copy.resolve({ success: true }));
+		expect(await screen.findByText("Path copied")).toBeInTheDocument();
+	});
+
+	it("shows Copy path success after a deferred IPC resolves in Strict Mode", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		const copy = deferred<{ success: boolean }>();
+		mockShowhowCopyPath.mockReturnValue(copy.promise);
+		render(
+			<StrictMode>
+				<RecordingLibrary />
+			</StrictMode>,
+		);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Copy path" }));
+		expect(screen.getByText("Copying path…")).toBeInTheDocument();
+
+		await act(async () => copy.resolve({ success: true }));
+		expect(await screen.findByText("Path copied")).toBeInTheDocument();
+	});
+
+	it("shows Copy path failure after a false result or rejection", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		mockShowhowCopyPath.mockRejectedValue(new Error("clipboard unavailable"));
+		render(<RecordingLibrary />);
+
+		await screen.findByRole("heading", { level: 1 });
+		await userEvent.click(screen.getByRole("button", { name: "Copy path" }));
+
+		expect(await screen.findByText("Couldn't copy path")).toBeInTheDocument();
+	});
+
 	it("renders a built-in video player for the selected bundle", async () => {
 		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
 		const { container } = render(<RecordingLibrary />);

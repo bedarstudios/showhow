@@ -43,12 +43,16 @@
 		"screens": "Màn hình ({{count}})",
 		"windows": "Cửa sổ ({{count}})",
 		"defaultSourceName": "Màn hình",
+		"selectSource": "Chọn nguồn ghi hình: {{source}}",
 		"emptyTitle": "Không tìm thấy màn hình hoặc cửa sổ",
 		"emptyDescription": "Nếu bạn vừa cấp quyền ghi màn hình, hãy tải lại trình chọn này. Trên macOS, bạn có thể cần mở lại Showhow.",
 		"loadFailedDescription": "Showhow không thể tải các nguồn ghi hình. Hãy tải lại trình chọn này và thử lại."
 	},
 	"recording": {
 		"selectSource": "Vui lòng chọn một nguồn để ghi",
+		"start": "Bắt đầu ghi hình",
+		"stop": "Dừng ghi hình",
+		"restart": "Khởi động lại ghi hình",
 		"saving": "Đang lưu..."
 	},
 	"language": "Ngôn ngữ",
