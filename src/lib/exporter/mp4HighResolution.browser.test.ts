@@ -58,7 +58,9 @@ it("recognizes every glyph in the exact unencoded reference control", async () =
 it("preserves native 4K source-quality text through motion and rejects blurred text", async ({
 	task,
 }) => {
-	const fixture = await createNativeTextVideo();
+	// Generate only the 24 frames exercised by this acceptance test. Keeping an
+	// unused one-second tail makes software-only Linux runners time out.
+	const fixture = await createNativeTextVideo(24);
 	const url = URL.createObjectURL(fixture);
 	const settings = calculateMp4ExportSettings({
 		quality: "source",
@@ -87,8 +89,7 @@ it("preserves native 4K source-quality text through motion and rejects blurred t
 				...settings,
 				bitrate,
 				frameRate: 60,
-				// Same native 1s input; only temporal export work is bounded.
-				trimRegions: [{ id: "bounded-test-tail", startMs: 400, endMs: 1000 }],
+				trimRegions: [],
 				wallpaper: "#141414",
 				zoomRegions: [],
 				showShadow: false,

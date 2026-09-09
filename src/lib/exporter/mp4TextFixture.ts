@@ -34,7 +34,7 @@ export function drawTextFixture(canvas: HTMLCanvasElement, frame: number) {
 	}
 }
 
-export async function createNativeTextVideo() {
+export async function createNativeTextVideo(frameCount = 60) {
 	const canvas = textCanvas();
 	const target = new BufferTarget();
 	const output = new Output({ target, format: new Mp4OutputFormat() });
@@ -46,7 +46,7 @@ export async function createNativeTextVideo() {
 	});
 	output.addVideoTrack(source, { frameRate: 60 });
 	await output.start();
-	for (let frame = 0; frame < 60; frame++) {
+	for (let frame = 0; frame < frameCount; frame++) {
 		drawTextFixture(canvas, frame);
 		await source.add(frame / 60, 1 / 60);
 	}
