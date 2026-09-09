@@ -32,7 +32,7 @@ export default mergeConfig(config, {
 				recordMp4ReviewMeasurement: defineBrowserCommand<[string, string]>(
 					async (_context, name, measurement) => {
 						if (
-							!/^(paired|oracle-(6|18|15|45)|quality-\d+-(6|18|15|45))$/.test(name) ||
+							!/^(paired|oracle-(3|9|6|18|15|45)|quality-\d+-(3|9|6|18|15|45))$/.test(name) ||
 							measurement.length > 16000
 						) {
 							throw new Error("Review measurement budget exceeded");
@@ -50,7 +50,7 @@ export default mergeConfig(config, {
 					if (process.env.MP4_CI_PHASE_DIR && path.basename(evidenceDirectory) !== "green-quality")
 						return;
 					if (
-						!/^(reference|decoded|blurred|control)-(6|18|15|45)$/.test(name) ||
+						!/^(reference|decoded|blurred|control)-(3|9|6|18|15|45)$/.test(name) ||
 						png.length > 200_000
 					) {
 						throw new Error("4K evidence budget exceeded");

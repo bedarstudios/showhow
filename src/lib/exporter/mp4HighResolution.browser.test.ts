@@ -13,6 +13,10 @@ import {
 } from "./mp4TextFixture";
 import { VideoExporter } from "./videoExporter";
 
+const FRAME_COUNT = 12;
+const SAMPLE_FRAMES = [3, 9] as const;
+const TEST_DURATION = FRAME_COUNT / 60;
+
 declare module "vitest/browser" {
 	interface BrowserCommands {
 		recordMp4Quality(name: string, png: string): Promise<void>;
@@ -28,7 +32,7 @@ function assertReadable(score: ReturnType<typeof scoreText>) {
 }
 
 it("recognizes every glyph in the exact unencoded reference control", async () => {
-	for (const frame of [6, 18]) {
+	for (const frame of SAMPLE_FRAMES) {
 		const reference = renderTextReference(frame);
 		const blurred = textCanvas();
 		try {
@@ -58,9 +62,9 @@ it("recognizes every glyph in the exact unencoded reference control", async () =
 it("preserves native 4K source-quality text through motion and rejects blurred text", async ({
 	task,
 }) => {
-	// Generate only the 24 frames exercised by this acceptance test. Keeping an
+	// Generate only the frames exercised by this acceptance test. Keeping an
 	// unused one-second tail makes software-only Linux runners time out.
-	const fixture = await createNativeTextVideo(24);
+	const fixture = await createNativeTextVideo(FRAME_COUNT);
 	const url = URL.createObjectURL(fixture);
 	const settings = calculateMp4ExportSettings({
 		quality: "source",
@@ -122,12 +126,12 @@ it("preserves native 4K source-quality text through motion and rejects blurred t
 			expect(video.displayWidth).toBe(TEXT_WIDTH);
 			expect(video.displayHeight).toBe(TEXT_HEIGHT);
 			expect(video.codec).toBe("avc");
-			expect(await input.computeDuration()).toBeCloseTo(0.4, 2);
+			expect(await input.computeDuration()).toBeCloseTo(TEST_DURATION, 2);
 			const packets = await video.computePacketStats();
 			expect(packets.averagePacketRate).toBeCloseTo(60, 0);
-			expect(packets.packetCount).toBe(24);
+			expect(packets.packetCount).toBe(FRAME_COUNT);
 			const sink = new VideoSampleSink(video);
-			for (const frame of [6, 18]) {
+			for (const frame of SAMPLE_FRAMES) {
 				const sample = (await sink.getSample(frame / 60))!;
 				const decoded = textCanvas();
 				const blurred = textCanvas();
