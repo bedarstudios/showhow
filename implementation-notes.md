@@ -510,3 +510,11 @@ derivation failure) is unchanged. No test-only production APIs were added; path 
 classifies as `no-clicks`. The start-request test was initially expected to be RED but passed immediately
 because `getEffectiveCursorCaptureMode` already reads the ref at call time; the stop-reason test was the
 genuine RED (3rd arg `undefined`) before the fix.
+
+## Issue 66 — 2026-09-07
+- Filter only click samples with an explicit `visible: false`; retain visible and legacy samples that omit visibility.
+- Apply the rule in both initial bundle generation and deterministic regeneration.
+- During regeneration, associate retained clicks with their prior screenshot by timestamp and coordinates so filtering an earlier hidden click cannot point a later step at the wrong image.
+- Preserve source video and cursor telemetry byte-for-byte.
+- Unit coverage includes mixed visibility, hidden-only captures, legacy samples, screenshot association, and repeat regeneration stability.
+- Earlier native automation proved outside-click filtering but could not produce trustworthy inside-click telemetry because the system pointer did not move with the accessibility action. Native inside-click retention remains the final acceptance gate.
