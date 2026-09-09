@@ -47,12 +47,16 @@
 		"screens": "螢幕 ({{count}})",
 		"windows": "視窗 ({{count}})",
 		"defaultSourceName": "螢幕",
+		"selectSource": "選擇錄製來源：{{source}}",
 		"emptyTitle": "找不到螢幕或視窗",
 		"emptyDescription": "如果你剛授予螢幕錄製權限，請重新載入此選擇器。在 macOS 上，你可能需要重新開啟 Showhow。",
 		"loadFailedDescription": "Showhow 無法載入擷取來源。請重新載入此選擇器並再試一次。"
 	},
 	"recording": {
 		"selectSource": "請選擇要錄製的來源",
+		"start": "開始錄製",
+		"stop": "停止錄製",
+		"restart": "重新開始錄製",
 		"saving": "正在儲存..."
 	},
 	"language": "語言",
