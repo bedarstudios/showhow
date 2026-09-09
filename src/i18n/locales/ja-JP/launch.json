@@ -47,12 +47,16 @@
 		"screens": "画面 ({{count}})",
 		"windows": "ウィンドウ ({{count}})",
 		"defaultSourceName": "画面",
+		"selectSource": "録画ソースを選択: {{source}}",
 		"emptyTitle": "画面またはウィンドウが見つかりません",
 		"emptyDescription": "画面収録の許可を与えた直後の場合は、この選択画面を再読み込みしてください。macOSではShowhowの再起動が必要な場合があります。",
 		"loadFailedDescription": "Showhowはキャプチャ元を読み込めませんでした。この選択画面を再読み込みして、もう一度お試しください。"
 	},
 	"recording": {
 		"selectSource": "録画するソースを選択してください",
+		"start": "録画を開始",
+		"stop": "録画を停止",
+		"restart": "録画を最初からやり直す",
 		"saving": "保存中..."
 	},
 	"language": "言語",

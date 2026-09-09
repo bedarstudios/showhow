@@ -43,12 +43,16 @@
 		"screens": "الشاشات ({{count}})",
 		"windows": "النوافذ ({{count}})",
 		"defaultSourceName": "الشاشة",
+		"selectSource": "تحديد مصدر التسجيل: {{source}}",
 		"emptyTitle": "لم يتم العثور على شاشات أو نوافذ",
 		"emptyDescription": "إذا منحت للتو إذن تسجيل الشاشة، فأعد تحميل أداة الاختيار. على macOS قد تحتاج إلى إعادة فتح Showhow.",
 		"loadFailedDescription": "تعذر على Showhow تحميل مصادر الالتقاط. أعد تحميل أداة الاختيار وحاول مرة أخرى."
 	},
 	"recording": {
 		"selectSource": "يرجى تحديد مصدر للتسجيل",
+		"start": "بدء التسجيل",
+		"stop": "إيقاف التسجيل",
+		"restart": "إعادة تشغيل التسجيل",
 		"saving": "جاري الحفظ..."
 	},
 	"language": "اللغة",

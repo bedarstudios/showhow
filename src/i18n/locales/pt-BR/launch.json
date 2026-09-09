@@ -47,12 +47,16 @@
 		"screens": "Telas ({{count}})",
 		"windows": "Janelas ({{count}})",
 		"defaultSourceName": "Tela",
+		"selectSource": "Selecionar fonte de gravação: {{source}}",
 		"emptyTitle": "Nenhuma tela ou janela encontrada",
 		"emptyDescription": "Se você acabou de conceder permissão para gravar a tela, recarregue este seletor. No macOS, talvez seja necessário reabrir o Showhow.",
 		"loadFailedDescription": "O Showhow não conseguiu carregar as fontes de captura. Recarregue este seletor e tente novamente."
 	},
 	"recording": {
 		"selectSource": "Por favor, selecione uma fonte para gravar",
+		"start": "Iniciar gravação",
+		"stop": "Parar gravação",
+		"restart": "Reiniciar gravação",
 		"saving": "Salvando..."
 	},
 	"language": "Idioma",
