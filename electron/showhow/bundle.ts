@@ -91,6 +91,8 @@ interface ClickSample {
 	 * is excluded from steps.
 	 */
 	visible?: boolean;
+	/** Zero-based occurrence among valid click samples before visibility filtering. */
+	sourceClickIndex?: number;
 }
 
 export interface StepFrame {
@@ -861,6 +863,20 @@ async function stepFramesFromBundle(bundleDir: string): Promise<StepFrame[]> {
 	const consumed = new Set<number>();
 	const outputPathFor = (click: ClickSample): string => {
 		if (priorSteps !== null) {
+			const occurrenceIndex = click.sourceClickIndex;
+			const occurrenceStep =
+				occurrenceIndex === undefined ? undefined : priorSteps[occurrenceIndex];
+			if (
+				occurrenceIndex !== undefined &&
+				occurrenceStep !== undefined &&
+				occurrenceStep.ts === click.timeMs &&
+				occurrenceStep.coords.cx === click.cx &&
+				occurrenceStep.coords.cy === click.cy
+			) {
+				consumed.add(occurrenceIndex);
+				claimed.add(occurrenceStep.screenshot);
+				return occurrenceStep.screenshot;
+			}
 			for (const [index, step] of priorSteps.entries()) {
 				if (consumed.has(index)) continue;
 				if (
@@ -946,16 +962,25 @@ function clickSamplesFromTelemetryStrict(raw: string): ClickSample[] {
 		// `samples` missing or wrong type is a structural failure, not zero clicks.
 		throw new Error("regenerateDocArtifacts: cursor telemetry has no samples array");
 	}
-	return telemetry.samples.filter(
-		(sample): sample is ClickSample =>
+	let sourceClickIndex = 0;
+	const clicks: ClickSample[] = [];
+	for (const sample of telemetry.samples) {
+		if (
 			typeof sample === "object" &&
 			sample !== null &&
 			(sample as ClickSample).interactionType === "click" &&
-			(sample as ClickSample).visible !== false &&
 			typeof (sample as ClickSample).timeMs === "number" &&
 			typeof (sample as ClickSample).cx === "number" &&
-			typeof (sample as ClickSample).cy === "number",
-	);
+			typeof (sample as ClickSample).cy === "number"
+		) {
+			const click = sample as ClickSample;
+			if (click.visible !== false) {
+				clicks.push({ ...click, sourceClickIndex });
+			}
+			sourceClickIndex += 1;
+		}
+	}
+	return clicks;
 }
 
 /**

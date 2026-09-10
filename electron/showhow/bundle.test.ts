@@ -1677,4 +1677,66 @@ describe("click visibility filtering (issue #66: exclude outside clicks)", () =>
 			"visible-frame",
 		);
 	});
+
+	it("regeneration: preserves click occurrence when hidden and visible samples share identity", async () => {
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-regen-collision-"));
+		const telemetry = JSON.stringify({
+			samples: [
+				{ timeMs: 0, cx: 0, cy: 0.5, interactionType: "click", visible: false },
+				{ timeMs: 0, cx: 0, cy: 0.5, interactionType: "click", visible: true },
+			],
+		});
+		await writeFile(path.join(bundleDir, "video.mp4"), "fake-mp4");
+		await writeFile(path.join(bundleDir, "video.mp4.cursor.json"), telemetry);
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Colliding click identities",
+				source: "desktop",
+				createdAt: 1,
+				video: "video.mp4",
+				cursorTelemetry: "video.mp4.cursor.json",
+				transcript: "transcript.txt",
+				steps: null,
+			}),
+		);
+		await writeFile(path.join(bundleDir, "transcript.txt"), "[0:00] visible action\n");
+		await writeFile(
+			path.join(bundleDir, "steps.json"),
+			serializeStepsJson([
+				{
+					label: "Hidden boundary click",
+					ts: 0,
+					coords: { cx: 0, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-01.png",
+				},
+				{
+					label: "Visible boundary click",
+					ts: 0,
+					coords: { cx: 0, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-02.png",
+				},
+			]),
+		);
+		await writeFile(path.join(bundleDir, "steps.md"), "# Before regeneration\n");
+		await mkdir(path.join(bundleDir, "screenshots"), { recursive: true });
+		await writeFile(path.join(bundleDir, "screenshots", "step-01.png"), "hidden-frame");
+		await writeFile(path.join(bundleDir, "screenshots", "step-02.png"), "visible-frame");
+
+		const regen = await regenerateDocArtifacts(bundleDir);
+
+		expect(regen.success).toBe(true);
+		expect(regen.stepsWritten).toBe(1);
+		const steps = JSON.parse(await readFile(path.join(bundleDir, "steps.json"), "utf-8")) as Step[];
+		expect(steps).toHaveLength(1);
+		expect(steps[0].screenshot).toBe("step-02.png");
+		expect(await readFile(path.join(bundleDir, "screenshots", steps[0].screenshot), "utf-8")).toBe(
+			"visible-frame",
+		);
+	});
 });
