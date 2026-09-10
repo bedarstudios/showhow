@@ -1,7 +1,7 @@
 # Secrets and tokens
 
-Showhow uses repository secrets for release publication, macOS signing, and review routing. Store
-real values only in GitHub; never commit them or place them in `.env` files.
+Showhow uses repository secrets for release publication, macOS signing, and Bedar Loop board sync.
+Store real values only in GitHub; never commit them or place them in `.env` files.
 
 ## `SHOWHOW_RELEASE_TOKEN`
 
@@ -25,10 +25,10 @@ workflow change.
 
 ## `BEDAR_LOOP_PAT`
 
-`nonpriority-review.yml` and `overnight-sweep.yml` use this token to dispatch the cold reviewer and
-update pull request labels and comments. Give it the minimum contents, pull-request, and issue
-write permissions those workflows need. Without it, only those two workflows fail; CI, builds, and
-releases are unaffected.
+`board-sync.yml` uses this classic personal access token to update the user-level Showhow project.
+Give it `repo`, `workflow`, and `project` scopes. Pull-request review is handled by the local Bedar
+Loop and Greptile; Showhow does not dispatch a Copilot reviewer. Without this token, board status
+projection fails while CI, builds, reviews, and releases remain unaffected.
 
 ## macOS signing and notarization
 
