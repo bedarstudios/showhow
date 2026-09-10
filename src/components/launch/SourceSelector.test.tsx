@@ -47,6 +47,174 @@ describe("SourceSelector", () => {
 		expect(screen.getByRole("button", { name: "Reload" })).toBeInTheDocument();
 	});
 
+	it("supports single-tab-stop radio keyboard selection and Share of the focused source", async () => {
+		window.electronAPI = {
+			...window.electronAPI,
+			getSources: vi.fn().mockResolvedValue([
+				{
+					id: "screen:1:0",
+					name: "Display 1",
+					thumbnail: null,
+					display_id: "1",
+					appIcon: null,
+				},
+				{
+					id: "screen:2:0",
+					name: "Display 2",
+					thumbnail: null,
+					display_id: "2",
+					appIcon: null,
+				},
+			]),
+			selectSource: vi.fn(),
+		} as typeof window.electronAPI;
+
+		render(<SourceSelector />);
+
+		const firstCard = await screen.findByRole("radio", { name: "Display 1" });
+		const secondCard = screen.getByRole("radio", { name: "Display 2" });
+
+		// Roving tabIndex: the visible source list adds one Tab stop, not one per card.
+		expect(firstCard).toHaveAttribute("tabindex", "0");
+		expect(secondCard).toHaveAttribute("tabindex", "-1");
+
+		// Space selects the focused radio and exposes the checked state.
+		fireEvent.keyDown(firstCard, { key: " " });
+		expect(firstCard).toBeChecked();
+		expect(secondCard).not.toBeChecked();
+
+		// ArrowDown moves focus and selection to the next radio in visual order.
+		fireEvent.keyDown(firstCard, { key: "ArrowDown" });
+		expect(secondCard).toBeChecked();
+		expect(secondCard).toHaveFocus();
+
+		// Share sends the keyboard-selected source through the existing IPC.
+		fireEvent.click(screen.getByRole("button", { name: "Share" }));
+		await waitFor(() => {
+			expect(window.electronAPI.selectSource).toHaveBeenCalledTimes(1);
+		});
+		expect(window.electronAPI.selectSource).toHaveBeenCalledWith(
+			expect.objectContaining({ id: "screen:2:0", name: "Display 2" }),
+		);
+	});
+
+	it("moves radio selection and focus with ArrowRight and exposes the checked state", async () => {
+		window.electronAPI = {
+			...window.electronAPI,
+			getSources: vi.fn().mockResolvedValue([
+				{
+					id: "screen:1:0",
+					name: "Display 1",
+					thumbnail: null,
+					display_id: "1",
+					appIcon: null,
+				},
+				{
+					id: "screen:2:0",
+					name: "Display 2",
+					thumbnail: null,
+					display_id: "2",
+					appIcon: null,
+				},
+			]),
+			selectSource: vi.fn(),
+		} as typeof window.electronAPI;
+
+		render(<SourceSelector />);
+
+		const [firstCard, secondCard] = await screen.findAllByTestId("source-selector-card");
+
+		// ArrowRight moves selection to the next radio in the group, moves focus
+		// with it, and exposes the checked state on the cards.
+		fireEvent.keyDown(firstCard, { key: "ArrowRight" });
+		expect(secondCard).toHaveFocus();
+		expect(secondCard).toBeChecked();
+		expect(firstCard).not.toBeChecked();
+	});
+
+	it("activates the focused radio with Enter and shares it through the existing IPC", async () => {
+		window.electronAPI = {
+			...window.electronAPI,
+			getSources: vi.fn().mockResolvedValue([
+				{
+					id: "screen:1:0",
+					name: "Display 1",
+					thumbnail: null,
+					display_id: "1",
+					appIcon: null,
+				},
+				{
+					id: "screen:2:0",
+					name: "Display 2",
+					thumbnail: null,
+					display_id: "2",
+					appIcon: null,
+				},
+			]),
+			selectSource: vi.fn(),
+		} as typeof window.electronAPI;
+
+		render(<SourceSelector />);
+
+		const [firstCard] = await screen.findAllByTestId("source-selector-card");
+
+		// Enter selects the focused radio and exposes the checked state.
+		fireEvent.keyDown(firstCard, { key: "Enter" });
+		expect(firstCard).toBeChecked();
+
+		// Share sends the Enter-selected source through the existing IPC.
+		fireEvent.click(screen.getByRole("button", { name: "Share" }));
+		await waitFor(() => {
+			expect(window.electronAPI.selectSource).toHaveBeenCalledTimes(1);
+		});
+		expect(window.electronAPI.selectSource).toHaveBeenCalledWith(
+			expect.objectContaining({ id: "screen:1:0", name: "Display 1" }),
+		);
+	});
+
+	it("moves selection backwards with ArrowLeft/ArrowUp, wraps, and moves the roving tab stop", async () => {
+		window.electronAPI = {
+			...window.electronAPI,
+			getSources: vi.fn().mockResolvedValue([
+				{
+					id: "screen:1:0",
+					name: "Display 1",
+					thumbnail: null,
+					display_id: "1",
+					appIcon: null,
+				},
+				{
+					id: "screen:2:0",
+					name: "Display 2",
+					thumbnail: null,
+					display_id: "2",
+					appIcon: null,
+				},
+			]),
+			selectSource: vi.fn(),
+		} as typeof window.electronAPI;
+
+		render(<SourceSelector />);
+
+		const [firstCard, secondCard] = await screen.findAllByTestId("source-selector-card");
+
+		// ArrowLeft from the first radio wraps to the last radio in the group.
+		fireEvent.keyDown(firstCard, { key: "ArrowLeft" });
+		expect(secondCard).toHaveFocus();
+		expect(secondCard).toBeChecked();
+		expect(firstCard).not.toBeChecked();
+
+		// The roving tab stop follows the selection.
+		expect(secondCard).toHaveAttribute("tabindex", "0");
+		expect(firstCard).toHaveAttribute("tabindex", "-1");
+
+		// ArrowUp from the second radio moves back to the first.
+		fireEvent.keyDown(secondCard, { key: "ArrowUp" });
+		expect(firstCard).toHaveFocus();
+		expect(firstCard).toBeChecked();
+		expect(secondCard).not.toBeChecked();
+	});
+
 	it("reloads capture sources from the empty state", async () => {
 		const getSources = vi
 			.fn()
@@ -72,8 +240,15 @@ describe("SourceSelector", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Reload" }));
 
 		await waitFor(() => {
-			expect(screen.getByText("Display 1")).toBeInTheDocument();
+			expect(screen.getByRole("radio", { name: "Display 1" })).toBeInTheDocument();
 		});
 		expect(getSources).toHaveBeenCalledTimes(2);
+
+		// The reloaded group starts unselected: the first named radio is the
+		// single Tab stop, nothing is checked, and Share stays disabled.
+		const firstCard = screen.getByRole("radio", { name: "Display 1" });
+		expect(firstCard).not.toBeChecked();
+		expect(firstCard).toHaveAttribute("tabindex", "0");
+		expect(screen.getByRole("button", { name: "Share" })).toBeDisabled();
 	});
 });

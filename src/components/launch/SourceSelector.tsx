@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MdCheck } from "react-icons/md";
 import { useScopedT } from "@/contexts/I18nContext";
 import { Button } from "../ui/button";
@@ -20,6 +21,7 @@ export function SourceSelector() {
 	const [selectedSource, setSelectedSource] = useState<DesktopSource | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [loadFailed, setLoadFailed] = useState(false);
+	const cardRefs = useRef(new Map<string, HTMLDivElement>());
 
 	const fetchSources = useCallback(async () => {
 		setLoading(true);
@@ -64,6 +66,40 @@ export function SourceSelector() {
 	const hasNoSources = !loading && sources.length === 0;
 
 	const handleSourceSelect = (source: DesktopSource) => setSelectedSource(source);
+
+	// Roving tabIndex: within each category radio group, the selected card (or
+	// the first card when nothing in that category is selected) is the single
+	// Tab stop; every other card is programmatically focusable only.
+	const isCardTabStop = (source: DesktopSource, index: number, category: DesktopSource[]) => {
+		if (selectedSource?.id === source.id) return true;
+		const selectionInCategory = category.some((item) => item.id === selectedSource?.id);
+		return !selectionInCategory && index === 0;
+	};
+
+	const handleCardKeyDown =
+		(source: DesktopSource, index: number, category: DesktopSource[]) =>
+		(event: ReactKeyboardEvent<HTMLDivElement>) => {
+			// Space or Enter activates the focused radio.
+			if (event.key === " " || event.key === "Enter") {
+				event.preventDefault();
+				setSelectedSource(source);
+				return;
+			}
+			// Arrows move focus and selection in visual grid order, wrapping at
+			// the ends. Tab/Shift+Tab are untouched so focus can leave the group.
+			const delta =
+				event.key === "ArrowRight" || event.key === "ArrowDown"
+					? 1
+					: event.key === "ArrowLeft" || event.key === "ArrowUp"
+						? -1
+						: 0;
+			if (delta === 0) return;
+			event.preventDefault();
+			const nextSource = category[(index + delta + category.length) % category.length] ?? source;
+			setSelectedSource(nextSource);
+			cardRefs.current.get(nextSource.id)?.focus();
+		};
+
 	const handleShare = async () => {
 		if (selectedSource) await window.electronAPI.selectSource(selectedSource);
 	};
@@ -106,16 +142,31 @@ export function SourceSelector() {
 		);
 	}
 
-	const renderSourceCard = (source: DesktopSource) => {
+	const renderSourceCard = (source: DesktopSource, index: number, category: DesktopSource[]) => {
 		const isSelected = selectedSource?.id === source.id;
 		const sourceKind = source.id.startsWith("screen:") ? "screen" : "window";
 		return (
 			<div
 				key={source.id}
+				ref={(node) => {
+					if (node) {
+						cardRefs.current.set(source.id, node);
+					} else {
+						cardRefs.current.delete(source.id);
+					}
+				}}
+				role="radio"
+				aria-checked={isSelected}
+				aria-label={source.name}
+				tabIndex={isCardTabStop(source, index, category) ? 0 : -1}
 				data-testid="source-selector-card"
 				data-source-kind={sourceKind}
 				className={`${styles.sourceCard} ${isSelected ? styles.selected : ""} p-1.5`}
-				onClick={() => handleSourceSelect(source)}
+				onClick={(event) => {
+					handleSourceSelect(source);
+					event.currentTarget.focus();
+				}}
+				onKeyDown={handleCardKeyDown(source, index, category)}
 			>
 				<div className="relative mb-1.5 overflow-hidden rounded-lg border border-white/[0.06] bg-black/30">
 					<img
@@ -165,16 +216,24 @@ export function SourceSelector() {
 					<div className="flex-1 min-h-0">
 						<TabsContent value="screens" className="h-full mt-0">
 							<div
+								role="radiogroup"
+								aria-label={t("sourceSelector.screens", { count: String(screenSources.length) })}
 								className={`grid h-[282px] auto-rows-min grid-cols-2 gap-2.5 overflow-y-auto pr-1.5 pt-1 ${styles.sourceGridScroll}`}
 							>
-								{screenSources.map(renderSourceCard)}
+								{screenSources.map((source, index) =>
+									renderSourceCard(source, index, screenSources),
+								)}
 							</div>
 						</TabsContent>
 						<TabsContent value="windows" className="h-full mt-0">
 							<div
+								role="radiogroup"
+								aria-label={t("sourceSelector.windows", { count: String(windowSources.length) })}
 								className={`grid h-[282px] auto-rows-min grid-cols-2 gap-2.5 overflow-y-auto pr-1.5 pt-1 ${styles.sourceGridScroll}`}
 							>
-								{windowSources.map(renderSourceCard)}
+								{windowSources.map((source, index) =>
+									renderSourceCard(source, index, windowSources),
+								)}
 							</div>
 						</TabsContent>
 					</div>
