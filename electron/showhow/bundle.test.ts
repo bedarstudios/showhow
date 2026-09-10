@@ -1,4 +1,4 @@
-import { access, mkdtemp, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -1321,5 +1321,422 @@ describe("regenerateDocArtifacts rollback safety (paired writes)", () => {
 		const afterMd = await readFile(path.join(result.bundleDir, "steps.md"), "utf-8");
 		expect(afterJson).toContain("updated first");
 		expect(afterMd).toContain("updated first");
+	});
+});
+
+describe("click visibility filtering (issue #66: exclude outside clicks)", () => {
+	const mixedTelemetry = JSON.stringify({
+		samples: [
+			// Outside click (e.g. the Stop control outside the recorded window): excluded.
+			{ timeMs: 1_000, cx: 0.25, cy: 0.5, interactionType: "click", visible: false },
+			// Inside click: kept.
+			{ timeMs: 2_000, cx: 0.5, cy: 0.5, interactionType: "click", visible: true },
+			// Legacy sample with no visibility field: kept.
+			{ timeMs: 3_000, cx: 0.75, cy: 0.2, interactionType: "click" },
+			// Non-click sample: ignored regardless of visibility.
+			{ timeMs: 4_000, cx: 0.9, cy: 0.9, interactionType: "move", visible: true },
+		],
+	});
+	const hiddenOnlyTelemetry = JSON.stringify({
+		samples: [
+			{ timeMs: 1_000, cx: 0.25, cy: 0.5, interactionType: "click", visible: false },
+			{ timeMs: 5_000, cx: 0.6, cy: 0.6, interactionType: "click", visible: false },
+		],
+	});
+
+	it("initial generation: keeps visible:true and legacy clicks, excluding only visible:false", async () => {
+		const work = await mkdtemp(path.join(os.tmpdir(), "showhow-bundle-"));
+		const root = path.join(work, "Recordings");
+		const screenVideoPath = path.join(work, "rec-mixed.mp4");
+		await writeFile(screenVideoPath, "fake-mp4");
+		await writeFile(`${screenVideoPath}.cursor.json`, mixedTelemetry);
+		const frames: Parameters<FrameExtractor>[0][] = [];
+		const extractFrames: FrameExtractor = async (input) => {
+			frames.push(input);
+		};
+
+		const result = await createRecordingBundle({
+			screenVideoPath,
+			createdAt: new Date(2026, 6, 11, 16, 42, 7).getTime(),
+			recordingsRoot: root,
+			transcriptContent: "[0:02] inside click\n[0:03] legacy click\n",
+			extractFrames,
+		});
+
+		// Only the visible:true and legacy (missing visibility) clicks get frames,
+		// numbered deterministically after exclusion.
+		expect(frames).toHaveLength(1);
+		expect(frames[0].clicks).toEqual([
+			{ timeMs: 2_000, cx: 0.5, cy: 0.5, outputPath: "step-01.png" },
+			{ timeMs: 3_000, cx: 0.75, cy: 0.2, outputPath: "step-02.png" },
+		]);
+		const steps = JSON.parse(
+			await readFile(path.join(result.bundleDir, "steps.json"), "utf-8"),
+		) as Step[];
+		expect(steps.map((s) => s.ts)).toEqual([2_000, 3_000]);
+		expect(steps.map((s) => s.screenshot)).toEqual(["step-01.png", "step-02.png"]);
+		const md = await readFile(path.join(result.bundleDir, "steps.md"), "utf-8");
+		expect(md).toContain("screenshots/step-01.png");
+		expect(md).toContain("screenshots/step-02.png");
+		expect(md).not.toContain("step-03.png");
+		// Media and telemetry are preserved unchanged.
+		expect(await readFile(result.screenVideoPath, "utf-8")).toBe("fake-mp4");
+		expect(await readFile(path.join(result.bundleDir, "video.mp4.cursor.json"), "utf-8")).toBe(
+			mixedTelemetry,
+		);
+	});
+
+	it("initial generation: hidden-only telemetry yields a transcript-only doc and no-clicks stepCapture", async () => {
+		const work = await mkdtemp(path.join(os.tmpdir(), "showhow-bundle-"));
+		const root = path.join(work, "Recordings");
+		const screenVideoPath = path.join(work, "rec-hidden.mp4");
+		await writeFile(screenVideoPath, "fake-mp4");
+		await writeFile(`${screenVideoPath}.cursor.json`, hiddenOnlyTelemetry);
+
+		const result = await createRecordingBundle({
+			screenVideoPath,
+			createdAt: new Date(2026, 6, 11, 16, 42, 7).getTime(),
+			recordingsRoot: root,
+			transcriptContent: "[0:04] narrated walkthrough\n",
+			// Seam: never invoke real ffmpeg on the fake MP4, even if clicks survive.
+			extractFrames: async () => {
+				// no-op
+			},
+		});
+
+		const stepsJson = await readFile(path.join(result.bundleDir, "steps.json"), "utf-8");
+		expect(stepsJson).toBe("[]\n");
+		const md = await readFile(path.join(result.bundleDir, "steps.md"), "utf-8");
+		expect(md).toContain("transcript-only");
+		const meta = JSON.parse(await readFile(path.join(result.bundleDir, "meta.json"), "utf-8"));
+		expect(meta.stepCapture).toEqual({
+			status: "unavailable",
+			reason: "no-clicks",
+			message: expect.any(String),
+		});
+		// Media and telemetry are preserved unchanged.
+		expect(await readFile(result.screenVideoPath, "utf-8")).toBe("fake-mp4");
+		expect(await readFile(path.join(result.bundleDir, "video.mp4.cursor.json"), "utf-8")).toBe(
+			hiddenOnlyTelemetry,
+		);
+	});
+
+	it("regeneration: keeps visible:true and legacy clicks, excluding only visible:false", async () => {
+		// A hand-assembled bundle isolates the regeneration parser from the
+		// initial-generation parser.
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-regen-vis-"));
+		await writeFile(path.join(bundleDir, "video.mp4"), "fake-mp4");
+		await writeFile(path.join(bundleDir, "video.mp4.cursor.json"), mixedTelemetry);
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Mixed visibility recording",
+				source: "desktop",
+				createdAt: 1,
+				video: "video.mp4",
+				cursorTelemetry: "video.mp4.cursor.json",
+				transcript: "transcript.txt",
+				steps: null,
+			}),
+		);
+		await writeFile(
+			path.join(bundleDir, "transcript.txt"),
+			"[0:02] inside click\n[0:03] legacy click\n",
+			"utf-8",
+		);
+
+		const regen = await regenerateDocArtifacts(bundleDir);
+
+		expect(regen.success).toBe(true);
+		expect(regen.stepsWritten).toBe(2);
+		const steps = JSON.parse(await readFile(path.join(bundleDir, "steps.json"), "utf-8")) as Step[];
+		expect(steps.map((s) => s.ts)).toEqual([2_000, 3_000]);
+		expect(steps.map((s) => s.screenshot)).toEqual(["step-01.png", "step-02.png"]);
+		const md = await readFile(path.join(bundleDir, "steps.md"), "utf-8");
+		expect(md).toContain("screenshots/step-01.png");
+		expect(md).toContain("screenshots/step-02.png");
+		expect(md).not.toContain("step-03.png");
+		// Media and telemetry are never mutated by regeneration.
+		expect(await readFile(path.join(bundleDir, "video.mp4"), "utf-8")).toBe("fake-mp4");
+		expect(await readFile(path.join(bundleDir, "video.mp4.cursor.json"), "utf-8")).toBe(
+			mixedTelemetry,
+		);
+	});
+
+	it("regeneration: hidden-only telemetry regenerates to zero steps without touching media or telemetry", async () => {
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-regen-hidden-"));
+		await writeFile(path.join(bundleDir, "video.mp4"), "fake-mp4");
+		await writeFile(path.join(bundleDir, "video.mp4.cursor.json"), hiddenOnlyTelemetry);
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Hidden-only recording",
+				source: "desktop",
+				createdAt: 1,
+				video: "video.mp4",
+				cursorTelemetry: "video.mp4.cursor.json",
+				transcript: "transcript.txt",
+				steps: null,
+			}),
+		);
+		await writeFile(path.join(bundleDir, "transcript.txt"), "[0:04] narrated\n", "utf-8");
+
+		const regen = await regenerateDocArtifacts(bundleDir);
+
+		expect(regen.success).toBe(true);
+		expect(regen.stepsWritten).toBe(0);
+		expect(await readFile(path.join(bundleDir, "steps.json"), "utf-8")).toBe("[]\n");
+		const md = await readFile(path.join(bundleDir, "steps.md"), "utf-8");
+		expect(md).toContain("transcript-only");
+		// Media and telemetry are never mutated by regeneration.
+		expect(await readFile(path.join(bundleDir, "video.mp4"), "utf-8")).toBe("fake-mp4");
+		expect(await readFile(path.join(bundleDir, "video.mp4.cursor.json"), "utf-8")).toBe(
+			hiddenOnlyTelemetry,
+		);
+	});
+
+	it("regeneration: retained visible step keeps its pre-fix screenshot image, not the hidden click's renumbered slot", async () => {
+		// A PRE-fix bundle: both the hidden and the visible click became steps,
+		// numbered unfiltered, and their frames were extracted under that
+		// numbering. Regeneration filters the hidden click but never re-extracts
+		// frames, so the retained visible step must keep the screenshot filename
+		// its prior step already referenced -- matched via the immutable
+		// ts + coords association -- rather than being renumbered onto the
+		// hidden click's image slot.
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-regen-legacy-"));
+		const telemetry = JSON.stringify({
+			samples: [
+				{ timeMs: 1_000, cx: 0.25, cy: 0.5, interactionType: "click", visible: false },
+				{ timeMs: 2_000, cx: 0.5, cy: 0.5, interactionType: "click", visible: true },
+			],
+		});
+		await writeFile(path.join(bundleDir, "video.mp4"), "fake-mp4");
+		await writeFile(path.join(bundleDir, "video.mp4.cursor.json"), telemetry);
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Pre-fix bundle",
+				source: "desktop",
+				createdAt: 1,
+				video: "video.mp4",
+				cursorTelemetry: "video.mp4.cursor.json",
+				transcript: "transcript.txt",
+				steps: null,
+			}),
+		);
+		await writeFile(path.join(bundleDir, "transcript.txt"), "[0:02] inside click\n", "utf-8");
+		// Pre-fix prior steps.json: BOTH clicks are steps, unfiltered numbering.
+		await writeFile(
+			path.join(bundleDir, "steps.json"),
+			serializeStepsJson([
+				{
+					label: "Step 1",
+					ts: 1_000,
+					coords: { cx: 0.25, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-01.png",
+				},
+				{
+					label: "Step 2",
+					ts: 2_000,
+					coords: { cx: 0.5, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-02.png",
+				},
+			]),
+		);
+		await writeFile(path.join(bundleDir, "steps.md"), "# Workflow doc\n", "utf-8");
+		// Distinguishable screenshot contents: hidden image vs visible image.
+		await mkdir(path.join(bundleDir, "screenshots"), { recursive: true });
+		await writeFile(path.join(bundleDir, "screenshots", "step-01.png"), "hidden-frame");
+		await writeFile(path.join(bundleDir, "screenshots", "step-02.png"), "visible-frame");
+
+		const regen = await regenerateDocArtifacts(bundleDir);
+
+		expect(regen.success).toBe(true);
+		expect(regen.stepsWritten).toBe(1);
+		const steps = JSON.parse(await readFile(path.join(bundleDir, "steps.json"), "utf-8")) as Step[];
+		expect(steps).toHaveLength(1);
+		expect(steps[0].ts).toBe(2_000);
+		// The retained visible click keeps ITS prior ref (step-02.png), not the
+		// renumbered step-01.png slot that holds the hidden click's image.
+		expect(steps[0].screenshot).toBe("step-02.png");
+		const md = await readFile(path.join(bundleDir, "steps.md"), "utf-8");
+		expect(md).toContain("screenshots/step-02.png");
+		expect(md).not.toContain("step-01.png");
+		// The referenced image is the visible click's frame; screenshot files untouched.
+		expect(await readFile(path.join(bundleDir, "screenshots", "step-02.png"), "utf-8")).toBe(
+			"visible-frame",
+		);
+		expect(await readFile(path.join(bundleDir, "screenshots", "step-01.png"), "utf-8")).toBe(
+			"hidden-frame",
+		);
+		// Media and telemetry untouched.
+		expect(await readFile(path.join(bundleDir, "video.mp4"), "utf-8")).toBe("fake-mp4");
+		expect(await readFile(path.join(bundleDir, "video.mp4.cursor.json"), "utf-8")).toBe(telemetry);
+
+		// Repeated regeneration is stable: byte-identical artifacts, same mapping.
+		const stableJson = await readFile(path.join(bundleDir, "steps.json"), "utf-8");
+		const stableMd = await readFile(path.join(bundleDir, "steps.md"), "utf-8");
+		const regen2 = await regenerateDocArtifacts(bundleDir);
+		expect(regen2.success).toBe(true);
+		expect(regen2.stepsWritten).toBe(1);
+		expect(await readFile(path.join(bundleDir, "steps.json"), "utf-8")).toBe(stableJson);
+		expect(await readFile(path.join(bundleDir, "steps.md"), "utf-8")).toBe(stableMd);
+	});
+
+	it("regeneration: fails safely without rewriting artifacts when step deletion removes the retained click's screenshot association", async () => {
+		// Review cycle-2 scenario (draft PR #78, P2): a PRE-fix bundle numbered
+		// BOTH clicks as steps (hidden -> step-01.png, visible -> step-02.png)
+		// and extracted both frames under that numbering. The user then deletes
+		// the VISIBLE step through the supported edit operation, which removes
+		// its prior mapping while both extracted images stay on disk (delete-step
+		// does not remove screenshot files). Regeneration filters the hidden
+		// click, but the retained visible click now has NO provable screenshot
+		// association: deterministic renumbering would hand it step-01.png --
+		// the hidden click's image. The safe behavior per the existing
+		// required-source-failure convention: report failure and leave every
+		// doc artifact, media, telemetry, and screenshot untouched.
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-regen-orphan-"));
+		const telemetry = JSON.stringify({
+			samples: [
+				{ timeMs: 1_000, cx: 0.25, cy: 0.5, interactionType: "click", visible: false },
+				{ timeMs: 2_000, cx: 0.5, cy: 0.5, interactionType: "click", visible: true },
+			],
+		});
+		await writeFile(path.join(bundleDir, "video.mp4"), "fake-mp4");
+		await writeFile(path.join(bundleDir, "video.mp4.cursor.json"), telemetry);
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Pre-fix bundle",
+				source: "desktop",
+				createdAt: 1,
+				video: "video.mp4",
+				cursorTelemetry: "video.mp4.cursor.json",
+				transcript: "transcript.txt",
+				steps: null,
+			}),
+		);
+		await writeFile(path.join(bundleDir, "transcript.txt"), "[0:02] inside click\n", "utf-8");
+		// Pre-fix prior steps.json: BOTH clicks are steps, unfiltered numbering.
+		await writeFile(
+			path.join(bundleDir, "steps.json"),
+			serializeStepsJson([
+				{
+					label: "Step 1",
+					ts: 1_000,
+					coords: { cx: 0.25, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-01.png",
+				},
+				{
+					label: "Step 2",
+					ts: 2_000,
+					coords: { cx: 0.5, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-02.png",
+				},
+			]),
+		);
+		// Distinguishable screenshot contents: hidden image vs visible image.
+		await mkdir(path.join(bundleDir, "screenshots"), { recursive: true });
+		await writeFile(path.join(bundleDir, "screenshots", "step-01.png"), "hidden-frame");
+		await writeFile(path.join(bundleDir, "screenshots", "step-02.png"), "visible-frame");
+		// Supported edit: delete the VISIBLE step (index 1). Its prior mapping is
+		// removed; both image files remain on disk.
+		await updateWorkflowDocument(bundleDir, { type: "delete-step", index: 1 });
+		const priorJson = await readFile(path.join(bundleDir, "steps.json"), "utf-8");
+		const priorMd = await readFile(path.join(bundleDir, "steps.md"), "utf-8");
+
+		const regen = await regenerateDocArtifacts(bundleDir);
+
+		// The retained visible click's screenshot association cannot be proven:
+		// regeneration must fail safely (success: false, like corrupt required
+		// sources) rather than renumber it onto the hidden click's image.
+		expect(regen.success).toBe(false);
+		// The prior artifact pair is preserved byte-for-byte -- no rewritten
+		// steps.json/steps.md referencing the hidden click's step-01.png.
+		expect(await readFile(path.join(bundleDir, "steps.json"), "utf-8")).toBe(priorJson);
+		expect(await readFile(path.join(bundleDir, "steps.md"), "utf-8")).toBe(priorMd);
+		// Media, telemetry, and both extracted screenshot images are untouched.
+		expect(await readFile(path.join(bundleDir, "video.mp4"), "utf-8")).toBe("fake-mp4");
+		expect(await readFile(path.join(bundleDir, "video.mp4.cursor.json"), "utf-8")).toBe(telemetry);
+		expect(await readFile(path.join(bundleDir, "screenshots", "step-01.png"), "utf-8")).toBe(
+			"hidden-frame",
+		);
+		expect(await readFile(path.join(bundleDir, "screenshots", "step-02.png"), "utf-8")).toBe(
+			"visible-frame",
+		);
+	});
+
+	it("regeneration: preserves click occurrence when hidden and visible samples share identity", async () => {
+		const bundleDir = await mkdtemp(path.join(os.tmpdir(), "showhow-regen-collision-"));
+		const telemetry = JSON.stringify({
+			samples: [
+				{ timeMs: 0, cx: 0, cy: 0.5, interactionType: "click", visible: false },
+				{ timeMs: 0, cx: 0, cy: 0.5, interactionType: "click", visible: true },
+			],
+		});
+		await writeFile(path.join(bundleDir, "video.mp4"), "fake-mp4");
+		await writeFile(path.join(bundleDir, "video.mp4.cursor.json"), telemetry);
+		await writeFile(
+			path.join(bundleDir, "meta.json"),
+			JSON.stringify({
+				schemaVersion: 1,
+				title: "Colliding click identities",
+				source: "desktop",
+				createdAt: 1,
+				video: "video.mp4",
+				cursorTelemetry: "video.mp4.cursor.json",
+				transcript: "transcript.txt",
+				steps: null,
+			}),
+		);
+		await writeFile(path.join(bundleDir, "transcript.txt"), "[0:00] visible action\n");
+		await writeFile(
+			path.join(bundleDir, "steps.json"),
+			serializeStepsJson([
+				{
+					label: "Hidden boundary click",
+					ts: 0,
+					coords: { cx: 0, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-01.png",
+				},
+				{
+					label: "Visible boundary click",
+					ts: 0,
+					coords: { cx: 0, cy: 0.5 },
+					tier: "desktop",
+					redaction: false,
+					screenshot: "step-02.png",
+				},
+			]),
+		);
+		await writeFile(path.join(bundleDir, "steps.md"), "# Before regeneration\n");
+		await mkdir(path.join(bundleDir, "screenshots"), { recursive: true });
+		await writeFile(path.join(bundleDir, "screenshots", "step-01.png"), "hidden-frame");
+		await writeFile(path.join(bundleDir, "screenshots", "step-02.png"), "visible-frame");
+
+		const regen = await regenerateDocArtifacts(bundleDir);
+
+		expect(regen.success).toBe(true);
+		expect(regen.stepsWritten).toBe(1);
+		const steps = JSON.parse(await readFile(path.join(bundleDir, "steps.json"), "utf-8")) as Step[];
+		expect(steps).toHaveLength(1);
+		expect(steps[0].screenshot).toBe("step-02.png");
+		expect(await readFile(path.join(bundleDir, "screenshots", steps[0].screenshot), "utf-8")).toBe(
+			"visible-frame",
+		);
 	});
 });
