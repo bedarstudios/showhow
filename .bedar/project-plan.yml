@@ -11,6 +11,7 @@ project:
 phases:
 - id: showhow-p1-folder-bundle
   title: Showhow Phase 1 — Folder bundle
+  mode: maintenance
   goal: Preserve every finished macOS recording as a local, agent-ready folder with
     video metadata and timestamped transcription.
   source: docs/superpowers/specs/2026-07-11-showhow-desktop-design.md#v1-cut-line-and-build-order
@@ -40,6 +41,7 @@ phases:
   github_number: 1
 - id: showhow-p2-desktop-doc-engine
   title: Showhow Phase 2 — Desktop doc engine
+  mode: maintenance
   goal: Turn desktop recordings into deterministic step-by-step workflow documents
     and agent-ready bug reports.
   source: docs/superpowers/specs/2026-07-11-showhow-desktop-design.md#v1-cut-line-and-build-order
@@ -110,6 +112,7 @@ phases:
   github_number: 2
 - id: showhow-p3-library-doc-ui
   title: Showhow Phase 3 — Library and doc view
+  mode: maintenance
   goal: Make local recording folders browsable and render their workflow documents
     inside the desktop application.
   source: docs/superpowers/specs/2026-07-11-showhow-desktop-design.md#v1-cut-line-and-build-order
@@ -159,6 +162,7 @@ phases:
   github_number: 3
 - id: showhow-p4-browser-bridge
   title: Showhow Phase 4 — Browser companion bridge
+  mode: maintenance
   goal: Pair browser capture with the desktop recorder so semantic steps and screenshots
     enter the same folder contract.
   source: docs/superpowers/specs/2026-07-11-showhow-desktop-design.md#v1-cut-line-and-build-order
@@ -208,6 +212,7 @@ phases:
   github_number: 4
 - id: showhow-p5-polish
   title: Showhow Phase 5 — V1 polish
+  mode: maintenance
   goal: Finish safe document editing and the empty, generating, and failure states
     required for a dependable personal V1.
   source: docs/superpowers/specs/2026-07-11-showhow-desktop-design.md#v1-cut-line-and-build-order
@@ -256,3 +261,31 @@ phases:
       on macOS 13 or newer.
     github_number: 27
   github_number: 5
+- id: showhow-p6-studio-workflow-ux
+  title: Showhow Phase 6 — Studio workflow UX
+  mode: maintenance
+  goal: Make Studio a complete control surface for recording and workflow management.
+  source: PLAN.md#showhow-studio-workflow-completion-implementation-plan
+  issues: []
+  github_number: 6
+- id: showhow-p7-editable-recordings
+  title: Showhow Phase 7 — Editable recording projects
+  mode: maintenance
+  goal: Connect Studio recordings to durable editable projects.
+  source: PLAN.md#showhow-studio-workflow-completion-implementation-plan
+  issues: []
+  github_number: 7
+- id: showhow-p8-client-delivery
+  title: Showhow Phase 8 — Client delivery
+  mode: maintenance
+  goal: Export portable client-ready workflow document packages.
+  source: PLAN.md#showhow-studio-workflow-completion-implementation-plan
+  issues: []
+  github_number: 8
+- id: showhow-p9-demo-video
+  title: Showhow Phase 9 — Demo video export
+  mode: maintenance
+  goal: Render workflow steps into a silent branded demo video.
+  source: PLAN.md#demo-video-export-implementation-plan
+  issues: []
+  github_number: 9
