@@ -270,21 +270,18 @@ phases:
   github_number: 6
 - id: showhow-p7-editable-recordings
   title: Showhow Phase 7 — Editable recording projects
-  mode: maintenance
   goal: Connect Studio recordings to durable editable projects.
   source: PLAN.md#showhow-studio-workflow-completion-implementation-plan
   issues: []
   github_number: 7
 - id: showhow-p8-client-delivery
   title: Showhow Phase 8 — Client delivery
-  mode: maintenance
   goal: Export portable client-ready workflow document packages.
   source: PLAN.md#showhow-studio-workflow-completion-implementation-plan
   issues: []
   github_number: 8
 - id: showhow-p9-demo-video
   title: Showhow Phase 9 — Demo video export
-  mode: maintenance
   goal: Render workflow steps into a silent branded demo video.
   source: PLAN.md#demo-video-export-implementation-plan
   issues: []
