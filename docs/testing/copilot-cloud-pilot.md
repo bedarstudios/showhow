@@ -73,8 +73,9 @@ requires the dedicated Copilot reviewer on the current head, no current unresolv
 threads, and an affirmative no-comments summary; ambiguous summaries block.
 
 Observed 2026-09-25:
-- OS ownership PR: https://github.com/bedarstudios/OS/pull/15 — nine local boundary
-  scenarios and independent review passed; deployment still pending human merge.
+- OS ownership PR: https://github.com/bedarstudios/OS/pull/15 — merged and deployed.
+  All sixteen scenarios passed against the installed poller, with byte parity to
+  merged main verified: https://github.com/bedarstudios/OS/pull/15#issuecomment-5836493148.
 - Environment PR: https://github.com/bedarstudios/showhow/pull/84 — hosted setup
   https://github.com/bedarstudios/showhow/actions/runs/36078284326 and CI
   https://github.com/bedarstudios/showhow/actions/runs/36078284275 passed on
@@ -91,9 +92,10 @@ Observed 2026-09-25:
   existing secret. Credential refresh and successful board sync are prerequisites
   for dispatch; no substitute broad local credential was copied into Actions.
 
-Pending: merge prerequisites, deploy OS protection, approve #83's exact scope,
-refresh the existing controller/board token, verify board membership, test and
-merge this disabled controller, then activate and observe the manual pilot.
+Environment PR #84 and phase-parking PR #81 are merged. Owner approval of #83's
+exact scope is recorded at https://github.com/bedarstudios/showhow/issues/83#issuecomment-5829286589.
+Pending: refresh the existing controller/board token, verify board membership,
+test and merge this disabled controller, then activate and observe the manual pilot.
 Nightly starts and the first actual overnight result remain unverified.
 
 ## Review corrections, 2026-09-25
