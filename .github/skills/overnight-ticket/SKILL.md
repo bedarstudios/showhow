@@ -37,6 +37,16 @@ The pilot allows portable code only. Native capture, platform permissions and
 visual acceptance require their real target environment; return a blocker when
 those are required. Preserve existing tests and acceptance requirements.
 
+## Machine-verifiable evidence
+
+The approved profile names an `evidenceFile` and `targetTest`. Commit JSON at that
+path: `{ "issue": <number>, "redCommit": "<full SHA>", "targetTest": "<approved path>" }`.
+The red commit must be in this PR's history after its base, contain the failing
+behavioral test, and retain the identical target test in the final passing head.
+Commit the minimum interface stub and failing test before implementing the fix.
+Use `Fixes #<issue>` in the PR body so GitHub links the implementation; the issue closes only when a human merges. The trusted Cloud evidence CI job re-runs
+both revisions; a self-reported pass alone cannot satisfy this gate.
+
 ## Exit and correction
 
 Return a PR for separate Copilot review and human merge. For a correction,

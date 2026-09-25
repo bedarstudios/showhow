@@ -1,0 +1,18 @@
+{
+	"version": 1,
+	"enabled": false,
+	"nightlyEnabled": false,
+	"repository": "bedarstudios/showhow",
+	"projectNumber": 2,
+	"mode": "maintenance",
+	"timezone": "Europe/London",
+	"maxActive": 1,
+	"maxFixDispatches": 1,
+	"maxReviewCycles": 2,
+	"paidOverage": false,
+	"osDeployment": null,
+	"budgetVerification": null,
+	"pilotEvidence": null,
+	"approvals": {},
+	"stateIssue": 86
+}
