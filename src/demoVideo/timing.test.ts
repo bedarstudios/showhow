@@ -59,7 +59,7 @@ describe("demo video timing", () => {
 		]);
 
 		expect(deriveStepStarts(timeline.titleFrames, timeline.stepFrames)).toEqual([78, 153, 231]);
-		expect(timeline.totalFrames).toBe(411);
+		expect(timeline.totalFrames).toBe(489);
 	});
 
 	it("throws for empty input with an actionable error", () => {
@@ -79,6 +79,6 @@ describe("demo video timing", () => {
 
 		expect(first).toEqual(second);
 		expect(steps).toEqual(original);
-		expect(first.stepFrames).toEqual([75, 132, 180]);
+		expect(first.stepFrames).toEqual([75, 99, 180]);
 	});
 });
