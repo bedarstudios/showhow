@@ -40,8 +40,11 @@ those are required. Preserve existing tests and acceptance requirements.
 ## Exit and correction
 
 Return a PR for separate Copilot review and human merge. For a correction,
-address the supplied findings on the same PR, rerun affected checks and report
-the new commit. The controller owns dispatch/review limits and scheduling.
+address the supplied findings on the same PR, then rerun the targeted test and
+full required profile against the final corrected commit: `npm run lint`,
+`npm run branding:check`, `npx tsc --noEmit`, `npm run test`,
+`npm run test:browser`, and `npx vite build`. Report that commit and every result;
+earlier-commit checks and affected-only reruns do not satisfy correction acceptance. The controller owns dispatch/review limits and scheduling.
 
 Leave policy, workflows, instructions, `.bedar`, release/signing configuration and
 native helpers unchanged unless this is an infrastructure ticket explicitly
