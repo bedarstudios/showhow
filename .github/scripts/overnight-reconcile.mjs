@@ -1,23 +1,27 @@
 import { evaluateHead } from "./overnight-review.mjs";
 
 export async function reconcileRun({ api, record, policy, now = new Date().toISOString() }) {
-	if (["merged", "cancelled", "blocked"].includes(record.state)) return record;
+	if (["merged", "cancelled"].includes(record.state)) return record;
 	const save = async (patch) => {
 		const updated = { ...record, ...patch, updatedAt: now };
 		await api.save(updated);
 		return updated;
 	};
+	// Human completion frees capacity even after approval was revoked. Blocked
+	// runs may observe that fact, but must never resume metered work.
+	const pr = await api.locatePR(record);
+	if (pr?.merged_at)
+		return save({ state: "merged", pr: pr.number, reason: "observed-human-merge" });
+	if (record.state === "blocked") return record;
 	const approval = policy.approvals?.[record.issue];
 	if (!approval || approval.scopeDigest !== record.scopeDigest)
 		return save({ state: "blocked", reason: "approval-changed" });
-	const pr = await api.locatePR(record);
 	if (!pr) {
 		if (Date.parse(now) - Date.parse(record.createdAt) > 90 * 60 * 1000) {
 			return save({ state: "blocked", reason: "no-pr-after-90-minutes-inspect-assignment" });
 		}
 		return record;
 	}
-	if (pr.merged_at) return save({ state: "merged", pr: pr.number, reason: "observed-human-merge" });
 	if (pr.state !== "open")
 		return save({ state: "blocked", pr: pr.number, reason: "pr-closed-without-merge" });
 	if (!(await api.scopeMatches(record)))

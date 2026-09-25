@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { GitHub } from "./overnight-github.mjs";
 import { reconcileRun } from "./overnight-reconcile.mjs";
 
 const head = "a".repeat(40),
@@ -179,5 +180,51 @@ for (const approvals of [{}, { 83: { scopeDigest: "replacement-digest" } }]) {
 		assert.equal(next.state, "blocked");
 		assert.equal(next.reason, "approval-changed");
 		assert.deepEqual(api.calls, [{ save: "blocked", fix: 0, review: 0 }]);
+	});
+}
+
+for (const state of ["reviewed", "blocked"]) {
+	for (const approvals of [{}, { 83: { scopeDigest: "replacement-digest" } }]) {
+		test(`human merge releases ${state} run despite revoked approval ${JSON.stringify(approvals)}`, async () => {
+			const api = fake();
+			api.locatePR = async () => ({ number: 84, state: "closed", merged_at: now });
+			api.scopeMatches = api.inspectPR = async () => {
+				throw Error("must not inspect or authorize work after merge");
+			};
+			const next = await reconcileRun({
+				api,
+				record: { ...record, state },
+				policy: { ...policy, approvals },
+				now,
+			});
+			assert.equal(next.state, "merged");
+			assert.deepEqual(api.calls, [{ save: "merged", fix: 0, review: 0 }]);
+			const queue = new GitHub({
+				repository: "bedarstudios/showhow",
+				maxActive: 1,
+				stateIssue: 86,
+			});
+			queue.records = async () => [next];
+			queue.call = async () => ({ id: 2 });
+			const reserved = await queue.reserve({ ...record, issue: 90 });
+			assert.equal(reserved.issue, 90);
+		});
+	}
+}
+for (const pr of [
+	null,
+	{ number: 84, state: "open" },
+	{ number: 84, state: "closed", merged_at: null },
+]) {
+	test(`blocked run stays inert without an observed merge: ${JSON.stringify(pr)}`, async () => {
+		const api = fake();
+		api.locatePR = async () => pr;
+		api.scopeMatches = api.inspectPR = async () => {
+			throw Error("blocked work must not resume");
+		};
+		const blocked = { ...record, state: "blocked", reason: "approval-changed" };
+		const next = await reconcileRun({ api, record: blocked, policy, now });
+		assert.deepEqual(next, blocked);
+		assert.deepEqual(api.calls, []);
 	});
 }

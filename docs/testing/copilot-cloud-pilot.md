@@ -111,3 +111,23 @@ The assignee regression initially accepted a human co-assignee; both revoked-
 approval regressions initially threw without saving blocked state. All 60 native
 controller checks pass after these fixes. Hosted validation remains the authority
 for the current PR head; none of these tests proves an actual cloud pilot.
+
+## Human merge after approval revocation
+
+Reconciliation observes a linked Copilot PR's human merge before evaluating its
+current approval. Already-blocked runs may observe that merge too, without
+resuming review or correction. Missing, open and closed-but-unmerged PRs leave a
+blocked record inert. The saved merged state frees capacity for the next ticket.
+
+Seven regression cases cover removed/replaced approvals for reviewed/blocked
+runs and the three unmerged cases. Four merged cases failed before the fix;
+they now pass and exercise successful reservation of another ticket through the
+real capacity check. All 67 native controller tests pass locally.
+
+Local code review before commit, working diff based on
+78a2db311984058eed89fb88509c7d8deac6e55c:
+- Standards: no blocking findings; narrow state-ordering change, existing identity
+  checks and read-only PR lookup preserved, no new metered action or merge path.
+- Requirements: no blocking findings; completion survives approval revocation,
+  historical blocked records recover only after observed merge, and incomplete
+  work does not regain authorization. Reservation capacity is exercised directly.
