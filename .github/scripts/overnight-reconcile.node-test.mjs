@@ -9,12 +9,14 @@ const record = {
 	version: 1,
 	id: 1,
 	issue: 83,
+	scopeDigest: "approved-digest",
 	state: "implementing",
 	fixDispatches: 0,
 	reviewCycles: 0,
 	createdAt: now,
 };
 const policy = {
+	approvals: { 83: { scopeDigest: record.scopeDigest } },
 	maxFixDispatches: 1,
 	maxReviewCycles: 2,
 	paidOverage: false,
@@ -166,3 +168,16 @@ test("dismissed prior review immediately invalidates reviewed even within pendin
 	assert.notEqual(result.state, "reviewed");
 	assert.equal(api.calls[0].save, "verifying");
 });
+
+for (const approvals of [{}, { 83: { scopeDigest: "replacement-digest" } }]) {
+	test(`revoked approval persists blocked before inspecting PR: ${JSON.stringify(approvals)}`, async () => {
+		const api = fake();
+		api.inspectPR = async () => {
+			throw Error("approval-changed");
+		};
+		const next = await reconcileRun({ api, record, policy: { ...policy, approvals }, now });
+		assert.equal(next.state, "blocked");
+		assert.equal(next.reason, "approval-changed");
+		assert.deepEqual(api.calls, [{ save: "blocked", fix: 0, review: 0 }]);
+	});
+}

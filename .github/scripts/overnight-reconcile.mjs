@@ -7,6 +7,9 @@ export async function reconcileRun({ api, record, policy, now = new Date().toISO
 		await api.save(updated);
 		return updated;
 	};
+	const approval = policy.approvals?.[record.issue];
+	if (!approval || approval.scopeDigest !== record.scopeDigest)
+		return save({ state: "blocked", reason: "approval-changed" });
 	const pr = await api.locatePR(record);
 	if (!pr) {
 		if (Date.parse(now) - Date.parse(record.createdAt) > 90 * 60 * 1000) {

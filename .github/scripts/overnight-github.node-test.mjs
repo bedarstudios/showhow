@@ -138,3 +138,24 @@ test("identical Copilot display names cannot substitute implementation and revie
 	assert.equal(isImplementer(reviewer), false);
 	assert.equal(isReviewer({ ...reviewer, type: "User" }), false);
 });
+
+test("active cloud ownership requires only the implementer assignee", async () => {
+	const { scopeDigest } = await import("./overnight.mjs");
+	const record = { issue: 83, scopeDigest: scopeDigest("approved") };
+	const worker = { id: 198982749, type: "Bot", login: "Copilot" };
+	for (const [assignees, expected] of [
+		[[worker], true],
+		[[worker, { id: 123, type: "User", login: "owner" }], false],
+		[[], false],
+		[undefined, false],
+	]) {
+		const api = new GitHub(policy);
+		api.call = async () => ({
+			state: "open",
+			body: "approved",
+			labels: [{ name: "overnight" }],
+			assignees,
+		});
+		assert.equal(await api.scopeMatches(record), expected);
+	}
+});

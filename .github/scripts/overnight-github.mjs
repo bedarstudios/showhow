@@ -325,6 +325,10 @@ export class GitHub {
 	async scopeMatches(record) {
 		const issue = await this.call("GET", `${this.prefix}/issues/${record.issue}`);
 		return (
+			issue.state === "open" &&
+			Array.isArray(issue.assignees) &&
+			issue.assignees.length === 1 &&
+			isImplementer(issue.assignees[0]) &&
 			scopeDigest(issue.body ?? "") === record.scopeDigest &&
 			issue.labels.some((l) => l.name === "overnight") &&
 			!issue.labels.some((l) => l.name === "needs-human")

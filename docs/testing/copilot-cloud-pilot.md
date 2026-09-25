@@ -95,3 +95,17 @@ Pending: merge prerequisites, deploy OS protection, approve #83's exact scope,
 refresh the existing controller/board token, verify board membership, test and
 merge this disabled controller, then activate and observe the manual pilot.
 Nightly starts and the first actual overnight result remain unverified.
+
+## Review corrections, 2026-09-25
+
+Correction instructions now require the full targeted/lint/branding/type/unit/
+browser/build profile on the final corrected commit. Active ownership requires
+an open issue with exactly the implementer bot assigned; human co-assignment,
+removal of the bot, and missing assignee data fail closed. Approval removal or
+digest replacement is persisted as a blocked run before PR inspection, so the
+controller can project needs-human and continue reconciling other records.
+
+The assignee regression initially accepted a human co-assignee; both revoked-
+approval regressions initially threw without saving blocked state. All 60 native
+controller checks pass after these fixes. Hosted validation remains the authority
+for the current PR head; none of these tests proves an actual cloud pilot.
