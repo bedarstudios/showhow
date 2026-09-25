@@ -1,0 +1,6 @@
+Change: Added a new pure TypeScript demo-video timing module (`src/demoVideo/types.ts`, `src/demoVideo/timing.ts`) plus focused unit coverage in `src/demoVideo/timing.test.ts`.
+Reason: Issue #83 scopes only the deterministic timeline math for demo-video generation, with no Remotion, UI, IPC, native, or workflow changes.
+Before evidence: See `artifacts/cloud-timing/red.txt` and red commit `1c8d25988d73ef64a03fef3fe4d09ae40037e410`.
+After evidence: See `artifacts/cloud-timing/verification.txt` for the passing targeted test and required repository checks on tested head `d7fd89d7dcc055da3992e7dbf32b87b664f8f073`.
+Commands: `npx vitest run src/demoVideo/timing.test.ts`, `npm run lint`, `npm run branding:check`, `npx tsc --noEmit`, `npm run test`, `npm run test:browser`, `npx vite build`.
+Limitations: Verification was Linux-only and intentionally limited to the approved pure timing scope; native capture, Remotion composition, and visual acceptance remain out of scope for this ticket.
