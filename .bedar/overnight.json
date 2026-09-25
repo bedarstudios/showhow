@@ -1,6 +1,6 @@
 {
 	"version": 1,
-	"enabled": false,
+	"enabled": true,
 	"nightlyEnabled": false,
 	"repository": "bedarstudios/showhow",
 	"projectNumber": 2,
@@ -10,9 +10,34 @@
 	"maxFixDispatches": 1,
 	"maxReviewCycles": 2,
 	"paidOverage": false,
-	"osDeployment": null,
-	"budgetVerification": null,
+	"osDeployment": {
+		"verified": true,
+		"commit": "9caaff9a0f71f4b01e11b370843f6a4a5ac95b2d",
+		"source": "https://github.com/bedarstudios/OS/pull/15#issuecomment-5836493148"
+	},
+	"budgetVerification": {
+		"stopPaidUsage": true,
+		"verifiedAt": "2026-09-25T22:22:53.100014+00:00",
+		"expiresAt": "2026-09-28T22:22:53.100014+00:00",
+		"source": "GitHub signed-in billing UI: Actions and All AI Credit SKUs $0, Stop usage Yes; additional usage disabled; 96/1500 included credits used."
+	},
 	"pilotEvidence": null,
-	"approvals": {},
+	"approvals": {
+		"83": {
+			"profile": "linux-portable",
+			"approver": "bedarstudios",
+			"source": "https://github.com/bedarstudios/showhow/issues/83#issuecomment-5829286589",
+			"scopeDigest": "6fd1f390158d42f0583a70bae69b31c9079a1b0c453e2d3caa5e4da6fc6113d4",
+			"allowedFiles": [
+				"src/demoVideo/types.ts",
+				"src/demoVideo/timing.ts",
+				"src/demoVideo/timing.test.ts",
+				"artifacts/cloud-timing/"
+			],
+			"targetTest": "src/demoVideo/timing.test.ts",
+			"evidenceFile": "artifacts/cloud-timing/evidence.json",
+			"dependencyCommits": []
+		}
+	},
 	"stateIssue": 86
 }
