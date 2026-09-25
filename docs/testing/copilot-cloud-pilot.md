@@ -58,8 +58,8 @@ empty array when the standalone scope has no code dependency). Record verified
 OS deployment and a bounded billing-verification expiry before enabling starts.
 
 Commands:
-- `node --test .github/scripts/overnight.test.mjs .github/scripts/overnight-review.test.mjs .github/scripts/overnight-reconcile.test.mjs .github/scripts/overnight-evidence.test.mjs .github/scripts/overnight-github.test.mjs`
-- After npm ci: `node --test .github/scripts/overnight-evidence-integration.test.mjs`
+- `node --test .github/scripts/overnight.node-test.mjs .github/scripts/overnight-review.node-test.mjs .github/scripts/overnight-reconcile.node-test.mjs .github/scripts/overnight-evidence.node-test.mjs .github/scripts/overnight-github.node-test.mjs`
+- After npm ci: `node --test .github/scripts/overnight-evidence-integration.node-test.mjs`
 - Local controller invocation defaults to dry-run. Mutating modes require a
   trusted main-branch Actions environment. Manual workflow input `start` requires
   an exact approved issue number. Scheduled ticks currently reconcile only.

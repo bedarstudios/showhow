@@ -42,7 +42,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
       - run: npm run test
-      - run: node --test .github/scripts/overnight-evidence-integration.test.mjs
+      - run: node --test .github/scripts/overnight-evidence-integration.node-test.mjs
       - run: npm run test:browser:install
       - run: npm run test:browser
 
@@ -121,4 +121,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22.22.1
-      - run: node --test .github/scripts/overnight.test.mjs .github/scripts/overnight-review.test.mjs .github/scripts/overnight-reconcile.test.mjs .github/scripts/overnight-evidence.test.mjs .github/scripts/overnight-github.test.mjs
+      - run: node --test .github/scripts/overnight.node-test.mjs .github/scripts/overnight-review.node-test.mjs .github/scripts/overnight-reconcile.node-test.mjs .github/scripts/overnight-evidence.node-test.mjs .github/scripts/overnight-github.node-test.mjs
