@@ -178,6 +178,27 @@ describe("theme preferences", () => {
 		noMediaCleanup?.();
 	});
 
+	it("renders the synchronous system appearance while the Electron theme request is pending", () => {
+		const storage = createStorage({ [THEME_STORAGE_KEY]: "system" });
+		vi.stubGlobal("matchMedia", () => ({
+			matches: true,
+			addEventListener: vi.fn(),
+			removeEventListener: vi.fn(),
+		}));
+		window.electronAPI = {
+			...window.electronAPI,
+			showhowGetSystemTheme: () =>
+				new Promise<boolean>(() => {
+					// Keep the IPC result pending to inspect the synchronous initial render.
+				}),
+			showhowOnSystemThemeChanged: () => vi.fn(),
+		};
+
+		const cleanup = initTheme({ storage });
+		expect(document.documentElement.dataset.shTheme).toBe("dark");
+		cleanup?.();
+	});
+
 	it("re-reads preference after a storage event and cleans up listeners", () => {
 		const storage = createStorage({ [THEME_STORAGE_KEY]: "light" });
 		const addSpy = vi.spyOn(window, "addEventListener");

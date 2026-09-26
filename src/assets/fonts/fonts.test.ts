@@ -11,6 +11,16 @@ const annotationFontsCssPath = resolve(fontsDirectory, "annotation-fonts.css");
 const annotationFontsCss = existsSync(annotationFontsCssPath)
 	? readFileSync(annotationFontsCssPath, "utf8")
 	: "";
+const annotationFontManifest = JSON.parse(
+	readFileSync(resolve(fontsDirectory, "annotation-fonts.manifest.json"), "utf8"),
+) as Array<{
+	family: string;
+	slug: string;
+	subset: string;
+	weight: number;
+	style: "normal" | "italic";
+	file: string;
+}>;
 const bundledFontCss = `${fontsCss}\n${annotationFontsCss}`;
 const globalStylesheet = readFileSync(resolve(process.cwd(), "src/index.css"), "utf8");
 
@@ -77,7 +87,8 @@ describe("local font assets", () => {
 
 		for (const [, filename] of [...annotationFontsCss.matchAll(/url\("\.\/([^"\\]+\.woff2)"\)/g)]) {
 			const font = readFileSync(resolve(fontsDirectory, filename));
-			expect(font.length, filename).toBeGreaterThan(10_000);
+			// Small single-script WOFF2 subsets are legitimately under 10 KB.
+			expect(font.length, filename).toBeGreaterThan(500);
 			expect(font.subarray(0, 4).toString("ascii"), filename).toBe("wOF2");
 		}
 
@@ -85,6 +96,69 @@ describe("local font assets", () => {
 		const available = new Set(readdirSync(fontsDirectory));
 		for (const [, filename] of [...annotationFontsCss.matchAll(/url\("\.\/([^"\\]+\.woff2)"\)/g)]) {
 			expect(available.has(filename), `${filename} exists`).toBe(true);
+		}
+	});
+
+	it("bundles both Fira Code symbols2 faces from the original Google CSS locally", () => {
+		const firaCodeSymbolsFaces = [...annotationFontsCss.matchAll(/@font-face\s*\{([^}]+)\}/g)]
+			.map(([, body]) => body)
+			.filter((body) => body.includes('font-family: "Fira Code";') && body.includes("U+2500-259F"));
+
+		expect(firaCodeSymbolsFaces).toHaveLength(2);
+		expect(
+			firaCodeSymbolsFaces.map((face) => face.match(/font-weight:\s*(\d+)/)?.[1]).sort(),
+		).toEqual(["400", "700"]);
+		for (const face of firaCodeSymbolsFaces) {
+			expect(face).toContain("font-style: normal;");
+			expect(face).toContain("U+2500-259F");
+			expect(face).toMatch(/src:\s*url\("\.\/[^"\\]+\.woff2"\)/);
+		}
+	});
+
+	it("declares every available annotation subset and style from the manifest", () => {
+		const faces = [...annotationFontsCss.matchAll(/@font-face\s*\{([^}]+)\}/g)].map(
+			([, body]) => body,
+		);
+		const subsetCounts = new Map<string, Set<string>>();
+		for (const entry of annotationFontManifest) {
+			const key = `${entry.family}|${entry.weight}|${entry.style}`;
+			const subsets = subsetCounts.get(key) ?? new Set<string>();
+			subsets.add(entry.subset);
+			subsetCounts.set(key, subsets);
+		}
+
+		for (const entry of annotationFontManifest) {
+			const filename = entry.file.split("/").at(-1);
+			const matching = faces.find(
+				(face) =>
+					face.includes(`font-family: "${entry.family}";`) &&
+					face.includes(`font-style: ${entry.style};`) &&
+					face.includes(`font-weight: ${entry.weight};`) &&
+					face.includes(`url("./${filename}")`),
+			);
+			expect(
+				matching,
+				`${entry.family} ${entry.subset} ${entry.weight} ${entry.style}`,
+			).toBeDefined();
+			if ((subsetCounts.get(`${entry.family}|${entry.weight}|${entry.style}`)?.size ?? 0) > 1) {
+				expect(matching, `${entry.family} ${entry.subset} unicode-range`).toMatch(
+					/unicode-range:\s*U\+/i,
+				);
+			}
+		}
+
+		for (const family of new Set(annotationFontManifest.map((entry) => entry.family))) {
+			if (
+				annotationFontManifest.some((entry) => entry.family === family && entry.style === "italic")
+			) {
+				expect(
+					faces.some(
+						(face) =>
+							face.includes(`font-family: "${family}";`) && face.includes("font-style: italic;"),
+					),
+					`${family} italic face`,
+				).toBe(true);
+			}
 		}
 	});
 

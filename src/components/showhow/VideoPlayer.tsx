@@ -14,7 +14,11 @@ function formatTime(milliseconds: number) {
 	return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, "0")}`;
 }
 
-export function VideoPlayer({
+export function VideoPlayer(props: VideoPlayerProps) {
+	return <VideoPlayerInstance key={props.src} {...props} />;
+}
+
+function VideoPlayerInstance({
 	src,
 	durationMs,
 	onEnded,
@@ -22,27 +26,57 @@ export function VideoPlayer({
 	...videoProps
 }: VideoPlayerProps) {
 	const videoRef = useRef<HTMLVideoElement>(null);
+	const playRequestRef = useRef(0);
 	const [playing, setPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
 	useEffect(() => {
 		const video = videoRef.current;
 		if (!video) return;
 
-		const updateCurrentTime = () => setCurrentTime(video.currentTime * 1000);
+		let active = true;
+		const updateCurrentTime = () => {
+			if (active && videoRef.current === video) setCurrentTime(video.currentTime * 1000);
+		};
+		const handlePlay = () => {
+			if (active && videoRef.current === video) setPlaying(true);
+		};
+		const handlePause = () => {
+			if (active && videoRef.current === video) {
+				playRequestRef.current += 1;
+				setPlaying(false);
+			}
+		};
 		video.addEventListener("timeupdate", updateCurrentTime);
-		return () => video.removeEventListener("timeupdate", updateCurrentTime);
+		video.addEventListener("play", handlePlay);
+		video.addEventListener("pause", handlePause);
+		return () => {
+			active = false;
+			video.removeEventListener("timeupdate", updateCurrentTime);
+			video.removeEventListener("play", handlePlay);
+			video.removeEventListener("pause", handlePause);
+		};
 	}, []);
 	const togglePlayback = () => {
 		const video = videoRef.current;
 		if (playing) {
+			playRequestRef.current += 1;
 			video?.pause();
 			setPlaying(false);
 		} else {
+			const request = ++playRequestRef.current;
 			const playPromise = video?.play();
 			if (playPromise) {
 				void playPromise.then(
-					() => setPlaying(true),
-					() => setPlaying(false),
+					() => {
+						if (playRequestRef.current === request && videoRef.current === video) {
+							setPlaying(true);
+						}
+					},
+					() => {
+						if (playRequestRef.current === request && videoRef.current === video) {
+							setPlaying(false);
+						}
+					},
 				);
 			} else {
 				setPlaying(true);

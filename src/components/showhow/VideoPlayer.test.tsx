@@ -4,6 +4,55 @@ import { describe, expect, it, vi } from "vitest";
 import { VideoPlayer } from "./VideoPlayer";
 
 describe("VideoPlayer media behavior", () => {
+	it("syncs the Play affordance with native play and pause events", () => {
+		const { container } = render(<VideoPlayer src="video.mp4" durationMs={65_000} />);
+		const video = container.querySelector("video");
+		if (!video) throw new Error("Expected the video element to render");
+
+		fireEvent(video, new Event("play"));
+		expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+
+		fireEvent(video, new Event("pause"));
+		expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+	});
+
+	it("resets its displayed position and playback affordance when src changes", () => {
+		const { container, rerender } = render(<VideoPlayer src="video-a.mp4" durationMs={65_000} />);
+		const video = container.querySelector("video");
+		if (!video) throw new Error("Expected the video element to render");
+
+		video.currentTime = 23;
+		fireEvent(video, new Event("timeupdate"));
+		expect(screen.getByText("0:23 / 1:05")).toBeInTheDocument();
+
+		const play = vi.spyOn(video, "play").mockImplementation(() => new Promise(() => undefined));
+		fireEvent.click(screen.getByRole("button", { name: "Play" }));
+		expect(play).toHaveBeenCalledOnce();
+		fireEvent(video, new Event("play"));
+		expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+
+		rerender(<VideoPlayer src="video-b.mp4" durationMs={65_000} />);
+		expect(screen.getByText("0:00 / 1:05")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+	});
+
+	it("ignores a stale play promise after src changes", async () => {
+		const { container, rerender } = render(<VideoPlayer src="video-a.mp4" durationMs={65_000} />);
+		const video = container.querySelector("video");
+		if (!video) throw new Error("Expected the video element to render");
+		let resolvePlay: (() => void) | undefined;
+		const playPromise = new Promise<void>((resolve) => (resolvePlay = resolve));
+		vi.spyOn(video, "play").mockReturnValue(playPromise);
+
+		fireEvent.click(screen.getByRole("button", { name: "Play" }));
+		fireEvent(video, new Event("play"));
+		expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+		rerender(<VideoPlayer src="video-b.mp4" durationMs={65_000} />);
+
+		await act(async () => resolvePlay?.());
+		expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+	});
+
 	it("plays and pauses the video element when its controls are clicked", async () => {
 		const { container } = render(<VideoPlayer src="video.mp4" durationMs={65_000} />);
 		const video = container.querySelector("video");

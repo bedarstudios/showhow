@@ -378,6 +378,7 @@
 	--ds-line: #2F2F2F24;
 	--ds-accent: #82B09A;
 	--ds-on-accent: #2F2F2F;
+	--showhow-accent-hover: var(--ds-accent-200);
 	--ds-space: 16;
 	--ds-radius: 8;
 	--ds-font-size: 14;
@@ -433,6 +434,7 @@
 	--ds-line: #FFFCF724;
 	--ds-accent: #82B09A;
 	--ds-on-accent: #2F2F2F;
+	--showhow-accent-hover: var(--ds-accent-strong);
 	--ds-space: 16;
 	--ds-radius: 8;
 	--ds-font-size: 14;

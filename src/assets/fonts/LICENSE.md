@@ -2,6 +2,8 @@
 
 Every font file in this directory ships inside the packaged app. The full license text for each font follows the per-family copyright notices below, reproduced verbatim from each Fontsource package (`@fontsource/<slug>@5`, https://cdn.jsdelivr.net/npm/@fontsource/<slug>@5). No font is fetched from Google at runtime.
 
+All available subsets and styles of the built-in annotation font families are bundled; package notices and licenses are unchanged.
+
 ## "Inter" — OFL-1.1
 Source package: https://cdn.jsdelivr.net/npm/@fontsource/inter@5
 Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter) Inter-Italic[opsz,wght].ttf: Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
@@ -61,6 +63,7 @@ Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyri
 ## "Fira Code" — OFL-1.1
 Source package: https://cdn.jsdelivr.net/npm/@fontsource/fira-code@5
 Copyright 2014-2020 The Fira Code Project Authors (https://github.com/tonsky/FiraCode)
+The symbols2 subset is the original Google css2 face data, served from fonts.gstatic.com; both weight declarations reference the same variable-font file.
 
 ## "Bebas Neue" — OFL-1.1
 Source package: https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5

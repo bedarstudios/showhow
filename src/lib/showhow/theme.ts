@@ -127,15 +127,13 @@ export function initTheme(options: InitThemeOptions = {}): (() => void) | void {
 			.then(updateSystemTheme)
 			.catch(() => undefined);
 	}
-	if (!hasElectronSubscription) {
-		try {
-			mediaQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
-			if (mediaQuery && options.systemIsDark === undefined && !hasElectronTheme) {
-				systemIsDark = mediaQuery.matches;
-			}
-		} catch {
-			mediaQuery = undefined;
+	try {
+		mediaQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+		if (mediaQuery && options.systemIsDark === undefined) {
+			systemIsDark = mediaQuery.matches;
 		}
+	} catch {
+		mediaQuery = undefined;
 	}
 	renderTheme();
 

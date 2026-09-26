@@ -26,3 +26,19 @@ Evidence: `artifacts/92/before.png` captured from the live Electron library befo
 - [passed] Final Electron Studio opens in System dark; AFTER PNG recaptured.
 - [failed] Current-head CI branding audit rejected two unclassified legacy refs.
 - [passed] Branding audit passes after exact legacy-reference classifications.
+
+## PR #99 Greptile fixes, 2026-09-26
+- [passed] Full browser suite: 17 passed, 1 skipped (9 files; exit 0).
+- [passed] TypeScript and Vite build pass with cached declared @types/ws.
+- [passed] Temporary type link removed; shared dependency tree restored.
+- [passed] Packaged Electron Studio opens from the ticket build in System dark.
+- [passed] Review AFTER capture is a genuine 3840×1936 PNG from that window.
+- [passed] Browser font, token, and hover checks pass in the full suite.
+- [passed] x64 and arm64 DMGs were generated; arm64 package has font notice.
+- [failed] First full lint found unformatted new font manifest JSON.
+- [passed] Full lint after formatting: 0 errors, 1 existing warning.
+- [passed] Browser font test loaded 5 actual faces, including italic and Cyrillic.
+- [passed] Independent Codex review: zero blocking Standards findings.
+- [passed] Independent Codex review: zero blocking Requirements findings.
+- [untested] Exact old/new annotation glyph pixels in editor and video export.
+- [passed] Full branding audit and diff whitespace check exit 0.

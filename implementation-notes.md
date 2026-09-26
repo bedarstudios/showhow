@@ -1041,6 +1041,21 @@ Removed all test-assigned `style.backgroundColor` probes. The Chromium test now 
 
 Exact final command: `ruby ~/.local/bin/bedar-runtime.rb run --resource heavy -- npx vitest run --config vitest.browser.config.ts src/components/showhow/theme.browser.test.tsx` — output: `✓ chromium src/components/showhow/theme.browser.test.tsx (1 test)`, `Test Files 1 passed (1)`, `Tests 1 passed (1)`. Observed computed values: Button text light `rgb(47, 47, 47)`, dark `rgb(255, 252, 247)`; Card surface light `rgb(255, 252, 247)`, dark `rgb(47, 47, 47)`; EmptyState `bg-ds-surface-raised` light `rgb(249, 245, 236)` (`#F9F5EC`), dark `rgb(54, 54, 54)` (`#363636`). Focused component suite also passed: 2 files / 12 tests. Biome passed on the browser config, Tailwind config, and browser test. No commit or push.
 
+## Review round 2 — Finding 1 addendum Fira Code symbols2
+
+- Genuine RED captured before font asset/CSS/manifest/license production edits with the wrapped targeted test. Exact failure excerpt:
+  ```
+  FAIL src/assets/fonts/fonts.test.ts > local font assets > bundles both Fira Code symbols2 faces from the original Google CSS locally
+  AssertionError: expected [] to have a length of 2 but got +0
+  Tests 1 failed | 5 passed (6)
+  Exited with code 1
+  ```
+- Bundled the original Google css2 Fira Code symbols2 variable font served from `fonts.gstatic.com` at `uU9NCBsR6Z2vfE9aq3bhZ_Wmh3mUfBsu_Q.woff2`. The downloaded file's first four bytes were verified as `wOF2`. Added provenance in the Fira Code section of `src/assets/fonts/LICENSE.md`; Fira Code's existing SIL OFL 1.1 license permits redistribution.
+- Added both normal-style Fira Code symbols2 face mappings (weights 400 and 700) using the same local `fira-code-symbols2-400-normal.woff2` asset, plus both manifest entries. The manifest coverage assertion now resolves each CSS URL from its manifest `file` basename, allowing both declared weights to intentionally share one asset.
+- GREEN: wrapped `npx vitest run src/assets/fonts/fonts.test.ts` passed 1 file / 6 tests, including the manifest-coverage test. Wrapped Chromium `npx vitest run --config vitest.browser.config.ts src/assets/fonts/fonts.browser.test.ts` passed 1 file / 5 tests, including loading the box-drawing symbol locally. Wrapped Biome check passed for both touched TypeScript tests. Wrapped `npm run branding:check` passed.
+- Verified mapping counts: `annotation-fonts.css` has 189 `@font-face` mappings and `annotation-fonts.manifest.json` has 189 mappings, including the two added Fira Code symbols2 weight declarations. Coverage parity with the original Google CSS is now 189/189 mappings.
+- No commit, push, or PR action.
+
 ### Follow-up RED observation — component node association
 
 The reported browser RED was `expected rgb(47, 47, 47), received rgb(249, 245, 236)`: the raised EmptyState surface was being compared against the Card's dark-surface value. Corrected/confirmed the assertions target actual roots by checking Card's `bg-ds-surface` class and computed surface (`rgb(255, 252, 247)` light, `rgb(47, 47, 47)` dark), and EmptyState's `bg-ds-surface-raised` class and computed surface (`rgb(249, 245, 236)` light, `rgb(54, 54, 54)` dark). No inline style injection remains. Final wrapped Chromium command passed: `ruby ~/.local/bin/bedar-runtime.rb run --resource heavy -- npx vitest run --config vitest.browser.config.ts src/components/showhow/theme.browser.test.tsx` — `Test Files 1 passed (1)`, `Tests 1 passed (1)`. Biome check passed for `vitest.browser.config.ts`, `tailwind.config.cjs`, and the browser test.
@@ -1140,3 +1155,112 @@ extraResources narrowing RED (pre-edit, wrapped): `AssertionError: expected '// 
 Cause: PR #99 CI Lint job failed at `npm run branding:check` (lint itself passed). The checker (scripts/branding-check.mjs) scans every git-tracked file for the inherited brand regex and requires exact-path classification in config/branding-allowlist.json. Two ticket files introduced unclassified references: (1) design/showhow.pen — design source of truth carrying two inherited project-format file strings; (2) src/lib/showhow/theme.ts — the legacy renderer theme-storage key fallback (Showhow-first/legacy-fallback persistence rule per AGENTS.md). Lead reproduced the wrapped RED.
 Fix (narrow): added exactly these two files to config/branding-allowlist.json with accurate reasons; no legacy compatibility code or design source changed. Self-inflicted trap found on first GREEN attempt: the reason text itself contained the literal brand token, and the allowlist file is also scanned — reworded to "contains two inherited project-format file references from the source ancestor" (matching the established convention of existing entries, which never spell the token). The theme.ts entry reasons it as a legacy storage-key fallback without the literal.
 Verification (wrapped heavy): `npm run branding:check` → "Branding check passed: all legacy-brand references are classified."; `npm run lint` → 559 files, 0 errors / 1 pre-existing unrelated warning. No commit/push/PR.
+
+## Review round 2 — Finding 2 synchronous dark initial render
+
+- Root cause: `initTheme` initialized the system appearance to light and only read `matchMedia` when Electron's theme API was absent. With Electron's system preference and a pending theme IPC response, the initial synchronous render therefore applied light on a dark OS.
+- RED verification (before the production fix): the new test stored `system`, made `matchMedia` report `matches: true`, kept `showhowGetSystemTheme()` pending, and asserted the document theme immediately. Exact failure excerpt:
+  ```text
+  FAIL src/lib/showhow/theme.test.ts > theme preferences > renders the synchronous system appearance while the Electron theme request is pending
+  AssertionError: expected 'light' to be 'dark' // Object.is equality
+  Expected: "dark"
+  Received: "light"
+  Tests 1 failed | 12 passed (13)
+  ```
+- Fix: seed `systemIsDark` synchronously from `matchMedia` regardless of whether Electron's theme API/subscription exists. Electron's async IPC result and change subscription remain authoritative when they resolve; absent `matchMedia` keeps the light fallback.
+- GREEN focused verification: `theme.test.ts` 13 passed; `electron/themeIpc.test.ts` 2 passed; total 2 files, 15 tests passed.
+
+## Review round 2 — Findings 3+4 VideoPlayer media sync
+
+Findings 3 and 4 confirmed VALID against the original component and reproduced with targeted red tests.
+
+- Root cause (3): only `timeupdate` was observed, so native `play` and `pause` events (including native controls and autoplay) did not synchronize the custom button state.
+- Root cause (4): changing `src` retained the same component state, and a prior `play()` promise could resolve after the source change and mark the new source as playing.
+- RED focused run: 7 tests, 3 failed / 4 passed. Exact failure excerpts:
+  - F3 native media events: `Unable to find an accessible element with the role "button" and name "Pause"` after firing `play`.
+  - F4 source reset: `Unable to find an element with the text: 0:00 / 1:05`; the displayed position remained `0:23 / 1:05` after switching sources.
+  - F4 stale promise: `Unable to find an accessible element with the role "button" and name "Play"`; after the old promise resolved, the button was `Pause`.
+- Fixes: listen to `play`/`pause` and remove those listeners during cleanup. Key the player internals by `src` to synchronously reset playback/time state on source changes and detach stale source event listeners; gate play-promise completions with a per-instance request token and video identity. Toggle handlers remain, while media events synchronize externally initiated playback.
+- GREEN focused run: 1 file, 7 tests passed.
+- GREEN Showhow component run: 3 files, 19 tests passed.
+- Biome check on `VideoPlayer.tsx` and `VideoPlayer.test.tsx`: passed.
+- TypeScript check: reports only the known unrelated `electron/showhow/bridgeServer.ts` errors for missing `ws` declarations and implicit `any` parameters (`ws`, `data`).
+
+## Review round 2 — Finding 5 dark primary hover contrast
+
+The primary Button's `hover:bg-ds-accent-200` selected dark `--ds-accent-200` (#3F6A5A) while retaining `--ds-on-accent` (#2F2F2F), yielding only 2.18:1 contrast. Added manifest-independent CSS alias `--ds-accent-hover`: light resolves through `--ds-accent-200` (#CFE4DA) and dark overrides it through `--ds-accent-strong` (#A9CDBB). Button now uses `hover:bg-[var(--ds-accent-hover)]`. These are composed CSS aliases, not new design tokens, so `designTokens.ts` was intentionally left unchanged.
+
+RED-first browser test output before the production edits:
+
+```text
+AssertionError: expected '' to be 'rgb(207, 228, 218)' // Object.is equality
+- rgb(207, 228, 218)
++ Received: ''
+Test Files  1 failed (1)
+Tests       1 failed (1)
+Exited with code 1
+```
+
+Contrast calculated against #2F2F2F using WCAG relative luminance: light #CFE4DA is 10.05:1; dark #A9CDBB is 7.74:1. The old dark hover #3F6A5A was 2.18:1.
+
+GREEN verification: focused browser test 1/1 passed; Showhow component suite 3 files / 19 tests passed (including Components.test.tsx); Biome check passed on the three touched source files. `npx tsc --noEmit` remains blocked by existing `electron/showhow/bridgeServer.ts` missing `ws` declarations and implicit-any errors at lines 58 and 177.
+
+## Review round 2 — PR#98 occurrence-aware branding exceptions
+
+The valid P2 review finding was that `scanBrandingReferences` treated every allowlist
+entry as a whole-file skip. Adding `design/showhow.pen` therefore also hid unrelated
+legacy-brand text added anywhere else in that design file. Added occurrence-aware
+exceptions: entries can now carry `lines: [{ "text": "<exact trimmed line>",
+"count": 2 }]`. Such files are scanned normally; only a matching trimmed line is
+classified when the exact-text occurrence count is no greater than its declared
+count. Any other brand match, or an over-count duplicate, remains a finding.
+Entries without `lines` retain their existing whole-file skip behavior. The scanner
+also accepts optional `listFiles` injection while defaulting to `git ls-files`.
+
+**RED evidence:** after adding the injected-file-list seam but before implementing
+line allowances, the required test run reported `Tests 2 failed | 2 passed (4)`.
+The third-occurrence assertion failed with `expected [] to have a length of 3 but got
++0`; the headline unrelated-line assertion failed with `expected [] to deeply equal
+[{ file: 'design.pen', line: 3, text: 'unrelated openscreen reference' }]`, receiving
+`[]`. The two passing checks verified that the exact two-line fixture and the legacy
+whole-file skip behaved as expected.
+
+**GREEN evidence:** focused test `4 passed, 0 failed`; `npm run branding:check`
+reported `Branding check passed: all legacy-brand references are classified.` The
+`.pen` policy now allows only this exact trimmed line, count 2:
+`"content": "or drag & drop a .showhow or legacy .openscreen project file here",`
+(the line occurs at design/showhow.pen lines 10969 and 11387 at implementation time).
+The policy JSON itself retains a whole-file exception because the policy must contain
+the literal legacy token in order to define this entry.
+
+## Review round 2 — Finding 1 annotation font coverage
+
+**Finding validity:** VALID. The removed Google CSS had italic faces and script-specific unicode ranges that the original locally bundled CSS did not provide. Added offline Fontsource WOFF2 coverage and kept all runtime Google Fonts requests absent.
+
+**RED evidence (before CSS and downloads):** `ruby ~/.local/bin/bedar-runtime.rb run --resource heavy -- npx vitest run src/assets/fonts/fonts.test.ts` failed in the new manifest-coverage assertion (not a collection/import failure):
+
+```text
+FAIL src/assets/fonts/fonts.test.ts > local font assets > declares every available annotation subset and style from the manifest
+AssertionError: Plus Jakarta Sans cyrillic-ext 400 italic: expected undefined to be defined
+Tests 1 failed | 4 passed (5)
+```
+
+**Coverage summary:** 187 Fontsource faces are represented by the manifest and local CSS. Subsets/styles available upstream were bundled across all 15 families; the fontsource subset coverage is: Plus Jakarta Sans (cyrillic-ext, latin, latin-ext, vietnamese; normal+italic 400/700), Space Grotesk (latin, latin-ext, vietnamese; normal 400/700), DM Sans (latin, latin-ext; normal+italic 400/700), Sora (latin, latin-ext; normal 400/700), Manrope (cyrillic, cyrillic-ext, greek, latin, latin-ext, vietnamese; normal 400/700), IBM Plex Sans (cyrillic, cyrillic-ext, greek, latin, latin-ext, vietnamese; normal+italic 400/700), IBM Plex Mono (cyrillic, cyrillic-ext, latin, latin-ext, vietnamese; normal+italic 400/700), Playfair Display (cyrillic, latin, latin-ext, vietnamese; normal+italic 400/700), Merriweather (cyrillic, cyrillic-ext, latin, latin-ext, vietnamese; normal+italic 400/700), Lora (cyrillic, cyrillic-ext, latin, latin-ext, math, symbols, vietnamese; normal+italic 400/700), Fira Code (cyrillic, cyrillic-ext, greek, greek-ext, latin, latin-ext; normal 400/700), Bebas Neue (latin, latin-ext; normal 400), Oswald (cyrillic, cyrillic-ext, latin, latin-ext, vietnamese; normal 400/700), Caveat (cyrillic, cyrillic-ext, latin, latin-ext; normal 400/700), and Permanent Marker (latin; normal 400). Google CSS2 provided 189 subset/weight/style unicode-range mappings; all 187 Fontsource entries had a matching mapping. Google offered two additional Fira Code `symbols2` ranges (400 and 700 normal) for which Fontsource has no matching WOFF2 file, so no asset/range was fabricated.
+
+**Validation:** focused unit test GREEN, 5/5 tests; browser test GREEN, 4/4 tests (including Playfair Display italic and Oswald Cyrillic loading offline). TypeScript reports only the noted pre-existing `electron/showhow/bridgeServer.ts` missing `ws` declaration/implicit-any errors (lines 2, 58, 177). Biome check was attempted but could not acquire the heavy runtime resource on retries (exit 75).
+
+**Asset size / limitations:** 187 new WOFF2 files; font directory has 202 files total and is 3.3 MB, below the ~8 MB guardrail. All files had valid `wOF2` magic; 71 legitimate small-script WOFF2 files are at or below 10 KB (smallest is 1,016 bytes), so the literal >10 KB check was not applicable to those valid subset binaries; the tests check valid magic and >500 bytes instead. Families without upstream italic faces are Space Grotesk, Sora, Manrope, Fira Code, Bebas Neue, Oswald, Caveat, and Permanent Marker. Single-weight Bebas Neue and Permanent Marker provide only weight 400; missing upstream styles/weights are not synthesized as bundled files.
+
+**File-count clarification:** 187 manifest faces reuse 37 already tracked WOFF2 files and add 159 new WOFF2 paths; the directory contains 196 WOFF2 files total (202 files including CSS, tests, manifest, and license).
+
+## Review round 2 — hover alias rename correction
+
+**Observed union RED:** At the review-round-2 head, the manifest test reported `expected 53 to be 52` because `--ds-accent-hover` added a 53rd `--ds-*` declaration. This was a genuine observed failure, not a newly fabricated RED.
+
+**Correction:** Renamed the composed alias to `--showhow-accent-hover` in both theme token blocks, the primary button hover class, and the browser assertions. The alias still resolves to `var(--ds-accent-200)` in light mode and `var(--ds-accent-strong)` in dark mode; the WCAG contrast assertions remain unchanged.
+
+**Validation:** GREEN — focused browser test 1/1; design token + theme tests 15/15 (including the preserved exact 52-token assertion); `src/components/showhow` 19/19; Biome checked the three touched files without findings. TypeScript reports only the pre-existing `electron/showhow/bridgeServer.ts` `ws` declaration and implicit-`any` errors.
+
+## Lead final-gate correction, 2026-09-26
+
+OpenCode's final lint summary was not accepted as proof: the lead's direct wrapped `npm run lint` returned exit 1 because the new `annotation-fonts.manifest.json` was unformatted. The manifest alone was formatted with wrapped Biome, then direct wrapped full lint passed (0 errors, one existing deferredClick warning). A browser-test quality note was also closed: `fonts.browser.test.ts` now requires `document.fonts.load()` to return at least one loaded face, rather than relying on `document.fonts.check()` alone. The wrapped focused Chromium test passed 5/5; targeted Biome passed. Independent Codex rechecked this test diff and reported zero blocking Standards or Requirements findings. Actual historical editor/export glyph-image parity is still untested and is not claimed.
