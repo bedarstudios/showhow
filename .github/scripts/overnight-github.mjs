@@ -357,10 +357,20 @@ export class GitHub {
 		const threadList = threads.data?.repository?.pullRequest?.reviewThreads;
 		if (!threadList || threadList.pageInfo.hasNextPage) throw Error("review-threads-incomplete");
 		const evidenceJob = checks.find((c) => c.name === "Cloud evidence");
+		// Review the provider's initial draft in place. Never write draft state:
+		// a read followed by a promotion cannot preserve concurrent human resets.
+		const draftReviewAllowed =
+			pr.draft === true &&
+			isImplementer(pr.user) &&
+			!(await this.list(`${this.prefix}/issues/${pr.number}/timeline`)).some((event) =>
+				["convert_to_draft", "converted_to_draft"].includes(event.event),
+			);
+
 		return {
 			head: pr.head.sha,
 			base: pr.base.sha,
 			draft: pr.draft,
+			draftReviewAllowed,
 			implementerFinished: task?.state === "completed",
 			taskState: task?.state,
 			sessionId: task?.id,

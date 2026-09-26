@@ -65,3 +65,26 @@ for (const [name, changed] of Object.entries({
 		assert.notEqual(evaluateHead({ ...snapshot, ...changed }).verdict, "reviewed");
 	});
 }
+
+test("current Copilot v2 approval summary passes with all other evidence gates", () => {
+	const body =
+		"<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### 🟢 Approval recommended\n\nNo unresolved review issues were identified, and all readiness assessments support approval.\n\n**Review effort:** Lite  \n**Findings:** None\n";
+	assert.equal(
+		evaluateHead({ ...snapshot, review: { ...snapshot.review, body } }).verdict,
+		"reviewed",
+	);
+	assert.notEqual(
+		evaluateHead({
+			...snapshot,
+			review: { ...snapshot.review, body: body.replace("**Findings:** None", "**Findings:** 1") },
+		}).verdict,
+		"reviewed",
+	);
+});
+
+test("a verified initial draft can pass cloud review without becoming ready for human review", () => {
+	const draft = { ...snapshot, draft: true, draftReviewAllowed: true };
+	assert.equal(evaluateHead(draft).verdict, "reviewed");
+	assert.notEqual(evaluateHead({ ...draft, draftReviewAllowed: false }).verdict, "reviewed");
+	assert.notEqual(evaluateHead({ ...draft, unresolvedThreads: 1 }).verdict, "reviewed");
+});

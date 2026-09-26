@@ -131,3 +131,74 @@ Local code review before commit, working diff based on
 - Requirements: no blocking findings; completion survives approval revocation,
   historical blocked records recover only after observed merge, and incomplete
   work does not regain authorization. Reservation capacity is exercised directly.
+
+## Live supervised pilot — 2026-09-26
+
+Copilot implemented #83 in PR #89 and performed one corrective session. Final head
+`c094e713c89dede50ab64f8aca6b0b7b48f4a684`, tested base
+`299cab478258a878eed75bc59257be9e5923b89b`:
+
+- [All CI checks passed](https://github.com/bedarstudios/showhow/actions/runs/36207931532).
+- [Trusted behavioral RED/GREEN replay passed](https://github.com/bedarstudios/showhow/actions/runs/36207931532/job/108308310879), with an identical test file at both revisions.
+- [Independent Copilot reviewer recommended approval with no findings](https://github.com/bedarstudios/showhow/pull/89#pullrequestreview-5323991275), on that same head.
+- Live read-only collection with the updated summary parser returned `scopeMatches: true` and `current-head-verified`.
+
+This was supervised, not a proven unattended overnight run. The supervisor recovered
+an asynchronous assignment response without redispatch, removed GitHub's automatic
+requester co-assignment, and promoted the initial completed draft. Product code and
+its corrective evidence were written by Copilot, not locally. The first attempt had
+changed test expectations after its RED commit; the evidence gate caught that and
+the single allowed correction repaired it. A local review agent initially had an
+authentication failure; a subsequent independent review succeeded.
+
+Compatibility fixes now read assignment/timeline publication with bounded GET-only
+polls and pin GitHub's automatic tracking-assignment event IDs. A subsequent human
+assignment still stops reconciliation. Initial Copilot drafts can receive cloud checks and review in place;
+a recorded draft reset prevents that eligibility. The controller never changes
+draft state. The owner marks the PR ready when starting human review. Explicit clean `ccr-overview-v2`
+review summaries are recognized alongside the older summary format. These adapter
+changes have local regression/review evidence; the next actual scheduled admission
+must verify them against GitHub.
+
+## Daily admission after configuration merge
+
+The daily cron is `0 3 * * *`, timezone `Europe/London`; GitHub may delay scheduled
+jobs. The existing ten-minute cron only reconciles existing work. No manual nightly
+mode or implicit approval is added.
+
+Queue an issue in Project #2 with `overnight` and `ready-to-implement`, no assignees
+and no existing local/cloud claim. It must also have an explicit approval entry in
+`.bedar/overnight.json`, pinning the approved issue-body digest, allowed paths,
+Linux check profile and dependencies. Labels alone never authorize new scope.
+The controller admits at most one issue; a blocked run occupies that slot and
+projects `needs-human`. Reviewed work waits for the owner to merge it. No automatic
+merge is enabled.
+
+The current allowlist contains only #83, so after its merge the queue has no new
+eligible work until another ticket is explicitly approved. The pilot proof must
+also be present in the ledger as reviewed or merged before nightly admission.
+
+Paid overage stays disabled. The current billing verification expires at
+2026-09-28 22:22:53 UTC; subsequent metered admission/review/correction fails closed
+until the owner/account settings are checked again and the policy is renewed.
+A configured cron is not evidence that a scheduled run occurred. Record the first
+actual scheduled workflow and admitted issue before claiming unattended operation.
+
+
+### PR #91 draft-state race correction
+
+Greptile correctly identified a read/write race in automatic draft promotion:
+a human reset after the timeline read could be overwritten by the ready mutation.
+Automatic promotion has been removed, including its GraphQL mutation exception and
+Actions PR-write permission. GitHub supports requesting Copilot review on drafts,
+so a completed initial Copilot draft with no recorded draft-reset event can proceed
+through the same CI, evidence and independent review gates without changing its
+GitHub draft state. A later observed reset invalidates draft review eligibility;
+reviewed ledger state is rechecked on reconciliation. No new ticket or extra metered
+review was dispatched to test this infrastructure fix.
+
+The deterministic race regression failed because the ready mutation overwrote
+`draft: true`, then passed after removing all draft-state writes. Draft review still
+requires confirmed provider completion, current CI/evidence and the separate
+reviewer identity. This preserves unattended cloud validation while leaving draft
+status and human review/merge decisions with the owner.

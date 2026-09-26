@@ -22,6 +22,7 @@ function fixture({
 	ciBase = base,
 	reviewHead = head,
 	changed = "src/demoVideo/timing.ts",
+	draftEvents = [],
 } = {}) {
 	const api = new GitHub(policy);
 	api.call = async (_method, path) => {
@@ -70,6 +71,7 @@ function fixture({
 		throw Error(`unexpected request ${path}`);
 	};
 	api.list = async (path) => {
+		if (path.endsWith("/timeline")) return draftEvents;
 		if (path.endsWith("/files")) return [{ filename: changed }];
 		if (path.endsWith("/reviews"))
 			return [
@@ -282,4 +284,32 @@ test("an unconfirmed assignment is never retried or treated as ownership", async
 		/assignment-not-confirmed/,
 	);
 	assert.equal(posts, 1);
+});
+
+test("draft state mutations are forbidden even for the writable controller", async () => {
+	const api = new GitHub(policy, { writable: true });
+	await assert.rejects(
+		api.call("POST", "/graphql", {
+			query:
+				"mutation($id:ID!){markPullRequestReadyForReview(input:{pullRequestId:$id}){pullRequest{isDraft}}}",
+			variables: { id: "PR_verified" },
+		}),
+		/read-query-required/,
+	);
+});
+
+test("only an initial Copilot draft without recorded resets can receive cloud review", async () => {
+	const draft = { ...pr, draft: true, user: { id: 198982749, type: "Bot" } };
+	for (const [draftEvents, expected] of [
+		[[], true],
+		[[{ event: "convert_to_draft" }], false],
+		[[{ event: "converted_to_draft" }], false],
+	]) {
+		const snapshot = await fixture({ draftEvents }).inspectPR(
+			{ issue: 83, scopeDigest: "digest" },
+			draft,
+		);
+		assert.equal(snapshot.draft, true);
+		assert.equal(snapshot.draftReviewAllowed, expected);
+	}
 });

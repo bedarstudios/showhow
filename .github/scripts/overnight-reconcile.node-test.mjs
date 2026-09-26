@@ -228,3 +228,39 @@ for (const pr of [
 		assert.deepEqual(api.calls, []);
 	});
 }
+
+test("human draft decision survives a reset racing cloud review preparation", async () => {
+	let draft = true;
+	const transport = new GitHub(
+		{ repository: "bedarstudios/showhow" },
+		{
+			token: "state",
+			writable: true,
+			request: async (_url, options) => {
+				if (options.method === "POST") draft = false;
+				// The timeline was captured before the human reset. The mutation
+				// would then overwrite the human's newer draft decision.
+				return {
+					ok: true,
+					status: 200,
+					json: async () =>
+						options.method === "GET"
+							? []
+							: { data: { markPullRequestReadyForReview: { pullRequest: { isDraft: false } } } },
+				};
+			},
+		},
+	);
+	const api = fake({ ...snapshot, draft: true, draftReviewAllowed: true });
+	api.locatePR = async () => ({
+		number: 84,
+		node_id: "PR_verified",
+		state: "open",
+		head: { sha: head },
+	});
+	api.markReady = (pr) => transport.markReady(pr);
+	const next = await reconcileRun({ api, record, policy, now });
+	assert.equal(draft, true, "controller must never overwrite the human draft state");
+	assert.equal(next.state, "reviewing");
+	assert.deepEqual(api.calls, [{ save: "reviewing", fix: 0, review: 1 }, "review"]);
+});
