@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Showhow Design System</title>
+<!-- Source of truth: design/showhow.pen (ds-* variables + components). Keep this page in step with it. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ds-surface:#FFFCF7;--ds-surface-raised:#F9F5EC;--ds-surface-sunken:#F7F2E8;
+  --ds-ink:#2F2F2F;--ds-ink-soft:#2F2F2FB3;--ds-muted:#2F2F2F8C;--ds-ink-faint:#2F2F2F66;
+  --ds-line:#2F2F2F24;--ds-ink-wash:#2F2F2F14;--ds-chip:#E8E4DC;
+  --ds-panel:#2F2F2F;--ds-panel-deep:#242424;--ds-on-panel:#FFFCF7;--ds-on-panel-muted:#FFFCF78C;
+  --ds-on-panel-line:#FFFCF71F;--ds-on-panel-wash:#FFFCF71A;--ds-on-panel-hover:#FFFCF70F;
+  --ds-accent:#82B09A;--ds-on-accent:#2F2F2F;--ds-accent-tint:#82B09A33;
+  --ds-accent-100:#E7F1EC;--ds-accent-200:#CFE4DA;--ds-accent-strong:#33564A;
+  --ds-rec:#E4572E;--ds-rec-wash:#E4572E1F;--ds-rec-ink:#B3431F;
+  --ds-font-body:Inter,system-ui,sans-serif;--ds-font-label:"JetBrains Mono",ui-monospace,monospace;
+  --ds-font-display:"Inter Tight",Inter,sans-serif;--ds-font-serif:"Instrument Serif",serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ds-surface);color:var(--ds-ink);font-family:var(--ds-font-body)}
+.page{max-width:1440px;margin:0 auto;padding:64px 64px 100px}
+@media (max-width:720px){.page{padding:40px 16px 80px}.grid2{grid-template-columns:1fr!important}}
+.mono{font-family:var(--ds-font-label);text-transform:uppercase;letter-spacing:.06em}
+.eyebrow{font-family:var(--ds-font-label);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-muted);margin-bottom:8px}
+h1{font-family:var(--ds-font-display);font-weight:500;font-size:30px;letter-spacing:-.02em;margin:0}
+h2{font-family:var(--ds-font-display);font-weight:500;font-size:22px;letter-spacing:-.01em;margin:0 0 18px}
+.lead{max-width:640px;font-size:14.5px;line-height:1.65;color:var(--ds-ink-soft);margin:0 0 40px}
+.note{font-size:12.5px;line-height:1.6;color:var(--ds-muted);margin:0 0 44px;max-width:760px}
+.note b{color:var(--ds-ink-soft);font-weight:600}
+.rule{height:1px;background:var(--ds-line);margin:0 0 44px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:44px}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px}
+.sw .box{height:56px;border-radius:8px;display:flex;align-items:flex-end;padding:6px 8px;font:8.5px var(--ds-font-label);border:1px solid var(--ds-ink-wash)}
+.sw .l{font-size:10.5px;margin-top:6px}.sw .h{font:9.5px var(--ds-font-label);opacity:.55}
+.dark{background:#2F2F2F;color:#FFFCF7;border-radius:12px;padding:16px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+/* components */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:4px;border:0;font:500 11px var(--ds-font-label);letter-spacing:.055em;text-transform:uppercase;cursor:pointer;transition:background .15s ease}
+.btn svg{width:14px;height:14px}
+.b-primary{background:var(--ds-accent);color:var(--ds-on-accent)}
+.b-secondary{background:var(--ds-chip);color:var(--ds-ink)}
+.b-ghost{background:transparent;color:var(--ds-ink);box-shadow:inset 0 0 0 1px var(--ds-line)}
+.b-dark{background:var(--ds-ink);color:var(--ds-surface)}
+.b-sidebar{background:var(--ds-on-panel-hover);color:var(--ds-on-panel);width:100%;justify-content:flex-start}
+.b-toolbar{background:transparent;color:var(--ds-ink-soft);padding:6px 8px}
+.tag{display:inline-block;padding:2px 6px;border-radius:3px;font:9.5px var(--ds-font-label);letter-spacing:.06em;text-transform:uppercase}
+.sidebar{width:272px;background:var(--ds-panel);color:var(--ds-on-panel);border-radius:10px;padding:26px 18px;display:flex;flex-direction:column;gap:14px}
+.lrow{padding:10px;border-radius:6px}.lrow.sel{background:var(--ds-accent-tint)}
+.lrow .t{font-size:13px;font-weight:500}.lrow .m{font:10px var(--ds-font-label);letter-spacing:.06em;text-transform:uppercase;color:var(--ds-on-panel-muted);margin:3px 0 5px}
+.video{height:220px;background:var(--ds-panel);border-radius:8px;display:flex;align-items:flex-end;padding:14px;color:var(--ds-on-panel-muted)}
+.step{display:flex;gap:16px;border-top:1px solid var(--ds-line);padding:20px 0}
+.step .n{width:36px;font:11px var(--ds-font-label);color:var(--ds-muted)}
+.step .shot{width:200px;height:112px;background:var(--ds-panel);border-radius:6px;flex:none}
+.step h4{margin:0 0 6px;font-weight:500;font-size:15px}.step p{margin:0;font-size:13px;color:var(--ds-muted);line-height:1.55}
+.step .q{font-family:var(--ds-font-serif);font-style:italic;font-size:15px;color:var(--ds-ink-soft)}
+.card{border:1px solid var(--ds-line);border-radius:8px;padding:16px;background:var(--ds-surface)}
+.path{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:6px;background:var(--ds-surface-raised);font:12px var(--ds-font-label);color:var(--ds-muted)}
+.toast{display:inline-block;background:var(--ds-ink);color:var(--ds-surface);font:500 11px var(--ds-font-label);letter-spacing:.06em;text-transform:uppercase;padding:10px 16px;border-radius:4px;box-shadow:0 16px 40px rgba(20,15,8,.2)}
+.bar{height:6px;background:var(--ds-chip);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;width:62%;background:var(--ds-accent)}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:36px 20px;border-radius:8px;background:var(--ds-surface-raised)}
+.empty h3{font-family:var(--ds-font-display);font-weight:500;font-size:20px;margin:0}.empty p{margin:0;max-width:280px;font-size:12.5px;color:var(--ds-muted);line-height:1.55}
+.list{display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.6;color:var(--ds-ink-soft)}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="row" style="gap:14px;margin-bottom:10px">
+  <span id="logo-lg"></span>
+  <h1>Showhow</h1>
+  <span class="mono" style="font-size:10px;color:var(--ds-muted);border:1px solid var(--ds-line);border-radius:3px;padding:5px 10px">Design system</span>
+</div>
+<p class="lead">A calm, paper-and-ink system for turning screen recordings into step-by-step guides. Cream surfaces, charcoal ink, one sage accent. Mono labels do the talking; colour marks state, never decoration. Source of truth: <span class="mono" style="font-size:11px">design/showhow.pen</span>.</p>
+<div class="rule"></div>
+
+<!-- COLOR -->
+<div class="eyebrow">Foundations</div>
+<h2>Colour</h2>
+<div class="grid2" style="margin-bottom:20px">
+  <div><div class="eyebrow">Light theme</div><div class="swatches" id="sw-light"></div></div>
+  <div class="dark"><div class="eyebrow" style="color:#FFFCF78C">Dark theme</div><div class="swatches" id="sw-dark"></div></div>
+</div>
+<div style="margin:24px 0 12px" class="eyebrow">Dark panel (sidebar, video, guide shots) — same in both themes</div>
+<div class="swatches" id="sw-panel" style="margin-bottom:20px"></div>
+<div style="margin:24px 0 12px" class="eyebrow">Fixed colours — recorder bar &amp; editor</div>
+<div class="swatches" id="sw-fixed" style="margin-bottom:16px"></div>
+<p class="note"><b>ds-accent</b> (sage) is the only accent: primary actions, the selected library row, progress, and the guide's "made by" markers. <b>ds-rec</b> marks recording and errors only — always next to a text label. The recorder bar (<b>ds-hud-*</b>) and editor (<b>ds-editor-*</b>) keep their own fixed dark palette. Every colour in a screen must be a <b>ds-*</b> variable; the logo is the only fixed-hex exception.</p>
+
+<!-- TYPOGRAPHY -->
+<h2>Typography</h2>
+<div id="type" style="display:flex;flex-direction:column;margin-bottom:28px"></div>
+<p class="note"><b>Inter Tight</b> (ds-font-display) — screen titles, recording names, section headings. <b>Inter</b> (ds-font-body) — paragraphs, step titles, row titles. <b>JetBrains Mono</b> (ds-font-label), uppercase with 0.06em tracking — buttons, tags, meta lines, timestamps, section numbers and paths. <b>Instrument Serif</b> italic (ds-font-serif) — only for quoted narration inside guide steps.</p>
+
+<!-- SPACING / RADIUS -->
+<div class="grid2" style="grid-template-columns:1.3fr 1fr;margin-bottom:44px">
+  <div><h2>Spacing</h2><div id="space" style="display:flex;flex-direction:column;gap:10px"></div></div>
+  <div><h2>Radius</h2><div id="radius" class="row" style="gap:16px;align-items:flex-start"></div></div>
+</div>
+
+<!-- ELEVATION / MOTION -->
+<div class="grid2" style="grid-template-columns:1.3fr 1fr;margin-bottom:48px">
+  <div><h2>Elevation</h2><div id="shadow" class="row" style="gap:18px;align-items:flex-start"></div></div>
+  <div>
+    <h2>Motion</h2>
+    <div class="row" style="gap:16px;margin-bottom:14px">
+      <div style="width:24px;height:24px;border:3px solid var(--ds-line);border-top-color:var(--ds-accent);border-radius:50%;animation:spin .8s linear infinite"></div>
+      <div style="width:9px;height:9px;border-radius:50%;background:var(--ds-rec);animation:pulse 2s ease-in-out infinite"></div>
+      <span class="mono" style="font-size:10px;color:var(--ds-muted)">Spinner · recording pulse</span>
+    </div>
+    <div class="list" style="font-size:12px">
+      <div><b>150ms ease</b> — hover, press, toggle</div>
+      <div><b>250ms ease</b> — theme switch, toast in/out</div>
+      <div><b>400ms ease</b> — guide content fade-in</div>
+      <div><b>800ms linear, loop</b> — making-guide spinner</div>
+      <div><b>2000ms ease-in-out, loop</b> — recording pulse dot</div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPONENTS -->
+<div class="eyebrow">Components (reusable in showhow.pen)</div>
+<h2>Buttons</h2>
+<div class="row" style="margin-bottom:12px" id="buttons"></div>
+<p class="note"><b>Button/Primary</b> sage — one per view, the main action (New recording, Create guide). <b>Secondary</b> chip — Export PDF, Copy path. <b>Dark</b> — the hand-off action (Copy for agent, Save step). <b>Ghost</b> — Remake, Cancel. <b>Toolbar</b> — icon-first actions in dense rows. <b>Sidebar</b> — actions on the dark panel. All buttons: 4px corners, 14px lucide icon (can be switched off), mono uppercase label.</p>
+
+<h2>Tags</h2>
+<div class="row" style="margin-bottom:12px">
+  <span class="tag" style="background:var(--ds-chip)">Browser · 2:14</span>
+  <span class="tag" style="background:var(--ds-accent);color:var(--ds-on-accent)">Guide ready</span>
+  <span class="tag" style="background:var(--ds-accent-100);color:var(--ds-accent-strong)">Making guide…</span>
+  <span class="tag" style="background:var(--ds-rec-wash);color:var(--ds-rec-ink)">Sensitive text found</span>
+  <span class="dark row" style="padding:8px;gap:8px;border-radius:6px">
+    <span class="tag" style="background:var(--ds-on-panel-wash);color:#FFFCF7AA">No guide</span>
+    <span class="tag" style="background:var(--ds-accent);color:var(--ds-on-accent)">Guide</span>
+  </span>
+</div>
+<p class="note"><b>Tag</b> — 3px corners, 9.5px mono. Status only; never a button.</p>
+
+<h2>Library layout</h2>
+<div class="row" style="align-items:stretch;gap:24px;margin-bottom:16px">
+  <aside class="sidebar">
+    <span id="logo-sm"></span>
+    <button class="btn b-primary" data-i="rec">New recording</button>
+    <div class="mono" style="font-size:10px;color:var(--ds-on-panel-muted);margin-top:6px">Library · 3</div>
+    <div class="lrow sel"><div class="t">Set up a new client in Stripe</div><div class="m">Browser · 2:14 <span style="color:var(--ds-accent)">· New</span></div><span class="tag" style="background:var(--ds-on-panel-wash);color:#FFFCF7AA">No guide</span></div>
+    <div class="lrow"><div class="t">Export monthly report</div><div class="m">Desktop · 4:02</div><span class="tag" style="background:var(--ds-accent);color:var(--ds-on-accent)">Guide</span></div>
+    <div class="lrow"><div class="t">Onboard a teammate to Linear</div><div class="m">Browser · 1:37</div><span class="tag" style="background:var(--ds-accent);color:var(--ds-on-accent)">Guide</span></div>
+    <div style="flex:1"></div>
+    <button class="btn b-sidebar" data-i="gear">Settings</button>
+  </aside>
+  <div style="flex:1;min-width:300px">
+    <div style="font-family:var(--ds-font-display);font-weight:500;font-size:30px;letter-spacing:-.02em">Export monthly report</div>
+    <div class="mono" style="font-size:11px;color:var(--ds-muted);margin:8px 0 16px">Desktop · 4:02 · 24 Sep 2026</div>
+    <div class="video"><span class="mono" style="font-size:11px">▶ 0:00 / 4:02</span></div>
+    <div class="row" style="justify-content:space-between;margin:24px 0 4px">
+      <span class="mono" style="font-size:11px">01 / Guide</span>
+      <div class="row" style="gap:8px">
+        <button class="btn b-ghost" data-i="redo">Remake</button>
+        <button class="btn b-secondary" data-i="file">Export PDF</button>
+        <button class="btn b-secondary" data-i="copy">Copy path</button>
+        <button class="btn b-dark" data-i="bot">Copy for agent</button>
+      </div>
+    </div>
+    <div class="step"><div class="n">01</div><div class="shot"></div><div><h4>Open Reports from the sidebar</h4><p><span class="q">“so first I go to reports”</span></p><div class="mono" style="font-size:10px;color:var(--ds-muted);margin-top:8px">0:12 · Edit · Delete</div></div></div>
+  </div>
+</div>
+<p class="note"><b>Sidebar</b> — dark panel, logo, one primary action, a <b>Library row</b> slot, Settings pinned to the bottom. The selected row gets <b>ds-accent-tint</b> only — no border or side bar. <b>Video player</b> sits above the inline guide; each <b>Guide step</b> is number, screenshot, step title, quoted narration, timestamp and step actions.</p>
+
+<h2>Supporting patterns</h2>
+<div class="grid2" style="gap:16px;margin-bottom:16px">
+  <div class="card">
+    <div class="mono" style="font-size:11px;margin-bottom:10px">Making guide · on this Mac</div>
+    <div class="bar"><i></i></div>
+    <div class="mono" style="font-size:10px;color:var(--ds-muted);margin:10px 0 14px">✓ Transcribing speech · ● Reading screens · ○ Writing steps</div>
+    <button class="btn b-ghost">Cancel</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="path"><span>▢</span>~/Showhow/Recordings/2026-09-24_export-monthly-report</div>
+    <div><span class="toast">Copied folder path</span></div>
+  </div>
+</div>
+<div class="grid2" style="gap:16px;margin-bottom:12px">
+  <div class="empty"><h3>Pick a recording</h3><p>Choose one from the library, or start a new recording.</p><button class="btn b-primary" data-i="rec">New recording</button></div>
+  <div class="empty"><h3>No guide yet</h3><p>Showhow turns what you clicked and said into steps, on this Mac. No account or API key.</p><button class="btn b-primary" data-i="spark">Create guide</button></div>
+</div>
+<p class="note"><b>Empty states</b> — one Inter Tight heading, one muted sentence naming what will appear, one primary button naming the action. Nothing else. <b>Progress</b> lives inline in a Card, never in a modal.</p>
+
+<div class="rule" style="margin-top:44px"></div>
+
+<!-- VOICE -->
+<div class="grid2" style="gap:40px">
+  <div>
+    <h2>Voice</h2>
+    <div class="list">
+      <div>Buttons name the action — <em>New recording</em>, <em>Create guide</em>, <em>Copy for agent</em> — never a bare "OK."</div>
+      <div>Toasts say what happened, without "successfully" — <em>Copied folder path</em>.</div>
+      <div>Empty states point to the next action — <em>"Pick a recording, or start a new one."</em></div>
+      <div>In-progress uses a present participle and an ellipsis — <em>"Making guide…"</em></div>
+      <div>Sentence case everywhere; mono labels are uppercased by style, not typed in caps.</div>
+      <div>It's a <em>guide</em>, not a "workflow doc" or "AI guide". Say where work happens: <em>on this Mac</em>.</div>
+    </div>
+  </div>
+  <div>
+    <h2>Do / Don't</h2>
+    <div class="list">
+      <div>Do keep surfaces cream and ink charcoal — never pure white or pure black.</div>
+      <div>Do use ds-* variables for every colour so dark mode works.</div>
+      <div>Do pair the red recording dot with a text label; colour alone never signals state.</div>
+      <div>Don't use more than one sage primary button per view.</div>
+      <div>Don't use sage or red decoratively.</div>
+      <div>Don't mix light and dark theme values in one view (the dark panel is part of both themes).</div>
+      <div>Don't build a one-off button or tag — use the component.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const sw=([tok,hex,label,fg])=>`<div class="sw"><div class="box" style="background:${hex};color:${fg}">${tok}</div><div class="l">${label}</div><div class="h">${hex}</div></div>`;
+const light=[["surface","#FFFCF7","Canvas","#2F2F2F"],["surface-raised","#F9F5EC","Card / raised","#2F2F2F"],["surface-sunken","#F7F2E8","Sunken","#2F2F2F"],["ink","#2F2F2F","Text","#FFFCF7"],["ink-soft","#2F2F2FB3","Text soft","#FFFCF7"],["muted","#2F2F2F8C","Muted","#FFFCF7"],["line","#2F2F2F24","Hairline","#2F2F2F"],["chip","#E8E4DC","Chip / secondary","#2F2F2F"],["accent","#82B09A","Accent · sage","#2F2F2F"],["accent-100","#E7F1EC","Accent surface","#33564A"],["accent-200","#CFE4DA","Accent hover","#33564A"],["accent-strong","#33564A","Accent text","#FFFCF7"],["rec","#E4572E","Recording / error","#FFFCF7"],["rec-ink","#B3431F","Error text","#FFFCF7"]];
+const dark=[["surface","#2F2F2F","Canvas","#FFFCF7"],["surface-raised","#363636","Card / raised","#FFFCF7"],["surface-sunken","#292929","Sunken","#FFFCF7"],["ink","#FFFCF7","Text","#2F2F2F"],["ink-soft","#FFFCF7B3","Text soft","#2F2F2F"],["muted","#FFFCF78C","Muted","#2F2F2F"],["line","#FFFCF724","Hairline","#FFFCF7"],["chip","#3A3A3A","Chip / secondary","#FFFCF7"],["accent","#82B09A","Accent · sage","#2F2F2F"],["accent-100","#33564A","Accent surface","#A9CDBB"],["accent-200","#3F6A5A","Accent hover","#A9CDBB"],["accent-strong","#A9CDBB","Accent text","#2F2F2F"],["rec","#E4572E","Recording / error","#FFFCF7"],["rec-ink","#F28B6B","Error text","#2F2F2F"]];
+const panel=[["panel","#2F2F2F","Panel (light)","#FFFCF7"],["panel-deep","#242424","Panel deep","#FFFCF7"],["on-panel","#FFFCF7","Text on panel","#2F2F2F"],["on-panel-muted","#FFFCF78C","Muted on panel","#2F2F2F"],["on-panel-wash","#FFFCF71A","Wash on panel","#2F2F2F"],["accent-tint","#82B09A33","Selected row","#2F2F2F"]];
+const fixed=[["hud-bg","#07080AE6","Recorder bar","#FFFFFF"],["hud-green","#4ADE80","Recorder ready","#07080A"],["hud-red","#F87171","Recorder stop","#07080A"],["editor-bg","#09090B","Editor canvas","#FFFFFF"],["editor-accent","#34B27B","Editor accent","#09090B"],["forest","#142F18","Click marker","#FFFFFF"],["signal","#6BFF7E","Click highlight","#142F18"]];
+const P="ds-";$("sw-light").innerHTML=light.map(s=>sw([P+s[0],...s.slice(1)])).join("");
+$("sw-dark").innerHTML=dark.map(s=>sw([P+s[0],...s.slice(1)])).join("");
+$("sw-panel").innerHTML=panel.map(s=>sw([P+s[0],...s.slice(1)])).join("");
+$("sw-fixed").innerHTML=fixed.map(s=>sw([P+s[0],...s.slice(1)])).join("");
+const type=[["display-36 · Inter Tight 500","Set up a new client in Stripe","font-family:var(--ds-font-display);font-weight:500;font-size:36px;letter-spacing:-.02em"],["heading-30 · Inter Tight 500","Export monthly report","font-family:var(--ds-font-display);font-weight:500;font-size:30px;letter-spacing:-.02em"],["heading-22 · Inter Tight 500","Guide engine","font-family:var(--ds-font-display);font-weight:500;font-size:22px"],["body-15 · Inter 500","Open Reports from the sidebar","font-size:15px;font-weight:500"],["body-14 · Inter","Choose one from the library, or start a new recording.","font-size:14px"],["body-13 · Inter · muted","At 0:12 you open the Reports page.","font-size:13px;color:var(--ds-muted)"],["quote-15 · Instrument Serif italic","“so first I go to reports”","font-family:var(--ds-font-serif);font-style:italic;font-size:15px;color:var(--ds-ink-soft)"],["label-11 · JetBrains Mono 500","Export PDF","font-family:var(--ds-font-label);font-weight:500;font-size:11px;letter-spacing:.06em;text-transform:uppercase"],["meta-10 · JetBrains Mono","Browser · 2:14 · 24 Sep","font-family:var(--ds-font-label);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ds-muted)"]];
+$("type").innerHTML=type.map(([t,s,st])=>`<div style="display:flex;align-items:baseline;gap:20px;padding:12px 0;border-bottom:1px solid var(--ds-ink-wash);flex-wrap:wrap"><div style="width:230px;flex:none;font:11px var(--ds-font-label);color:var(--ds-muted)">${t}</div><div style="${st}">${s}</div></div>`).join("");
+$("space").innerHTML=[4,8,12,16,24,32,40,56].map(px=>`<div class="row" style="flex-wrap:nowrap"><div style="width:56px;font:11px var(--ds-font-label);color:var(--ds-muted)">${px===16?"ds-space":px+"px"}</div><div style="height:8px;width:${px*3}px;background:var(--ds-accent-200);border-radius:2px"></div><div style="font-size:11px;color:var(--ds-muted)">${px}px</div></div>`).join("");
+$("radius").innerHTML=[["tag",3],["button",4],["row / shot",6],["ds-radius · card, video",8],["window",10]].map(([t,px])=>`<div style="text-align:center;width:72px"><div style="width:64px;height:64px;margin:auto;background:var(--ds-surface-raised);border:1px solid var(--ds-line);border-radius:${px}px"></div><div style="font-size:10px;color:var(--ds-ink-soft);margin-top:6px">${t}</div><div style="font-size:9.5px;color:var(--ds-muted)">${px}px</div></div>`).join("");
+$("shadow").innerHTML=[["none + hairline","cards, steps","box-shadow:none;border:1px solid var(--ds-line)"],["shadow-md","app window, video","box-shadow:0 10px 40px rgba(0,0,0,.13)"],["shadow-lg","toast, dialog","box-shadow:0 16px 40px rgba(20,15,8,.2)"]].map(([t,u,st])=>`<div style="width:120px;text-align:center"><div style="height:64px;border-radius:8px;background:var(--ds-surface);${st}"></div><div style="font-size:10px;color:var(--ds-ink-soft);margin-top:10px">${t}</div><div style="font-size:9.5px;color:var(--ds-muted)">${u}</div></div>`).join("");
+const I={rec:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',redo:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',file:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/>',copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',bot:'<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 4v4M9 13v2M15 13v2"/>',spark:'<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>'};
+const svg=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
+$("buttons").innerHTML=[["primary","rec","New recording"],["secondary","file","Export PDF"],["ghost","redo","Remake"],["dark","bot","Copy for agent"],["toolbar","copy","Copy path"]].map(([v,i,l])=>`<button class="btn b-${v}" data-i="${i}">${l}</button>`).join("")+`<span class="dark" style="padding:8px;border-radius:6px;width:180px;display:inline-block"><button class="btn b-sidebar" data-i="gear">Settings</button></span>`;
+document.querySelectorAll("[data-i]").forEach(b=>b.insertAdjacentHTML("afterbegin",svg(b.dataset.i)));
+const logo=(s,name)=>`<span class="row" style="gap:12px"><svg width="${s}" height="${s}" viewBox="0 0 50 50"><rect width="50" height="50" rx="6" fill="#FFFCF7"/><rect x="8" y="8" width="37" height="37" fill="#82B09A"/><rect x="6" y="6" width="37" height="37" fill="#2F2F2F"/><g transform="translate(10 10) scale(.25)"><path d="M30 0l0 16m-30 14l16 0m-10-24l12 12" stroke="#82B09A" stroke-width="6" stroke-linecap="square" fill="none"/></g><g transform="translate(20 20) scale(.5)"><path d="M0 0l31 22-13 1 7 13-7 4-7-14-11 8z" fill="#FFFCF7"/></g><rect x="35.5" y="11.5" width="3" height="3" fill="#E4572E"/></svg>${name?`<span style="font-family:var(--ds-font-display);font-weight:500;font-size:19px;letter-spacing:-.4px">Showhow</span>`:""}</span>`;
+$("logo-lg").innerHTML=logo(40,false);$("logo-sm").innerHTML=logo(40,true);
+</script>
+</body>
+</html>

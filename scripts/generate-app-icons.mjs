@@ -8,7 +8,7 @@ import sharp from "sharp";
 const scriptRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const root = path.resolve(process.env.SHOWHOW_ICON_ROOT ?? scriptRoot);
 const platform = process.env.SHOWHOW_ICON_PLATFORM ?? process.platform;
-const source = path.join(root, "docs/design/brand/showhow-app-icon.svg");
+const source = path.join(root, "design/brand/showhow-app-icon.svg");
 const pngDirectory = path.join(root, "icons/icons/png");
 const macDirectory = path.join(root, "icons/icons/mac");
 const windowsDirectory = path.join(root, "icons/icons/win");

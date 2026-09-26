@@ -147,10 +147,10 @@ function icnsPayloadOffset(buffer, wantedType) {
 
 function makeRoot() {
 	const root = fs.mkdtempSync(path.join(os.tmpdir(), "showhow-icons-"));
-	fs.mkdirSync(path.join(root, "docs/design/brand"), { recursive: true });
+	fs.mkdirSync(path.join(root, "design/brand"), { recursive: true });
 	fs.copyFileSync(
-		path.join(repoRoot, "docs/design/brand/showhow-app-icon.svg"),
-		path.join(root, "docs/design/brand/showhow-app-icon.svg"),
+		path.join(repoRoot, "design/brand/showhow-app-icon.svg"),
+		path.join(root, "design/brand/showhow-app-icon.svg"),
 	);
 	return root;
 }
@@ -266,7 +266,7 @@ describe("Showhow icon generation", () => {
 			);
 			expect(second).toEqual(first);
 
-			const source = path.join(root, "docs/design/brand/showhow-app-icon.svg");
+			const source = path.join(root, "design/brand/showhow-app-icon.svg");
 			fs.writeFileSync(source, fs.readFileSync(source, "utf8").replace("#6BFF7E", "#6AFF7D"));
 			generate(root);
 			expect(hash(path.join(root, "icons/icons/png/1024x1024.png"))).not.toBe(
