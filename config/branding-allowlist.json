@@ -303,6 +303,10 @@
 		{
 			"file": "tests/e2e/windows-native-checklist.spec.ts",
 			"reason": "Legacy temp paths and project extension in an e2e fixture"
+		},
+		{
+			"file": "design/showhow.pen",
+			"reason": "Design mock of the editor drop zone, mirroring the legacy project extension compatibility copy"
 		}
 	]
 }
