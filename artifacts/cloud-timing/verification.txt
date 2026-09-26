@@ -1,4 +1,4 @@
-Tested head before evidence commit: d7fd89d7dcc055da3992e7dbf32b87b664f8f073
+Tested head before evidence commit: 6b8738711652b019ee53715d0ee6d2f201328288
 Limitations: Linux-only verification. This ticket covers pure timing logic only; no native capture, Remotion, or visual composition behavior was exercised.
 
 $ npx vitest run src/demoVideo/timing.test.ts
@@ -8,8 +8,8 @@ $ npx vitest run src/demoVideo/timing.test.ts
 
  Test Files  1 passed (1)
       Tests  5 passed (5)
-   Start at  22:33:34
-   Duration  715ms (transform 29ms, setup 0ms, import 39ms, tests 5ms, environment 559ms)
+   Start at  01:13:09
+   Duration  600ms (transform 31ms, setup 0ms, import 40ms, tests 5ms, environment 459ms)
 
 Result: exit 0
 
@@ -32,7 +32,7 @@ src/lib/showhow/companion/deferredClick.test.ts:28:55 lint/suspicious/noEmptyBlo
   i Empty blocks are usually the result of an incomplete refactoring. Remove the empty block or add a comment inside it if it is intentional.
   
 
-Checked 535 files in 501ms. No fixes applied.
+Checked 535 files in 526ms. No fixes applied.
 Found 1 warning.
 Result: exit 0
 
@@ -62,8 +62,8 @@ Not implemented: HTMLCanvasElement's getContext() method: without installing the
 
  Test Files  89 passed (89)
       Tests  778 passed | 1 skipped (779)
-   Start at  22:33:45
-   Duration  34.90s (transform 3.13s, setup 0ms, import 8.89s, tests 12.90s, environment 68.95s)
+   Start at  01:13:19
+   Duration  32.91s (transform 3.21s, setup 0ms, import 8.68s, tests 12.41s, environment 64.00s)
 
 Result: exit 0
 
@@ -75,8 +75,8 @@ $ npm run test:browser
 
  RUN  v4.1.5 /home/runner/work/showhow/showhow
 
-10:37:13 PM [vite] [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mreact/jsx-dev-runtime, react, react-dom/client, @tiptap/react, @tiptap/starter-kit, @radix-ui/react-tooltip, react-icons/md, sonner, lucide-react, react-dom, react-icons/bs, react-icons/fa, react-icons/fa6, react-icons/fi, react-icons/rx, clsx, tailwind-merge, @radix-ui/react-tabs, @radix-ui/react-slot, class-variance-authority, @fix-webm-duration/fix[32m[39m
-10:37:13 PM [vite] [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+1:16:50 AM [vite] [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mreact/jsx-dev-runtime, react, react-dom/client, react-icons/md, @radix-ui/react-tooltip, @tiptap/react, @tiptap/starter-kit, sonner, lucide-react, react-dom, react-icons/bs, react-icons/fa, react-icons/fa6, react-icons/fi, react-icons/rx, @radix-ui/react-slot, class-variance-authority, @radix-ui/react-tabs, clsx, tailwind-merge, @fix-webm-duration/fix[32m[39m
+1:16:50 AM [vite] [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
 
 [vitest] Vite unexpectedly reloaded a test. This may cause tests to fail, lead to flaky behaviour or duplicated test runs.
 For a stable experience, please add mentioned dependencies to your config's `optimizeDeps.include` field manually.
@@ -85,8 +85,8 @@ For a stable experience, please add mentioned dependencies to your config's `opt
 
  Test Files  4 passed | 1 skipped (5)
       Tests  9 passed | 1 skipped (10)
-   Start at  22:34:20
-   Duration  175.64s (transform 0ms, setup 0ms, import 974ms, tests 169.60s, environment 0ms)
+   Start at  01:13:53
+   Duration  180.49s (transform 0ms, setup 0ms, import 994ms, tests 174.93s, environment 0ms)
 
 Result: exit 0
 
@@ -113,7 +113,7 @@ computing gzip size...
 [2mdist/[22m[2massets/[22m[36mpixi-BXozQCwi.js                     [39m[1m[2m542.50 kB[22m[1m[22m[2m │ gzip: 154.16 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-BjBYgC8n.js                    [39m[1m[2m641.83 kB[22m[1m[22m[2m │ gzip: 190.08 kB[22m
 [2mdist/[22m[2massets/[22m[36mVideoEditor-CCJmzeeG.js              [39m[1m[2m715.50 kB[22m[1m[22m[2m │ gzip: 219.29 kB[22m
-[32m✓ built in 22.89s[39m
+[32m✓ built in 19.63s[39m
 [36mvite v7.3.2 [32mbuilding client environment for production...[36m[39m
 transforming...
 [32m✓[39m 92 modules transformed.
@@ -123,13 +123,13 @@ computing gzip size...
 [2mdist-electron/[22m[36mmain.js              [39m[1m[2m  1.27 kB[22m[1m[22m[2m │ gzip:  0.53 kB[22m
 [2mdist-electron/[22m[36mmain-BuAl48wy.js     [39m[1m[2m 10.79 kB[22m[1m[22m[2m │ gzip:  3.40 kB[22m
 [2mdist-electron/[22m[36mwindows-D7bFQqN7.js  [39m[1m[2m240.14 kB[22m[1m[22m[2m │ gzip: 61.95 kB[22m
-[32m✓ built in 305ms[39m
+[32m✓ built in 278ms[39m
 [36mvite v7.3.2 [32mbuilding client environment for production...[36m[39m
 transforming...
 [32m✓[39m 2 modules transformed.
 rendering chunks...
 computing gzip size...
 [2mdist-electron/[22m[36mpreload.mjs  [39m[1m[2m7.50 kB[22m[1m[22m[2m │ gzip: 1.84 kB[22m
-[32m✓ built in 13ms[39m
+[32m✓ built in 14ms[39m
 Result: exit 0
 

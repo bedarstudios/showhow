@@ -1,5 +1,5 @@
 {
 	"issue": 83,
-	"redCommit": "1c8d25988d73ef64a03fef3fe4d09ae40037e410",
+	"redCommit": "f73d775b64aa95b2314e2647e26f95b2d49302df",
 	"targetTest": "src/demoVideo/timing.test.ts"
 }
