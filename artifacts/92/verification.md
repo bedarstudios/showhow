@@ -24,3 +24,5 @@ Evidence: `artifacts/92/before.png` captured from the live Electron library befo
 - [untested] Non-Latin editor font glyph parity; local subset fallback not checked.
 - [passed] macOS app package built; font notice ships in Resources (22,044 bytes).
 - [passed] Final Electron Studio opens in System dark; AFTER PNG recaptured.
+- [failed] Current-head CI branding audit rejected two unclassified legacy refs.
+- [passed] Branding audit passes after exact legacy-reference classifications.

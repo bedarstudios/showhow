@@ -61,6 +61,10 @@
 			"reason": "Documents the upstream relationship and import policy"
 		},
 		{
+			"file": "design/showhow.pen",
+			"reason": "Design source of truth; contains two inherited project-format file references from the source ancestor"
+		},
+		{
 			"file": "docs/github-actions-workflows.md",
 			"reason": "Legacy compatibility instruction for the temporary inherited release-token fallback"
 		},
@@ -283,6 +287,10 @@
 		{
 			"file": "src/lib/projectFilePolicy.test.ts",
 			"reason": "Covers legacy project-extension acceptance in the renderer"
+		},
+		{
+			"file": "src/lib/showhow/theme.ts",
+			"reason": "Legacy renderer theme-storage key fallback per the Showhow-first/legacy-fallback persistence rule"
 		},
 		{
 			"file": "src/lib/userPreferences.test.ts",
