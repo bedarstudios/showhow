@@ -4,12 +4,22 @@ import { isImplementer, isReviewer } from "./overnight-identities.mjs";
 const MARKER = "<!-- bedar-cloud-run:v1 -->\n";
 const BOT = "github-actions[bot]";
 export class GitHub {
-	constructor(policy, { token, agentToken, writable = false, request = fetch } = {}) {
+	constructor(
+		policy,
+		{
+			token,
+			agentToken,
+			writable = false,
+			request = fetch,
+			wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+		} = {},
+	) {
 		this.policy = policy;
 		this.token = token;
 		this.agentToken = agentToken;
 		this.writable = writable;
 		this.request = request;
+		this.wait = wait;
 		this.prefix = `/repos/${policy.repository}`;
 	}
 	async call(method, path, body, agent = false) {
@@ -153,7 +163,11 @@ export class GitHub {
 		};
 	}
 	async assign(issue, baseHead, approval) {
-		const assigned = await this.call(
+		const dispatcher = await this.call("GET", "/user", undefined, true);
+		if (dispatcher.type !== "User" || !Number.isInteger(dispatcher.id))
+			throw Error("dispatcher-unverified");
+		const since = Math.floor(Date.now() / 1000) * 1000;
+		await this.call(
 			"POST",
 			`${this.prefix}/issues/${issue}/assignees`,
 			{
@@ -166,11 +180,68 @@ export class GitHub {
 			},
 			true,
 		);
-		if (!assigned.assignees?.some(isImplementer)) {
-			throw Error("assignment-not-confirmed");
+		// The assignment endpoint may return before the bot appears. Only read
+		// again here: a second POST could start a second metered session.
+		let assigned;
+		let automaticCoassignment;
+		for (let attempt = 0; attempt < 5; attempt++) {
+			if (attempt) await this.wait(2000);
+			assigned = await this.call("GET", `${this.prefix}/issues/${issue}`);
+			if (assigned.assignees?.some(isImplementer)) break;
 		}
-		return { url: assigned.html_url, confirmedAt: new Date().toISOString() };
+		if (!assigned.assignees?.some(isImplementer)) throw Error("assignment-not-confirmed");
+		if (assigned.assignees.length !== 1) {
+			// GitHub co-assigns the requesting user for tracking. Pin the exact
+			// event pair; later human assignment must still stop the controller.
+			let events;
+			for (let attempt = 0; attempt < 5; attempt++) {
+				if (attempt) await this.wait(2000);
+				events = (await this.list(`${this.prefix}/issues/${issue}/timeline`)).filter(
+					(event) =>
+						["assigned", "unassigned"].includes(event.event) &&
+						Date.parse(event.created_at) >= since,
+				);
+				// Incomplete publication can settle; positive ownership conflicts
+				// cannot. Never repeat the assignment write.
+				if (
+					events.length >= 2 ||
+					events.some(
+						(event) =>
+							event.event !== "assigned" ||
+							event.actor?.id !== dispatcher.id ||
+							(!isImplementer(event.assignee) && event.assignee?.id !== dispatcher.id),
+					)
+				)
+					break;
+			}
+
+			const botEvent = events.find((event) => isImplementer(event.assignee));
+			const ownerEvent = events.find((event) => event.assignee?.id === dispatcher.id);
+			if (
+				assigned.assignees.length !== 2 ||
+				!assigned.assignees.some((user) => user.id === dispatcher.id) ||
+				events.length !== 2 ||
+				!botEvent ||
+				!ownerEvent ||
+				![botEvent, ownerEvent].every(
+					(event) => event.event === "assigned" && event.actor?.id === dispatcher.id,
+				) ||
+				botEvent.created_at !== ownerEvent.created_at
+			)
+				throw Error("assignment-ownership-conflict");
+			automaticCoassignment = {
+				userId: dispatcher.id,
+				eventId: ownerEvent.id,
+				botEventId: botEvent.id,
+			};
+		}
+		return {
+			url: assigned.html_url,
+			confirmedAt: new Date().toISOString(),
+			...(automaticCoassignment ? { automaticCoassignment } : {}),
+		};
 	}
+
 	async requestReview(pr) {
 		return this.call(
 			"POST",
@@ -324,11 +395,32 @@ export class GitHub {
 	}
 	async scopeMatches(record) {
 		const issue = await this.call("GET", `${this.prefix}/issues/${record.issue}`);
-		return (
-			issue.state === "open" &&
+		let ownership =
 			Array.isArray(issue.assignees) &&
 			issue.assignees.length === 1 &&
-			isImplementer(issue.assignees[0]) &&
+			isImplementer(issue.assignees[0]);
+		const automatic = record.assignment?.automaticCoassignment;
+		if (
+			automatic &&
+			issue.assignees?.length === 2 &&
+			issue.assignees.some(isImplementer) &&
+			issue.assignees.some((user) => user.id === automatic.userId)
+		) {
+			const events = (await this.list(`${this.prefix}/issues/${record.issue}/timeline`)).filter(
+				(event) => ["assigned", "unassigned"].includes(event.event),
+			);
+			const last = events.slice(-2);
+			ownership =
+				last.length === 2 &&
+				last.every((event) => event.event === "assigned" && event.actor?.id === automatic.userId) &&
+				last.some(
+					(event) => event.id === automatic.eventId && event.assignee?.id === automatic.userId,
+				) &&
+				last.some((event) => event.id === automatic.botEventId && isImplementer(event.assignee));
+		}
+		return (
+			issue.state === "open" &&
+			ownership &&
 			scopeDigest(issue.body ?? "") === record.scopeDigest &&
 			issue.labels.some((l) => l.name === "overnight") &&
 			!issue.labels.some((l) => l.name === "needs-human")
