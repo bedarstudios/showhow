@@ -3,8 +3,6 @@ import { isImplementer, isReviewer } from "./overnight-identities.mjs";
 
 const MARKER = "<!-- bedar-cloud-run:v1 -->\n";
 const BOT = "github-actions[bot]";
-const READY_MUTATION =
-	"mutation($id:ID!){markPullRequestReadyForReview(input:{pullRequestId:$id}){pullRequest{isDraft}}}";
 export class GitHub {
 	constructor(
 		policy,
@@ -25,11 +23,7 @@ export class GitHub {
 		this.prefix = `/repos/${policy.repository}`;
 	}
 	async call(method, path, body, agent = false) {
-		if (
-			path === "/graphql" &&
-			!/^query\b/.test(body?.query?.trim() ?? "") &&
-			!(this.writable && method === "POST" && body?.query === READY_MUTATION)
-		)
+		if (path === "/graphql" && !/^query\b/.test(body?.query?.trim() ?? ""))
 			throw Error("read-query-required");
 		if (method !== "GET" && path !== "/graphql" && !this.writable)
 			throw Error("dry-run-write-forbidden");
@@ -248,23 +242,6 @@ export class GitHub {
 		};
 	}
 
-	async markReady(pr) {
-		if (!pr.node_id || !Number.isInteger(pr.number)) throw Error("pr-identity-required");
-		const events = await this.list(`${this.prefix}/issues/${pr.number}/timeline`);
-		if (
-			events.some(
-				(event) => event.event === "convert_to_draft" || event.event === "converted_to_draft",
-			)
-		)
-			throw Error("draft-reset-requires-human");
-		const result = await this.call("POST", "/graphql", {
-			query: READY_MUTATION,
-			variables: { id: pr.node_id },
-		});
-		if (result.data?.markPullRequestReadyForReview?.pullRequest?.isDraft !== false)
-			throw Error("ready-not-confirmed");
-	}
-
 	async requestReview(pr) {
 		return this.call(
 			"POST",
@@ -380,10 +357,20 @@ export class GitHub {
 		const threadList = threads.data?.repository?.pullRequest?.reviewThreads;
 		if (!threadList || threadList.pageInfo.hasNextPage) throw Error("review-threads-incomplete");
 		const evidenceJob = checks.find((c) => c.name === "Cloud evidence");
+		// Review the provider's initial draft in place. Never write draft state:
+		// a read followed by a promotion cannot preserve concurrent human resets.
+		const draftReviewAllowed =
+			pr.draft === true &&
+			isImplementer(pr.user) &&
+			!(await this.list(`${this.prefix}/issues/${pr.number}/timeline`)).some((event) =>
+				["convert_to_draft", "converted_to_draft"].includes(event.event),
+			);
+
 		return {
 			head: pr.head.sha,
 			base: pr.base.sha,
 			draft: pr.draft,
+			draftReviewAllowed,
 			implementerFinished: task?.state === "completed",
 			taskState: task?.state,
 			sessionId: task?.id,

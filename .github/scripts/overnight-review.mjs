@@ -11,7 +11,10 @@ const REQUIRED_CHECKS = [
 export function evaluateHead(snapshot) {
 	const result = (verdict, reason) => ({ verdict, head: snapshot.head, reason });
 	if (snapshot.protectedPaths?.length) return result("blocked", "protected-path-change");
-	if (snapshot.implementerFinished !== true || snapshot.draft !== false) {
+	if (
+		snapshot.implementerFinished !== true ||
+		(snapshot.draft !== false && snapshot.draftReviewAllowed !== true)
+	) {
 		return result("pending", "implementer-not-finished");
 	}
 	if (snapshot.testedHead !== snapshot.head || snapshot.testedBase !== snapshot.base) {

@@ -22,6 +22,7 @@ function fixture({
 	ciBase = base,
 	reviewHead = head,
 	changed = "src/demoVideo/timing.ts",
+	draftEvents = [],
 } = {}) {
 	const api = new GitHub(policy);
 	api.call = async (_method, path) => {
@@ -70,6 +71,7 @@ function fixture({
 		throw Error(`unexpected request ${path}`);
 	};
 	api.list = async (path) => {
+		if (path.endsWith("/timeline")) return draftEvents;
 		if (path.endsWith("/files")) return [{ filename: changed }];
 		if (path.endsWith("/reviews"))
 			return [
@@ -284,36 +286,30 @@ test("an unconfirmed assignment is never retried or treated as ownership", async
 	assert.equal(posts, 1);
 });
 
-test("initial draft promotion permits only the fixed ready mutation and respects human resets", async () => {
-	for (const [writable, events, expected] of [
-		[true, [], true],
-		[false, [], false],
-		[true, [{ event: "convert_to_draft" }], false],
+test("draft state mutations are forbidden even for the writable controller", async () => {
+	const api = new GitHub(policy, { writable: true });
+	await assert.rejects(
+		api.call("POST", "/graphql", {
+			query:
+				"mutation($id:ID!){markPullRequestReadyForReview(input:{pullRequestId:$id}){pullRequest{isDraft}}}",
+			variables: { id: "PR_verified" },
+		}),
+		/read-query-required/,
+	);
+});
+
+test("only an initial Copilot draft without recorded resets can receive cloud review", async () => {
+	const draft = { ...pr, draft: true, user: { id: 198982749, type: "Bot" } };
+	for (const [draftEvents, expected] of [
+		[[], true],
+		[[{ event: "convert_to_draft" }], false],
+		[[{ event: "converted_to_draft" }], false],
 	]) {
-		const writes = [];
-		const api = new GitHub(policy, {
-			token: "state",
-			writable,
-			request: async (url, options) => {
-				if (options.method === "POST") writes.push(JSON.parse(options.body));
-				return {
-					ok: true,
-					status: 200,
-					json: async () =>
-						url.endsWith("/graphql")
-							? { data: { markPullRequestReadyForReview: { pullRequest: { isDraft: false } } } }
-							: events,
-				};
-			},
-		});
-		const action = api.markReady({ number: 89, node_id: "PR_verified" });
-		if (expected) {
-			await action;
-			assert.equal(writes.length, 1);
-			assert.deepEqual(writes[0].variables, { id: "PR_verified" });
-		} else {
-			await assert.rejects(action);
-			assert.equal(writes.length, 0);
-		}
+		const snapshot = await fixture({ draftEvents }).inspectPR(
+			{ issue: 83, scopeDigest: "digest" },
+			draft,
+		);
+		assert.equal(snapshot.draft, true);
+		assert.equal(snapshot.draftReviewAllowed, expected);
 	}
 });

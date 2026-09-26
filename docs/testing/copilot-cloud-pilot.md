@@ -153,8 +153,9 @@ authentication failure; a subsequent independent review succeeded.
 
 Compatibility fixes now read assignment/timeline publication with bounded GET-only
 polls and pin GitHub's automatic tracking-assignment event IDs. A subsequent human
-assignment still stops reconciliation. Initial completed drafts can be promoted;
-a recorded draft reset requires human assessment. Explicit clean `ccr-overview-v2`
+assignment still stops reconciliation. Initial Copilot drafts can receive cloud checks and review in place;
+a recorded draft reset prevents that eligibility. The controller never changes
+draft state. The owner marks the PR ready when starting human review. Explicit clean `ccr-overview-v2`
 review summaries are recognized alongside the older summary format. These adapter
 changes have local regression/review evidence; the next actual scheduled admission
 must verify them against GitHub.
@@ -182,3 +183,22 @@ Paid overage stays disabled. The current billing verification expires at
 until the owner/account settings are checked again and the policy is renewed.
 A configured cron is not evidence that a scheduled run occurred. Record the first
 actual scheduled workflow and admitted issue before claiming unattended operation.
+
+
+### PR #91 draft-state race correction
+
+Greptile correctly identified a read/write race in automatic draft promotion:
+a human reset after the timeline read could be overwritten by the ready mutation.
+Automatic promotion has been removed, including its GraphQL mutation exception and
+Actions PR-write permission. GitHub supports requesting Copilot review on drafts,
+so a completed initial Copilot draft with no recorded draft-reset event can proceed
+through the same CI, evidence and independent review gates without changing its
+GitHub draft state. A later observed reset invalidates draft review eligibility;
+reviewed ledger state is rechecked on reconciliation. No new ticket or extra metered
+review was dispatched to test this infrastructure fix.
+
+The deterministic race regression failed because the ready mutation overwrote
+`draft: true`, then passed after removing all draft-state writes. Draft review still
+requires confirmed provider completion, current CI/evidence and the separate
+reviewer identity. This preserves unattended cloud validation while leaving draft
+status and human review/merge decisions with the owner.

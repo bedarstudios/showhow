@@ -81,3 +81,10 @@ test("current Copilot v2 approval summary passes with all other evidence gates",
 		"reviewed",
 	);
 });
+
+test("a verified initial draft can pass cloud review without becoming ready for human review", () => {
+	const draft = { ...snapshot, draft: true, draftReviewAllowed: true };
+	assert.equal(evaluateHead(draft).verdict, "reviewed");
+	assert.notEqual(evaluateHead({ ...draft, draftReviewAllowed: false }).verdict, "reviewed");
+	assert.notEqual(evaluateHead({ ...draft, unresolvedThreads: 1 }).verdict, "reviewed");
+});
