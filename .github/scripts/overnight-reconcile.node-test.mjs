@@ -228,3 +228,11 @@ for (const pr of [
 		assert.deepEqual(api.calls, []);
 	});
 }
+
+test("finished initial cloud draft is promoted once before review or correction", async () => {
+	const api = fake({ ...snapshot, draft: true });
+	api.markReady = async () => api.calls.push("ready");
+	const next = await reconcileRun({ api, record, policy, now });
+	assert.equal(next.state, "verifying");
+	assert.deepEqual(api.calls, ["ready", { save: "verifying", fix: 0, review: 0 }]);
+});

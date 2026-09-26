@@ -1,7 +1,7 @@
 {
 	"version": 1,
 	"enabled": true,
-	"nightlyEnabled": false,
+	"nightlyEnabled": true,
 	"repository": "bedarstudios/showhow",
 	"projectNumber": 2,
 	"mode": "maintenance",
@@ -21,7 +21,17 @@
 		"expiresAt": "2026-09-28T22:22:53.100014+00:00",
 		"source": "GitHub signed-in billing UI: Actions and All AI Credit SKUs $0, Stop usage Yes; additional usage disabled; 96/1500 included credits used."
 	},
-	"pilotEvidence": null,
+	"pilotEvidence": {
+		"verified": true,
+		"issue": 83,
+		"pr": 89,
+		"head": "c094e713c89dede50ab64f8aca6b0b7b48f4a684",
+		"base": "299cab478258a878eed75bc59257be9e5923b89b",
+		"ci": "https://github.com/bedarstudios/showhow/actions/runs/36207931532",
+		"review": "https://github.com/bedarstudios/showhow/pull/89#pullrequestreview-5323991275",
+		"evidence": "https://github.com/bedarstudios/showhow/actions/runs/36207931532/job/108308310879",
+		"qualification": "Supervised cloud implementation and one cloud correction passed; initial assignment recovery and draft promotion required supervisor intervention. First unattended scheduled admission remains unobserved."
+	},
 	"approvals": {
 		"83": {
 			"profile": "linux-portable",

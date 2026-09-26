@@ -13,6 +13,8 @@ on:
         required: false
   schedule:
     - cron: '7,17,27,37,47,57 * * * *'
+    - cron: '0 3 * * *'
+      timezone: Europe/London
 
 concurrency:
   group: copilot-cloud-ownership
@@ -21,7 +23,7 @@ concurrency:
 permissions:
   contents: read
   issues: write
-  pull-requests: read
+  pull-requests: write
   actions: read
 
 jobs:
@@ -41,6 +43,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_DISPATCH_TOKEN: ${{ secrets.BEDAR_LOOP_PAT }}
-          CLOUD_MODE: ${{ github.event_name == 'schedule' && 'reconcile' || inputs.mode }}
+          CLOUD_MODE: ${{ github.event_name == 'schedule' && (github.event.schedule == '0 3 * * *' && 'nightly' || 'reconcile') || inputs.mode }}
           CLOUD_ISSUE: ${{ inputs.issue }}
         run: node .github/scripts/overnight-cli.mjs

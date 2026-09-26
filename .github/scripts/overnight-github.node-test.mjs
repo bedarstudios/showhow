@@ -283,3 +283,37 @@ test("an unconfirmed assignment is never retried or treated as ownership", async
 	);
 	assert.equal(posts, 1);
 });
+
+test("initial draft promotion permits only the fixed ready mutation and respects human resets", async () => {
+	for (const [writable, events, expected] of [
+		[true, [], true],
+		[false, [], false],
+		[true, [{ event: "convert_to_draft" }], false],
+	]) {
+		const writes = [];
+		const api = new GitHub(policy, {
+			token: "state",
+			writable,
+			request: async (url, options) => {
+				if (options.method === "POST") writes.push(JSON.parse(options.body));
+				return {
+					ok: true,
+					status: 200,
+					json: async () =>
+						url.endsWith("/graphql")
+							? { data: { markPullRequestReadyForReview: { pullRequest: { isDraft: false } } } }
+							: events,
+				};
+			},
+		});
+		const action = api.markReady({ number: 89, node_id: "PR_verified" });
+		if (expected) {
+			await action;
+			assert.equal(writes.length, 1);
+			assert.deepEqual(writes[0].variables, { id: "PR_verified" });
+		} else {
+			await assert.rejects(action);
+			assert.equal(writes.length, 0);
+		}
+	}
+});

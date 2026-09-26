@@ -3,6 +3,8 @@ import { isImplementer, isReviewer } from "./overnight-identities.mjs";
 
 const MARKER = "<!-- bedar-cloud-run:v1 -->\n";
 const BOT = "github-actions[bot]";
+const READY_MUTATION =
+	"mutation($id:ID!){markPullRequestReadyForReview(input:{pullRequestId:$id}){pullRequest{isDraft}}}";
 export class GitHub {
 	constructor(
 		policy,
@@ -23,7 +25,11 @@ export class GitHub {
 		this.prefix = `/repos/${policy.repository}`;
 	}
 	async call(method, path, body, agent = false) {
-		if (path === "/graphql" && !/^query\b/.test(body?.query?.trim() ?? ""))
+		if (
+			path === "/graphql" &&
+			!/^query\b/.test(body?.query?.trim() ?? "") &&
+			!(this.writable && method === "POST" && body?.query === READY_MUTATION)
+		)
 			throw Error("read-query-required");
 		if (method !== "GET" && path !== "/graphql" && !this.writable)
 			throw Error("dry-run-write-forbidden");
@@ -240,6 +246,23 @@ export class GitHub {
 			confirmedAt: new Date().toISOString(),
 			...(automaticCoassignment ? { automaticCoassignment } : {}),
 		};
+	}
+
+	async markReady(pr) {
+		if (!pr.node_id || !Number.isInteger(pr.number)) throw Error("pr-identity-required");
+		const events = await this.list(`${this.prefix}/issues/${pr.number}/timeline`);
+		if (
+			events.some(
+				(event) => event.event === "convert_to_draft" || event.event === "converted_to_draft",
+			)
+		)
+			throw Error("draft-reset-requires-human");
+		const result = await this.call("POST", "/graphql", {
+			query: READY_MUTATION,
+			variables: { id: pr.node_id },
+		});
+		if (result.data?.markPullRequestReadyForReview?.pullRequest?.isDraft !== false)
+			throw Error("ready-not-confirmed");
 	}
 
 	async requestReview(pr) {

@@ -42,7 +42,16 @@ export function evaluateHead(snapshot) {
 	}
 	// Copilot submits COMMENTED reviews. Zero inline comments alone cannot prove
 	// a clean review: require its affirmative summary as well, otherwise escalate.
-	if (!/generated (?:no|0) comments|did not find any issues/i.test(review.body ?? "")) {
+	const body = review.body ?? "";
+	const legacyApproval = /generated (?:no|0) comments|did not find any issues/i.test(body);
+	const overviewApproval =
+		body.startsWith("<!-- ccr-overview-v2 -->") &&
+		/^### 🟢 Approval recommended\s*$/m.test(body) &&
+		/^\*\*Findings:\*\* None\s*$/m.test(body) &&
+		body.includes(
+			"No unresolved review issues were identified, and all readiness assessments support approval.",
+		);
+	if (!legacyApproval && !overviewApproval) {
 		return result("blocked", "review-summary-needs-assessment");
 	}
 	const evidence = snapshot.evidence;

@@ -36,6 +36,22 @@ export async function reconcileRun({ api, record, policy, now = new Date().toISO
 	if (["failed", "timed_out", "cancelled", "waiting_for_user"].includes(snapshot.taskState)) {
 		return save({ ...context, state: "blocked", reason: `provider-${snapshot.taskState}` });
 	}
+	// Copilot leaves initial PRs in draft. Promote only the finished initial
+	// implementation; never undo a later human reset or a reviewed draft.
+	if (
+		record.state === "implementing" &&
+		snapshot.implementerFinished === true &&
+		snapshot.draft === true &&
+		snapshot.protectedPaths?.length === 0
+	) {
+		try {
+			await api.markReady(pr);
+		} catch {
+			return save({ ...context, state: "blocked", reason: "draft-promotion-needs-assessment" });
+		}
+		return save({ ...context, state: "verifying", reason: "initial-draft-promoted" });
+	}
+
 	if (record.state === "fixing" && record.lastFixHead === snapshot.head) {
 		if (Date.parse(now) - Date.parse(record.fixRequestedAt) > 90 * 60 * 1000) {
 			return save({ ...context, state: "blocked", reason: "correction-produced-no-new-head" });
