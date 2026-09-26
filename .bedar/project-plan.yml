@@ -286,3 +286,115 @@ phases:
   source: PLAN.md#demo-video-export-implementation-plan
   issues: []
   github_number: 9
+- id: showhow-p10-library-recorder-redesign
+  github_number: 10
+  title: Showhow Phase 10 — Library and recorder bar redesign
+  mode: maintenance
+  goal: Showhow opens on a redesigned library, records from a redesigned recorder bar,
+    and returns to the library on the saved recording with Remake, Export PDF and
+    Copy for agent, in light and dark themes.
+  source: docs/superpowers/plans/2026-09-26-library-and-recorder-redesign.md
+  issues:
+  - id: showhow-p10-design-foundations
+    github_number: 92
+    title: Add ds design tokens, local fonts, theme modes and core components
+    goal: Give the renderer the showhow.pen design system as CSS variables, bundled
+      fonts, a System/Light/Dark theme and reusable React components.
+    labels:
+    - feature
+    depends_on: []
+    source: docs/superpowers/plans/2026-09-26-library-and-recorder-redesign.md#phase-1--foundations
+    status: planned
+    completion_evidence: []
+    scope:
+    - All ds-* variables in light and dark, Tailwind mapping, local Inter, Inter Tight,
+      JetBrains Mono and Instrument Serif, persisted theme preference following macOS,
+      and Button, Tag, Logo, LibraryRow, Sidebar, VideoPlayer, GuideStep, Card and
+      EmptyState components.
+    exclusions:
+    - No screen redesign, no runtime Google Fonts, no removal of legacy sh-* tokens.
+    done_when:
+    - Components render with ds-* tokens in both themes with tests, and the theme
+      preference persists and follows macOS appearance when set to System.
+  - id: showhow-p10-window-flow
+    github_number: 93
+    title: Open on the library and return to it after saving
+    goal: Make the library the app's home while keeping recording one shortcut away.
+    labels:
+    - feature
+    depends_on: []
+    source: docs/superpowers/plans/2026-09-26-library-and-recorder-redesign.md#phase-2--window-flow
+    status: planned
+    completion_evidence: []
+    scope:
+    - App launch and Dock activation show the library; tray icon and global shortcut
+      open the recorder bar; New recording hides the library; every macOS save-completion
+      path reopens the library with the saved bundle selected and marked New.
+    exclusions:
+    - No editor changes, no Windows or Linux flow changes, no change to bundle storage.
+    done_when:
+    - Launching shows the library, and a full record, edit and save loop on macOS ends
+      in the library with that recording selected, including when bundling fails open.
+  - id: showhow-p10-library-redesign
+    github_number: 94
+    title: Rebuild the library in the showhow.pen design
+    goal: Replace the current library UI with the sidebar and detail layout and inline
+      guide from showhow.pen screens 23 to 35.
+    labels:
+    - feature
+    depends_on:
+    - showhow-p10-design-foundations
+    - showhow-p10-window-flow
+    source: docs/superpowers/plans/2026-09-26-library-and-recorder-redesign.md#phase-3--library-redesign-screens-2335
+    status: planned
+    completion_evidence: []
+    scope:
+    - Sidebar and detail layout, nothing-selected, no-guide, making-guide, guide-ready,
+      error and empty-library states, inline guide steps with existing edit, delete,
+      seek and reveal behaviour, and workflow doc renamed to guide in all 13 locales.
+    exclusions:
+    - No Laya or Whisper guide engine, no Guide engine settings, no editor reskin.
+    done_when:
+    - Every library state matches its showhow.pen screen in light and dark, existing
+      library behaviour and tests still pass, and i18n check passes.
+  - id: showhow-p10-guide-actions
+    github_number: 95
+    title: Add Remake, Export PDF, Copy for agent and Appearance settings
+    goal: Let users remake, export and hand off a guide, and choose appearance, from
+      the library.
+    labels:
+    - feature
+    depends_on:
+    - showhow-p10-library-redesign
+    source: docs/superpowers/plans/2026-09-26-library-and-recorder-redesign.md#phase-4--guide-actions
+    status: planned
+    completion_evidence: []
+    scope:
+    - Remake with confirmation over edited guides, PDF export via printToPDF with a
+      save dialog, Copy for agent prompt with the bundle path and files, and a Settings
+      view with System, Light and Dark.
+    exclusions:
+    - No DOCX, Markdown or ZIP packages, no cloud sharing, no AI engine settings.
+    done_when:
+    - Remake, Export PDF and Copy for agent work on a real macOS bundle, the agent prompt
+      wording is approved by Mohamed, and appearance changes apply to all windows.
+  - id: showhow-p10-recorder-bar-redesign
+    github_number: 96
+    title: Restyle the recorder bar to the showhow.pen design
+    goal: Match the recorder bar to showhow.pen screens 36 to 40 without changing its
+      behaviour.
+    labels:
+    - feature
+    depends_on:
+    - showhow-p10-design-foundations
+    source: docs/superpowers/plans/2026-09-26-library-and-recorder-redesign.md#phase-5--recorder-bar-redesign-screens-3640
+    status: planned
+    completion_evidence: []
+    scope:
+    - Idle, source picker, countdown, recording and paused states using ds-hud tokens
+      and shared components, then removal of legacy sh-* tokens.
+    exclusions:
+    - No control, shortcut, IPC or capture-exclusion changes, no editor reskin.
+    done_when:
+    - Recorder bar states match showhow.pen, existing launch and source selector tests
+      pass, and the bar stays excluded from recordings on macOS.
