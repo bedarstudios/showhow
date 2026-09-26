@@ -159,3 +159,127 @@ test("active cloud ownership requires only the implementer assignee", async () =
 		assert.equal(await api.scopeMatches(record), expected);
 	}
 });
+
+test("assignment confirms asynchronously and pins only the dispatcher's automatic co-assignment", async () => {
+	const bot = { id: 198982749, type: "Bot", login: "Copilot" };
+	const owner = { id: 205761318, type: "User", login: "bedarstudios" };
+	const calls = [];
+	let reads = 0;
+	let timelineReads = 0;
+	let removed = false;
+	const api = new GitHub(policy, {
+		token: "state",
+		agentToken: "agent",
+		writable: true,
+		wait: async () => undefined,
+		request: async (url, options) => {
+			const path = new URL(url).pathname;
+			calls.push([options.method, path]);
+			let data;
+			if (path === "/user") data = owner;
+			else if (options.method === "POST") data = { assignees: [owner] };
+			else if (options.method === "DELETE") {
+				assert.deepEqual(JSON.parse(options.body), { assignees: [owner.login] });
+				removed = true;
+				data = {};
+			} else if (path.endsWith("/timeline")) {
+				timelineReads++;
+				const created_at = new Date().toISOString();
+				data = (timelineReads === 1 ? [] : [bot, owner]).map((assignee, id) => ({
+					id,
+					event: "assigned",
+					actor: owner,
+					assignee,
+					created_at,
+				}));
+			} else {
+				reads++;
+				data = {
+					html_url: "https://github.com/bedarstudios/showhow/issues/83",
+					assignees: removed ? [bot] : reads === 1 ? [owner] : [bot, owner],
+				};
+			}
+			return { ok: true, status: 200, json: async () => data };
+		},
+	});
+	const result = await api.assign(83, base, {
+		scopeDigest: "digest",
+		allowedFiles: ["src/demoVideo/timing.ts"],
+		targetTest: "src/demoVideo/timing.test.ts",
+	});
+	assert.ok(result.confirmedAt);
+	assert.equal(removed, false);
+	assert.deepEqual(result.automaticCoassignment, { userId: owner.id, eventId: 1, botEventId: 0 });
+	assert.equal(calls.filter(([method]) => method === "POST").length, 1);
+});
+
+test("confirmed automatic tracking assignment never permits a later human takeover", async () => {
+	const { scopeDigest } = await import("./overnight.mjs");
+	const bot = { id: 198982749, type: "Bot", login: "Copilot" };
+	const owner = { id: 205761318, type: "User", login: "bedarstudios" };
+	const original = [bot, owner].map((assignee, id) => ({
+		id,
+		event: "assigned",
+		actor: owner,
+		assignee,
+	}));
+	const record = {
+		issue: 83,
+		scopeDigest: scopeDigest("approved"),
+		assignment: { automaticCoassignment: { userId: owner.id, eventId: 1, botEventId: 0 } },
+	};
+	for (const [events, expected] of [
+		[original, true],
+		[
+			[
+				...original,
+				{ id: 2, event: "unassigned", actor: owner, assignee: owner },
+				{ id: 3, event: "assigned", actor: owner, assignee: owner },
+			],
+			false,
+		],
+		[[...original, { id: 2, event: "assigned", actor: owner, assignee: { id: 999 } }], false],
+		[[], false],
+	]) {
+		const api = new GitHub(policy, {
+			token: "state",
+			request: async (url) => ({
+				ok: true,
+				status: 200,
+				json: async () =>
+					url.includes("/timeline")
+						? events
+						: {
+								state: "open",
+								body: "approved",
+								labels: [{ name: "overnight" }],
+								assignees: [bot, owner],
+							},
+			}),
+		});
+		assert.equal(await api.scopeMatches(record), expected);
+	}
+});
+
+test("an unconfirmed assignment is never retried or treated as ownership", async () => {
+	let posts = 0;
+	const api = new GitHub(policy, {
+		token: "state",
+		agentToken: "agent",
+		writable: true,
+		wait: async () => undefined,
+		request: async (url, options) => {
+			if (options.method === "POST") posts++;
+			return {
+				ok: true,
+				status: 200,
+				json: async () => (url.endsWith("/user") ? { id: 1, type: "User" } : { assignees: [] }),
+			};
+		},
+	});
+	await assert.rejects(
+		api.assign(83, base, { allowedFiles: [], targetTest: "test" }),
+		/assignment-not-confirmed/,
+	);
+	assert.equal(posts, 1);
+});
