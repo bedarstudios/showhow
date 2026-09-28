@@ -1,7 +1,17 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, protocol, session, Tray } from "electron";
+import {
+	app,
+	BrowserWindow,
+	ipcMain,
+	Menu,
+	nativeImage,
+	nativeTheme,
+	protocol,
+	session,
+	Tray,
+} from "electron";
 import { ShortcutBinding } from "../src/lib/shortcuts";
 import { createAppWindowReadinessGate } from "./appWindowReadiness";
 import { isDiagnosticModeEnabled, mainLogBuffer } from "./diagnostics/main-log-buffer";
@@ -14,6 +24,7 @@ import { mainT, setMainLocale } from "./i18n";
 import { getSelectedDesktopSource, registerIpcHandlers } from "./ipc/handlers";
 import { fetchShowhowMedia, SHOWHOW_MEDIA_SCHEME } from "./showhow/mediaProtocol";
 import { acquireStableInstanceLock } from "./singleInstanceLock";
+import { registerThemeIpc } from "./themeIpc";
 import {
 	createCountdownOverlayWindow,
 	createEditorWindow,
@@ -36,6 +47,12 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+registerThemeIpc({
+	ipcMain,
+	nativeTheme,
+	windowRegistry: () => BrowserWindow.getAllWindows(),
+});
 
 // Use Screen & System Audio Recording permissions instead of the CoreAudio Tap API on macOS.
 // Tap needs NSAudioCaptureUsageDescription in the parent app's Info.plist, which breaks when

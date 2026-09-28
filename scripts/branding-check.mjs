@@ -14,19 +14,41 @@ const BRAND_RE = new RegExp(
 	"gi",
 );
 
-export async function scanBrandingReferences(rootDir, policy) {
-	const allowed = new Set(policy.allowed.map((entry) => entry.file));
-	const { stdout } = await execFileAsync("git", ["ls-files"], { cwd: rootDir });
+export async function scanBrandingReferences(
+	rootDir,
+	policy,
+	listFiles = async () => {
+		const { stdout } = await execFileAsync("git", ["ls-files"], { cwd: rootDir });
+		return stdout.split("\n").filter(Boolean);
+	},
+) {
+	const wholeFileAllowed = new Set(
+		policy.allowed.filter((entry) => !entry.lines).map((entry) => entry.file),
+	);
+	const lineAllowances = new Map(
+		policy.allowed.filter((entry) => entry.lines).map((entry) => [entry.file, entry.lines]),
+	);
+	const files = await listFiles();
 	const matches = [];
-	for (const file of stdout.split("\n").filter(Boolean)) {
-		if (allowed.has(file) || file === "package-lock.json") continue;
+	for (const file of files) {
+		if (wholeFileAllowed.has(file) || file === "package-lock.json") continue;
 		BRAND_RE.lastIndex = 0;
 		if (BRAND_RE.test(file)) matches.push({ file, line: 0, text: "legacy name in path" });
 		const contents = await fs.readFile(path.join(rootDir, file), "utf8").catch(() => null);
 		if (contents === null) continue;
-		for (const [index, line] of contents.split("\n").entries()) {
+		const lines = contents.split("\n");
+		const allowances = lineAllowances.get(file) ?? [];
+		const allowanceCounts = new Map(
+			allowances.map(({ text }) => [text, lines.filter((line) => line.trim() === text).length]),
+		);
+		for (const [index, line] of lines.entries()) {
 			BRAND_RE.lastIndex = 0;
-			if (BRAND_RE.test(line)) matches.push({ file, line: index + 1, text: line.trim() });
+			if (!BRAND_RE.test(line)) continue;
+			const text = line.trim();
+			const allowance = allowances.find(
+				(entry) => entry.text === text && allowanceCounts.get(text) <= entry.count,
+			);
+			if (!allowance) matches.push({ file, line: index + 1, text });
 		}
 	}
 	return matches;

@@ -1,6 +1,8 @@
 import { realpathSync } from "node:fs";
 import path from "node:path";
 import { playwright } from "@vitest/browser-playwright";
+import autoprefixer from "autoprefixer";
+import tailwindcss from "tailwindcss";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -15,8 +17,22 @@ export default defineConfig({
 			allow: [__dirname, realpathSync(path.resolve(__dirname, "node_modules/gif.js/dist"))],
 		},
 	},
+	css: {
+		postcss: {
+			plugins: [tailwindcss(), autoprefixer()],
+		},
+	},
 	test: {
 		include: ["src/**/*.browser.test.{ts,tsx}"],
+		// Process the real stylesheet (Tailwind + @font-face) for tests that render
+		// ds-* components; other CSS imports keep the default stub behavior.
+		css: {
+			include: [
+				/src\/index\.css$/,
+				/src\/assets\/fonts\/fonts\.css$/,
+				/src\/assets\/fonts\/annotation-fonts\.css$/,
+			],
+		},
 		// Real software encoders compete for the small Linux CI runner's resources.
 		fileParallelism: false,
 		browser: {

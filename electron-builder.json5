@@ -33,7 +33,14 @@
   ],
   // Asset layout contract: "wallpapers/" and "cursors/" under resourcesPath must
   // align with assetBaseDir in electron/preload.ts (packaged branch).
+  // font-licenses: the consolidated per-family copyright notices and full license
+  // texts for every bundled font family must ship with the packaged app.
   "extraResources": [
+    {
+      "from": "src/assets/fonts",
+      "to": "font-licenses",
+      "filter": ["LICENSE.md"]
+    },
     {
       "from": "public/wallpapers",
       "to": "wallpapers"
