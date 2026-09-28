@@ -263,7 +263,6 @@ phases:
   github_number: 5
 - id: showhow-p6-studio-workflow-ux
   title: Showhow Phase 6 — Studio workflow UX
-  mode: maintenance
   goal: Make Studio a complete control surface for recording and workflow management.
   source: PLAN.md#showhow-studio-workflow-completion-implementation-plan
   issues: []
@@ -289,7 +288,6 @@ phases:
 - id: showhow-p10-library-recorder-redesign
   github_number: 10
   title: Showhow Phase 10 — Library and recorder bar redesign
-  mode: maintenance
   goal: Showhow opens on a redesigned library, records from a redesigned recorder bar,
     and returns to the library on the saved recording with Remake, Export PDF and
     Copy for agent, in light and dark themes.
