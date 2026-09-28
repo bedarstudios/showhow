@@ -345,6 +345,8 @@ interface Window {
 		onRequestCloseConfirm: (callback: () => void) => () => void;
 		sendCloseConfirmResponse: (choice: "save" | "discard" | "cancel") => void;
 		setLocale: (locale: string) => Promise<void>;
+		showhowGetSystemTheme: () => Promise<boolean>;
+		showhowOnSystemThemeChanged: (callback: (isDark: boolean) => void) => () => void;
 		saveDiagnostic: (payload: {
 			error: string;
 			stack?: string;

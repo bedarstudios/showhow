@@ -61,6 +61,20 @@
 			"reason": "Documents the upstream relationship and import policy"
 		},
 		{
+			"file": "config/branding-allowlist.json",
+			"reason": "Contains the literal legacy-brand strings required to define the branding policy"
+		},
+		{
+			"file": "design/showhow.pen",
+			"reason": "Design source of truth; allows only the two inherited project-format file references",
+			"lines": [
+				{
+					"text": "\"content\": \"or drag & drop a .showhow or legacy .openscreen project file here\",",
+					"count": 2
+				}
+			]
+		},
+		{
 			"file": "docs/github-actions-workflows.md",
 			"reason": "Legacy compatibility instruction for the temporary inherited release-token fallback"
 		},
@@ -283,6 +297,10 @@
 		{
 			"file": "src/lib/projectFilePolicy.test.ts",
 			"reason": "Covers legacy project-extension acceptance in the renderer"
+		},
+		{
+			"file": "src/lib/showhow/theme.ts",
+			"reason": "Legacy renderer theme-storage key fallback per the Showhow-first/legacy-fallback persistence rule"
 		},
 		{
 			"file": "src/lib/userPreferences.test.ts",

@@ -337,4 +337,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	sendCloseConfirmResponse: (choice: "save" | "discard" | "cancel") => {
 		ipcRenderer.send("close-confirm-response", choice);
 	},
+	showhowGetSystemTheme: () => ipcRenderer.invoke("showhow:get-system-theme") as Promise<boolean>,
+	showhowOnSystemThemeChanged: (callback: (isDark: boolean) => void) => {
+		const listener = (_event: unknown, isDark: boolean) => callback(isDark);
+		ipcRenderer.on("showhow:system-theme-changed", listener);
+		return () => ipcRenderer.removeListener("showhow:system-theme-changed", listener);
+	},
 });

@@ -3,7 +3,10 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { I18nProvider } from "./contexts/I18nContext";
 import { clearStaleSourceCache } from "./lib/exporter/localSourceFile";
+import { initTheme } from "./lib/showhow/theme";
 import "./index.css";
+
+initTheme();
 
 const windowType = new URLSearchParams(window.location.search).get("windowType") || "";
 

@@ -1,0 +1,1514 @@
+[
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-cyrillic-ext-400-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-cyrillic-ext-700-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-latin-400-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-latin-400-normal.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-latin-700-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-latin-700-normal.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-latin-ext-400-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-latin-ext-700-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-vietnamese-400-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/plus-jakarta-sans-vietnamese-700-italic.woff2"
+	},
+	{
+		"family": "Plus Jakarta Sans",
+		"slug": "plus-jakarta-sans",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/plus-jakarta-sans-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "Space Grotesk",
+		"slug": "space-grotesk",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/space-grotesk-latin-400-normal.woff2"
+	},
+	{
+		"family": "Space Grotesk",
+		"slug": "space-grotesk",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/space-grotesk-latin-700-normal.woff2"
+	},
+	{
+		"family": "Space Grotesk",
+		"slug": "space-grotesk",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/space-grotesk-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Space Grotesk",
+		"slug": "space-grotesk",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/space-grotesk-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Space Grotesk",
+		"slug": "space-grotesk",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/space-grotesk-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "Space Grotesk",
+		"slug": "space-grotesk",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/space-grotesk-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/dm-sans-latin-400-italic.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/dm-sans-latin-400-normal.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/dm-sans-latin-700-italic.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/dm-sans-latin-700-normal.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/dm-sans-latin-ext-400-italic.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/dm-sans-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/dm-sans-latin-ext-700-italic.woff2"
+	},
+	{
+		"family": "DM Sans",
+		"slug": "dm-sans",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/dm-sans-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Sora",
+		"slug": "sora",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/sora-latin-400-normal.woff2"
+	},
+	{
+		"family": "Sora",
+		"slug": "sora",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/sora-latin-700-normal.woff2"
+	},
+	{
+		"family": "Sora",
+		"slug": "sora",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/sora-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Sora",
+		"slug": "sora",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/sora-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/manrope-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/manrope-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/manrope-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/manrope-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "greek",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/manrope-greek-400-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "greek",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/manrope-greek-700-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/manrope-latin-400-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/manrope-latin-700-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/manrope-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/manrope-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/manrope-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "Manrope",
+		"slug": "manrope",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/manrope-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-cyrillic-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-cyrillic-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-cyrillic-ext-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-cyrillic-ext-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "greek",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-greek-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "greek",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-greek-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "greek",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-greek-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "greek",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-greek-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-latin-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-latin-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-latin-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-latin-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-latin-ext-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-latin-ext-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-vietnamese-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-sans-vietnamese-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Sans",
+		"slug": "ibm-plex-sans",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-sans-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-cyrillic-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-cyrillic-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-cyrillic-ext-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-cyrillic-ext-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-latin-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-latin-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-latin-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-latin-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-latin-ext-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-latin-ext-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-vietnamese-400-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/ibm-plex-mono-vietnamese-700-italic.woff2"
+	},
+	{
+		"family": "IBM Plex Mono",
+		"slug": "ibm-plex-mono",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/ibm-plex-mono-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/playfair-display-cyrillic-400-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/playfair-display-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/playfair-display-cyrillic-700-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/playfair-display-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/playfair-display-latin-400-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/playfair-display-latin-400-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/playfair-display-latin-700-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/playfair-display-latin-700-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/playfair-display-latin-ext-400-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/playfair-display-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/playfair-display-latin-ext-700-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/playfair-display-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/playfair-display-vietnamese-400-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/playfair-display-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/playfair-display-vietnamese-700-italic.woff2"
+	},
+	{
+		"family": "Playfair Display",
+		"slug": "playfair-display",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/playfair-display-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/merriweather-cyrillic-400-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/merriweather-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/merriweather-cyrillic-700-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/merriweather-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/merriweather-cyrillic-ext-400-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/merriweather-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/merriweather-cyrillic-ext-700-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/merriweather-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/merriweather-latin-400-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/merriweather-latin-400-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/merriweather-latin-700-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/merriweather-latin-700-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/merriweather-latin-ext-400-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/merriweather-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/merriweather-latin-ext-700-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/merriweather-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/merriweather-vietnamese-400-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/merriweather-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/merriweather-vietnamese-700-italic.woff2"
+	},
+	{
+		"family": "Merriweather",
+		"slug": "merriweather",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/merriweather-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/lora-cyrillic-400-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/lora-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/lora-cyrillic-700-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/lora-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/lora-cyrillic-ext-400-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/lora-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/lora-cyrillic-ext-700-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/lora-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/lora-latin-400-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/lora-latin-400-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/lora-latin-700-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/lora-latin-700-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/lora-latin-ext-400-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/lora-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/lora-latin-ext-700-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/lora-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "math",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/lora-math-400-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "math",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/lora-math-400-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "math",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/lora-math-700-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "math",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/lora-math-700-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "symbols",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/lora-symbols-400-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "symbols",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/lora-symbols-400-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "symbols",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/lora-symbols-700-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "symbols",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/lora-symbols-700-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "italic",
+		"file": "files/lora-vietnamese-400-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/lora-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "italic",
+		"file": "files/lora-vietnamese-700-italic.woff2"
+	},
+	{
+		"family": "Lora",
+		"slug": "lora",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/lora-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/fira-code-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/fira-code-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/fira-code-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/fira-code-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "greek",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/fira-code-greek-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "greek",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/fira-code-greek-700-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "greek-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/fira-code-greek-ext-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "greek-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/fira-code-greek-ext-700-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/fira-code-latin-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/fira-code-latin-700-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/fira-code-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/fira-code-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Bebas Neue",
+		"slug": "bebas-neue",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/bebas-neue-latin-400-normal.woff2"
+	},
+	{
+		"family": "Bebas Neue",
+		"slug": "bebas-neue",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/bebas-neue-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/oswald-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/oswald-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/oswald-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/oswald-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/oswald-latin-400-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/oswald-latin-700-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/oswald-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/oswald-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "vietnamese",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/oswald-vietnamese-400-normal.woff2"
+	},
+	{
+		"family": "Oswald",
+		"slug": "oswald",
+		"subset": "vietnamese",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/oswald-vietnamese-700-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "cyrillic",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/caveat-cyrillic-400-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "cyrillic",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/caveat-cyrillic-700-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "cyrillic-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/caveat-cyrillic-ext-400-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "cyrillic-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/caveat-cyrillic-ext-700-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/caveat-latin-400-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "latin",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/caveat-latin-700-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "latin-ext",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/caveat-latin-ext-400-normal.woff2"
+	},
+	{
+		"family": "Caveat",
+		"slug": "caveat",
+		"subset": "latin-ext",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/caveat-latin-ext-700-normal.woff2"
+	},
+	{
+		"family": "Permanent Marker",
+		"slug": "permanent-marker",
+		"subset": "latin",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/permanent-marker-latin-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "symbols2",
+		"weight": 400,
+		"style": "normal",
+		"file": "files/fira-code-symbols2-400-normal.woff2"
+	},
+	{
+		"family": "Fira Code",
+		"slug": "fira-code",
+		"subset": "symbols2",
+		"weight": 700,
+		"style": "normal",
+		"file": "files/fira-code-symbols2-400-normal.woff2"
+	}
+]
