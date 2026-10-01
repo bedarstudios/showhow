@@ -122,3 +122,13 @@ build still publishes, but the DMG is unsigned.
 - **i18n**: 13 locales in `src/i18n/locales/<locale>/` (e.g. `src/i18n/locales/en/settings.json`). The `i18n:check` script validates them — run it after touching translation files.
 - **Build pipeline**: `npm run build` is full electron-builder. For iterating on renderer only, use `npm run build-vite` (Vite + tsc, no packaging).
 - **README tone**: the project is explicitly "not production-grade" and free forever — don't add paywalls, premium tiers, or upsell language to UI/copy.
+
+## Workflow
+
+Read `~/dev/OS/.agents/loop-config/WORKFLOW.md` before any build work and
+follow it. If that file cannot be read, stop and tell the owner. Do not guess
+the workflow.
+
+Read `.agents/CONTEXT.md` and `.agents/HANDOFF.md` before any work. This
+repository owns those files and `.agents/decisions.md`. Agents never merge
+pull requests.
