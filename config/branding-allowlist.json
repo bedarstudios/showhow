@@ -1,6 +1,10 @@
 {
 	"allowed": [
 		{
+			"file": ".agents/CONTEXT.md",
+			"reason": "Documents which legacy identifiers are kept and why"
+		},
+		{
 			"file": ".bedar/project-plan.yml",
 			"reason": "Dated project plan referencing the inherited baseline"
 		},
@@ -21,11 +25,11 @@
 			"reason": "Temporary read-only inherited release-token secret fallback until repository cutover"
 		},
 		{
-			"file": ".harness/docs/git-workflow.md",
+			"file": "Archive/2026-10-01-harness/docs/git-workflow.md",
 			"reason": "Records which upstream release machinery was deleted, so it is not restored"
 		},
 		{
-			"file": ".harness/memory/MEMORY.md",
+			"file": "Archive/2026-10-01-harness/memory/MEMORY.md",
 			"reason": "Append-only historical harness memory"
 		},
 		{
