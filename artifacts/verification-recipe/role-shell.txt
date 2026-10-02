@@ -1,0 +1,7 @@
+<home>/.nvm/versions/node/v22.22.1/bin/node
+v22.22.1
+<home>/.nvm/versions/node/v22.22.1/bin/npm
+10.9.4
+<home>/.npm-global/bin/codex
+codex-cli 0.160.0
+role=executor ZDOTDIR=<home>/dev/OS/.agents/loop-config/roles/zsh

@@ -1,0 +1,16 @@
+{
+	"head": "03897af59b04e562662b37fd8dcee0fb64da07ff",
+	"checks": [
+		{
+			"command": "npx vite build",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-final/01-npx-build.txt"
+		},
+		{
+			"command": "node --test .github/scripts/overnight.node-test.mjs .github/scripts/overnight-review.node-test.mjs .github/scripts/overnight-reconcile.node-test.mjs .github/scripts/overnight-evidence.node-test.mjs .github/scripts/overnight-github.node-test.mjs",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-final/02-node-.github-scripts-overnight-github.node-test.mjs.txt"
+		}
+	],
+	"endHead": "03897af59b04e562662b37fd8dcee0fb64da07ff"
+}

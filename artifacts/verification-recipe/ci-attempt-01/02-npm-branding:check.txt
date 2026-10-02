@@ -1,0 +1,15 @@
+Command: npm run branding:check
+Exit: 1
+
+> showhow@1.6.0 branding:check
+> node scripts/branding-check.mjs
+
+artifacts/verification-recipe/native-02/result.json:150 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+artifacts/verification-recipe/native-03/result.json:150 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+artifacts/verification-recipe/native-04/result.json:154 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+artifacts/verification-recipe/native-05/result.json:163 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+artifacts/verification-recipe/native-06/result.json:164 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+artifacts/verification-recipe/native-07/result.json:164 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+artifacts/verification-recipe/native-08/result.json:164 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+artifacts/verification-recipe/native-09/result.json:164 "path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+scripts/verify-showhow-export.mjs:69 const locks = ["showhow-single-instance", "openscreen-single-instance"].map(prefix => {

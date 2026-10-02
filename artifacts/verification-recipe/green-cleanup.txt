@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: missing tools, build, fixture or dependencies fail before launch
+ok 1 - missing tools, build, fixture or dependencies fail before launch
+  ---
+  duration_ms: 0.418125
+  type: 'test'
+  ...
+# Subtest: an existing evidence directory is rejected without touching its bytes
+ok 2 - an existing evidence directory is rejected without touching its bytes
+  ---
+  duration_ms: 1.873083
+  type: 'test'
+  ...
+# Subtest: successful media cannot mask cleanup failure or fixture mutation
+ok 3 - successful media cannot mask cleanup failure or fixture mutation
+  ---
+  duration_ms: 0.128458
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 30.077959

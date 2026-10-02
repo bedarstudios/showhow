@@ -1,0 +1,15 @@
+{
+	"head": "9f6a3bcc38f15f0182768edc480f3926914ccb6b",
+	"checks": [
+		{
+			"command": "npm run lint",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-attempt-01/01-npm-lint.txt"
+		},
+		{
+			"command": "npm run branding:check",
+			"exit": 1,
+			"log": "artifacts/verification-recipe/ci-attempt-01/02-npm-branding:check.txt"
+		}
+	]
+}

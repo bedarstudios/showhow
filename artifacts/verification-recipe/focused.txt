@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: missing tools, build, fixture or dependencies fail before launch
+ok 1 - missing tools, build, fixture or dependencies fail before launch
+  ---
+  duration_ms: 0.466958
+  type: 'test'
+  ...
+# Subtest: an existing evidence directory is rejected without touching its bytes
+ok 2 - an existing evidence directory is rejected without touching its bytes
+  ---
+  duration_ms: 0.927667
+  type: 'test'
+  ...
+# Subtest: successful media cannot mask cleanup failure or fixture mutation
+ok 3 - successful media cannot mask cleanup failure or fixture mutation
+  ---
+  duration_ms: 0.109042
+  type: 'test'
+  ...
+# Subtest: a corrupt GIF or incomplete independent decoder cannot establish export proof
+ok 4 - a corrupt GIF or incomplete independent decoder cannot establish export proof
+  ---
+  duration_ms: 0.110291
+  type: 'test'
+  ...
+# Subtest: full FFmpeg decode failure rejects a GIF with plausible signature and probe
+ok 5 - full FFmpeg decode failure rejects a GIF with plausible signature and probe
+  ---
+  duration_ms: 0.392458
+  type: 'test'
+  ...
+# Subtest: exact engine and Codex pins reject substitutions
+ok 6 - exact engine and Codex pins reject substitutions
+  ---
+  duration_ms: 0.124
+  type: 'test'
+  ...
+# Subtest: probe frame, dimension and duration bounds reject implausible media
+ok 7 - probe frame, dimension and duration bounds reject implausible media
+  ---
+  duration_ms: 0.139709
+  type: 'test'
+  ...
+# Subtest: supporting bootstrap ordering sets private paths before production import
+ok 8 - supporting bootstrap ordering sets private paths before production import
+  ---
+  duration_ms: 0.12375
+  type: 'test'
+  ...
+# Subtest: real CLI doctor with missing tool PATH retains failure and never launches Electron
+ok 9 - real CLI doctor with missing tool PATH retains failure and never launches Electron
+  ---
+  duration_ms: 100.70925
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 133.855375

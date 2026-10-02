@@ -396,3 +396,31 @@ phases:
     done_when:
     - Recorder bar states match showhow.pen, existing launch and source selector tests
       pass, and the bar stays excluded from recordings on macOS.
+- id: showhow-verification-recipe
+  github_number: 11
+  title: Showhow Verification Recipe
+  mode: maintenance
+  goal: Give agents repeatable isolated native editor-to-GIF verification with diagnostic, evidence and cleanup results.
+  source: PLAN.md#showhow-verification-recipe-implementation-plan
+  issues:
+  - id: showhow-verification-recipe-export
+    github_number: 102
+    title: Add isolated Electron export verification recipe
+    goal: Verify a synthetic recording opens in the real editor and exports a decodable GIF through the production filesystem writer.
+    labels:
+    - feature
+    depends_on: []
+    source: PLAN.md#task-1-isolated-electron-export-verification-recipe
+    status: planned
+    completion_evidence: []
+    scope:
+    - Project-owned five-stage recipe and foreground Node/Playwright driver with prerequisite doctor, early Electron path isolation, actual editor and GIF export, sanitized evidence and owned cleanup.
+    - Focused negative safety tests, two fresh native macOS runs and complete applicable project CI.
+    exclusions:
+    - No product behavior, renderer, IPC, native helper, dependency-version, OS permission, global skill or runtime changes.
+    - No unparked phases, personal recordings, MP4 acceptance, native recording or native save-dialog acceptance, or Windows/Linux claims.
+    done_when:
+    - Two fresh macOS runs load the committed synthetic clip in isolated real Electron and save a GIF through the production writer; full independent decode succeeds and the fixture hash remains unchanged.
+    - Owned Electron processes are gone and temporary run roots are removed after each run; cleanup failure prevents success and failed evidence is preserved.
+    - Focused negative safety tests and all applicable current-head project CI pass; reviewed evidence declares dialog override, isolation and platform limits.
+    - Independent Standards and Requirements review has zero blockers and one review-ready standalone task PR is open and unmerged.

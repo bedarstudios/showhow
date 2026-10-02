@@ -1,0 +1,51 @@
+TAP version 13
+# Subtest: missing tools, build, fixture or dependencies fail before launch
+ok 1 - missing tools, build, fixture or dependencies fail before launch
+  ---
+  duration_ms: 0.414459
+  type: 'test'
+  ...
+# Subtest: an existing evidence directory is rejected without touching its bytes
+ok 2 - an existing evidence directory is rejected without touching its bytes
+  ---
+  duration_ms: 1.069083
+  type: 'test'
+  ...
+# Subtest: successful media cannot mask cleanup failure or fixture mutation
+ok 3 - successful media cannot mask cleanup failure or fixture mutation
+  ---
+  duration_ms: 0.14475
+  type: 'test'
+  ...
+# Subtest: a corrupt GIF or incomplete independent decoder cannot establish export proof
+ok 4 - a corrupt GIF or incomplete independent decoder cannot establish export proof
+  ---
+  duration_ms: 0.096875
+  type: 'test'
+  ...
+# Subtest: full FFmpeg decode failure rejects a GIF with plausible signature and probe
+not ok 5 - full FFmpeg decode failure rejects a GIF with plausible signature and probe
+  ---
+  duration_ms: 0.242334
+  type: 'test'
+  location: '<repo>/scripts/verify-showhow-export.node-test.mjs:44:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file://<repo>/scripts/verify-showhow-export.node-test.mjs:47:9)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 4
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 30.94325

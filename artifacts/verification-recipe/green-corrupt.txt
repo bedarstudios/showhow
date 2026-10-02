@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: missing tools, build, fixture or dependencies fail before launch
+ok 1 - missing tools, build, fixture or dependencies fail before launch
+  ---
+  duration_ms: 0.417291
+  type: 'test'
+  ...
+# Subtest: an existing evidence directory is rejected without touching its bytes
+ok 2 - an existing evidence directory is rejected without touching its bytes
+  ---
+  duration_ms: 1.216
+  type: 'test'
+  ...
+# Subtest: successful media cannot mask cleanup failure or fixture mutation
+ok 3 - successful media cannot mask cleanup failure or fixture mutation
+  ---
+  duration_ms: 0.165708
+  type: 'test'
+  ...
+# Subtest: a corrupt GIF or incomplete independent decoder cannot establish export proof
+ok 4 - a corrupt GIF or incomplete independent decoder cannot establish export proof
+  ---
+  duration_ms: 0.107209
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29.988541

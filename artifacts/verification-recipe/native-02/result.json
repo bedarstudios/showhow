@@ -1,0 +1,169 @@
+{
+	"schemaVersion": 1,
+	"started": "2026-10-02T03:26:04.600Z",
+	"platform": "darwin",
+	"saveDialogOverride": "pick-export-save-path only; production write-export-to-path untouched",
+	"harness": "shell (not asserted to be a Codex role profile)",
+	"roleShell": {
+		"role": null,
+		"zdotdir": null,
+		"nativeCodexProfileLaunched": false
+	},
+	"assertions": [
+		{
+			"status": "passed",
+			"label": "All prerequisites resolved before Electron launch"
+		},
+		{
+			"status": "passed",
+			"label": "Actual runtime profile, recordings, temp and both stable locks are contained; lock PIDs equal child PID"
+		},
+		{
+			"status": "passed",
+			"label": "Production IPC loaded synthetic video with finite duration and visible canvas"
+		},
+		{
+			"status": "failed",
+			"label": "export: locator.waitFor: Timeout 120000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Export Complete', { exact: true }) to be visible\u001b[22m\n"
+		},
+		{
+			"status": "passed",
+			"label": "Committed synthetic fixture hash unchanged"
+		},
+		{
+			"status": "passed",
+			"label": "All observed owned processes gone and private run root removed"
+		}
+	],
+	"fixture": {
+		"before": "34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6",
+		"bytes": 23869,
+		"after": "34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6"
+	},
+	"cleanup": {
+		"owned": [
+			{
+				"pid": 98607,
+				"ppid": 98552,
+				"birth": "Fri Oct  2 04:26:04 2026"
+			},
+			{
+				"pid": 98672,
+				"ppid": 98607,
+				"birth": "Fri Oct  2 04:26:05 2026"
+			},
+			{
+				"pid": 98673,
+				"ppid": 98607,
+				"birth": "Fri Oct  2 04:26:05 2026"
+			},
+			{
+				"pid": 98706,
+				"ppid": 98607,
+				"birth": "Fri Oct  2 04:26:05 2026"
+			},
+			{
+				"pid": 98804,
+				"ppid": 98607,
+				"birth": "Fri Oct  2 04:26:05 2026"
+			},
+			{
+				"pid": 98999,
+				"ppid": 98607,
+				"birth": "Fri Oct  2 04:26:07 2026"
+			},
+			{
+				"pid": 19748,
+				"ppid": 98607,
+				"birth": "Fri Oct  2 04:28:13 2026"
+			},
+			{
+				"pid": 19749,
+				"ppid": 98607,
+				"birth": "Fri Oct  2 04:28:13 2026"
+			}
+		],
+		"survivingPids": [],
+		"processesGone": true,
+		"trackingFailure": null,
+		"rootGone": true
+	},
+	"journey": false,
+	"doctor": {
+		"facts": {
+			"node": "v22.22.1",
+			"npm": "10.9.4",
+			"codex": "codex-cli 0.160.0",
+			"missing": []
+		},
+		"tools": {
+			"npm": {
+				"path": "<home>/.nvm/versions/node/v22.22.1/bin/npm",
+				"version": "10.9.4"
+			},
+			"codex": {
+				"path": "<home>/.npm-global/bin/codex",
+				"version": "codex-cli 0.160.0"
+			},
+			"ffmpeg": {
+				"path": "/opt/homebrew/bin/ffmpeg",
+				"version": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers"
+			},
+			"ffprobe": {
+				"path": "/opt/homebrew/bin/ffprobe",
+				"version": "ffprobe version 9.0.2 Copyright (c) 2007-2026 the FFmpeg developers"
+			},
+			"ps": {
+				"path": "/bin/ps",
+				"version": "system process table"
+			}
+		},
+		"electronBinary": "<repo>/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
+		"playwright": "<repo>/node_modules/playwright/index.js",
+		"nodePath": "<home>/.nvm/versions/node/v22.22.1/bin/node",
+		"electronVersion": "41.2.1",
+		"playwrightVersion": "1.59.1"
+	},
+	"source": {
+		"sha": "3013a2ec65384970b1569ce8371eb7b4c4e9cf03",
+		"dirty": "M implementation-notes.md\n M package.json\n?? artifacts/verification-recipe/\n?? scripts/verify-showhow-export.mjs\n?? scripts/verify-showhow-export.node-test.mjs"
+	},
+	"electronPid": 98607,
+	"runtime": {
+		"paths": {
+			"appData": "<run>/appData",
+			"userData": "<run>/appData/Showhow",
+			"sessionData": "<run>/sessionData",
+			"downloads": "<run>/downloads",
+			"temp": "<run>/temp",
+			"logs": "<run>/logs",
+			"crashDumps": "<run>/crashDumps"
+		},
+		"recordings": "<run>/appData/Showhow/recordings",
+		"tmpdir": "<run>/temp",
+		"locks": [
+			{
+				"path": "<run>/temp/showhow-single-instance-uid-501.lock",
+				"pid": 98607
+			},
+			{
+				"path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+				"pid": 98607
+			}
+		],
+		"pid": 98607
+	},
+	"video": [
+		{
+			"duration": 2,
+			"width": 640,
+			"height": 480
+		}
+	],
+	"failure": {
+		"stage": "export",
+		"message": "locator.waitFor: Timeout 120000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Export Complete', { exact: true }) to be visible\u001b[22m\n"
+	},
+	"success": false,
+	"finished": "2026-10-02T03:28:13.887Z"
+}

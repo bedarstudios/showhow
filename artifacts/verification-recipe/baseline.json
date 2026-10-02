@@ -1,0 +1,11 @@
+{
+	"source": "3013a2ec65384970b1569ce8371eb7b4c4e9cf03",
+	"absent": ["scripts/verify-showhow-export.mjs", "docs/testing/verification-recipe.md"],
+	"packageCommandAbsent": true,
+	"existingE2EGap": {
+		"writerRemoved": true,
+		"mockWritesBase64ThenHarnessWritesFile": true,
+		"defaultUserData": true
+	},
+	"fixtureSha256": "34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6"
+}

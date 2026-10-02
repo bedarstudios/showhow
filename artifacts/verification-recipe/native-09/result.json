@@ -1,0 +1,235 @@
+{
+	"schemaVersion": 1,
+	"started": "2026-10-02T03:42:35.140Z",
+	"platform": "darwin",
+	"saveDialogOverride": "pick-export-save-path only; production write-export-to-path untouched",
+	"harness": "codex-api-executor",
+	"roleShell": {
+		"role": null,
+		"zdotdir": null,
+		"nativeCodexProfileLaunched": false
+	},
+	"assertions": [
+		{
+			"status": "passed",
+			"label": "All prerequisites resolved before Electron launch"
+		},
+		{
+			"status": "passed",
+			"label": "Actual runtime profile, recordings, temp and both stable locks are contained; lock PIDs equal child PID"
+		},
+		{
+			"status": "passed",
+			"label": "Editor reload exposed actual WebCodecs decoder and encoder before export"
+		},
+		{
+			"status": "passed",
+			"label": "Production IPC loaded synthetic video with finite duration and visible canvas"
+		},
+		{
+			"status": "passed",
+			"label": "Renderer completed GIF export and production writer created real file"
+		},
+		{
+			"status": "passed",
+			"label": "Independent ffprobe bounds and full FFmpeg decode passed"
+		},
+		{
+			"status": "passed",
+			"label": "Committed synthetic fixture hash unchanged"
+		},
+		{
+			"status": "passed",
+			"label": "All observed owned processes gone and private run root removed"
+		}
+	],
+	"fixture": {
+		"before": "34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6",
+		"bytes": 23869,
+		"after": "34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6"
+	},
+	"cleanup": {
+		"owned": [
+			{
+				"pid": 71487,
+				"ppid": 71426,
+				"birth": "Fri Oct  2 04:42:35 2026"
+			},
+			{
+				"pid": 71520,
+				"ppid": 71487,
+				"birth": "Fri Oct  2 04:42:35 2026"
+			},
+			{
+				"pid": 71521,
+				"ppid": 71487,
+				"birth": "Fri Oct  2 04:42:35 2026"
+			},
+			{
+				"pid": 71538,
+				"ppid": 71487,
+				"birth": "Fri Oct  2 04:42:35 2026"
+			},
+			{
+				"pid": 71587,
+				"ppid": 71487,
+				"birth": "Fri Oct  2 04:42:35 2026"
+			},
+			{
+				"pid": 71682,
+				"ppid": 71487,
+				"birth": "Fri Oct  2 04:42:36 2026"
+			},
+			{
+				"pid": 73185,
+				"ppid": 71487,
+				"birth": "Fri Oct  2 04:42:45 2026"
+			},
+			{
+				"pid": 73186,
+				"ppid": 71487,
+				"birth": "Fri Oct  2 04:42:45 2026"
+			}
+		],
+		"survivingPids": [],
+		"unexplainedPids": [],
+		"processesGone": true,
+		"trackingFailure": null,
+		"rootGone": true
+	},
+	"journey": true,
+	"doctor": {
+		"facts": {
+			"node": "v22.22.1",
+			"npm": "10.9.4",
+			"codex": "codex-cli 0.160.0",
+			"missing": []
+		},
+		"tools": {
+			"npm": {
+				"path": "<home>/.nvm/versions/node/v22.22.1/bin/npm",
+				"version": "10.9.4"
+			},
+			"codex": {
+				"path": "<home>/.npm-global/bin/codex",
+				"version": "codex-cli 0.160.0"
+			},
+			"ffmpeg": {
+				"path": "/opt/homebrew/bin/ffmpeg",
+				"version": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers"
+			},
+			"ffprobe": {
+				"path": "/opt/homebrew/bin/ffprobe",
+				"version": "ffprobe version 9.0.2 Copyright (c) 2007-2026 the FFmpeg developers"
+			},
+			"ps": {
+				"path": "/bin/ps",
+				"version": "system process table"
+			}
+		},
+		"electronBinary": "<repo>/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
+		"playwright": "<repo>/node_modules/playwright/index.js",
+		"nodePath": "<home>/.nvm/versions/node/v22.22.1/bin/node",
+		"electronVersion": "41.2.1",
+		"playwrightVersion": "1.59.1"
+	},
+	"source": {
+		"sha": "3013a2ec65384970b1569ce8371eb7b4c4e9cf03",
+		"dirty": "M AGENTS.md\n M implementation-notes.md\n M package.json\n?? artifacts/verification-recipe/\n?? docs/testing/verification-recipe.md\n?? scripts/verify-showhow-export.mjs\n?? scripts/verify-showhow-export.node-test.mjs",
+		"files": {
+			"scripts/verify-showhow-export.mjs": "616061302965e26e512749a735ad8b2888d224367edcd16495795d159ea22169",
+			"scripts/verify-showhow-export.node-test.mjs": "f2ce53327e3857e6b0127bdea4bb6df495a0da33d380c7d3a2ea22fa8f1acb99",
+			"package.json": "35091a2c11c7d55bb6fc40b354bae747bb87b609da38c096e0b7ed44851b632c"
+		}
+	},
+	"electronPid": 71487,
+	"runtime": {
+		"paths": {
+			"appData": "<run>/appData",
+			"userData": "<run>/appData/Showhow",
+			"sessionData": "<run>/sessionData",
+			"downloads": "<run>/downloads",
+			"temp": "<run>/temp",
+			"logs": "<run>/logs",
+			"crashDumps": "<run>/crashDumps"
+		},
+		"recordings": "<run>/appData/Showhow/recordings",
+		"tmpdir": "<run>/temp",
+		"locks": [
+			{
+				"path": "<run>/temp/showhow-single-instance-uid-501.lock",
+				"pid": 71487
+			},
+			{
+				"path": "<run>/temp/openscreen-single-instance-uid-501.lock",
+				"pid": 71487
+			}
+		],
+		"pid": 71487
+	},
+	"initialCodecs": {
+		"videoDecoder": "undefined",
+		"videoEncoder": "undefined",
+		"secureContext": true,
+		"url": "file://<repo>/dist/index.html?windowType=editor"
+	},
+	"exportCodecs": {
+		"videoDecoder": "function",
+		"videoEncoder": "function",
+		"secureContext": true,
+		"url": "file://<repo>/dist/index.html?windowType=editor"
+	},
+	"video": [
+		{
+			"duration": 2,
+			"width": 640,
+			"height": 480
+		}
+	],
+	"completionUI": "GIF exported successfully",
+	"probe": {
+		"programs": [],
+		"stream_groups": [],
+		"streams": [
+			{
+				"width": 1280,
+				"height": 720,
+				"duration": "2.100000",
+				"nb_read_frames": "30"
+			}
+		],
+		"format": {
+			"duration": "2.100000"
+		}
+	},
+	"decode": {
+		"command": [
+			"/opt/homebrew/bin/ffmpeg",
+			"-v",
+			"error",
+			"-xerror",
+			"-i",
+			"<run>/downloads/verification-export.gif",
+			"-f",
+			"null",
+			"-"
+		],
+		"exit": 0,
+		"stdout": "",
+		"stderr": "",
+		"signal": null,
+		"error": null
+	},
+	"media": {
+		"valid": true,
+		"width": 1280,
+		"height": 720,
+		"frames": 30,
+		"duration": 2.1,
+		"size": 6199282,
+		"decodeExit": 0,
+		"sha256": "6b424e8231641f8f1f2b0c816418a12314e8cefe0370289584380a47b7c83d66"
+	},
+	"success": true,
+	"finished": "2026-10-02T03:42:45.890Z"
+}

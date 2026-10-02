@@ -1,0 +1,462 @@
+Command: node --test .github/scripts/overnight.node-test.mjs .github/scripts/overnight-review.node-test.mjs .github/scripts/overnight-reconcile.node-test.mjs .github/scripts/overnight-evidence.node-test.mjs .github/scripts/overnight-github.node-test.mjs
+Exit: 0
+TAP version 13
+# Subtest: report requires the approved target test and a distinct red commit
+ok 1 - report requires the approved target test and a distinct red commit
+  ---
+  duration_ms: 0.459959
+  type: 'test'
+  ...
+# Subtest: missing imports and setup failures do not count as behavioral red
+ok 2 - missing imports and setup failures do not count as behavioral red
+  ---
+  duration_ms: 0.270583
+  type: 'test'
+  ...
+# Subtest: collector associates provider task by REST PR ID, not issue/PR number
+ok 3 - collector associates provider task by REST PR ID, not issue/PR number
+  ---
+  duration_ms: 0.798708
+  type: 'test'
+  ...
+# Subtest: collector rejects old CI base, old reviewer head and protected file changes
+ok 4 - collector rejects old CI base, old reviewer head and protected file changes
+  ---
+  duration_ms: 0.901208
+  type: 'test'
+  ...
+# Subtest: read-only adapter rejects REST writes and GraphQL mutations before transport
+ok 5 - read-only adapter rejects REST writes and GraphQL mutations before transport
+  ---
+  duration_ms: 0.337916
+  type: 'test'
+  ...
+# Subtest: identical Copilot display names cannot substitute implementation and review identities
+ok 6 - identical Copilot display names cannot substitute implementation and review identities
+  ---
+  duration_ms: 0.059083
+  type: 'test'
+  ...
+# Subtest: active cloud ownership requires only the implementer assignee
+ok 7 - active cloud ownership requires only the implementer assignee
+  ---
+  duration_ms: 0.514042
+  type: 'test'
+  ...
+# Subtest: assignment confirms asynchronously and pins only the dispatcher's automatic co-assignment
+ok 8 - assignment confirms asynchronously and pins only the dispatcher's automatic co-assignment
+  ---
+  duration_ms: 1.628042
+  type: 'test'
+  ...
+# Subtest: confirmed automatic tracking assignment never permits a later human takeover
+ok 9 - confirmed automatic tracking assignment never permits a later human takeover
+  ---
+  duration_ms: 0.418
+  type: 'test'
+  ...
+# Subtest: an unconfirmed assignment is never retried or treated as ownership
+ok 10 - an unconfirmed assignment is never retried or treated as ownership
+  ---
+  duration_ms: 0.148167
+  type: 'test'
+  ...
+# Subtest: draft state mutations are forbidden even for the writable controller
+ok 11 - draft state mutations are forbidden even for the writable controller
+  ---
+  duration_ms: 0.263333
+  type: 'test'
+  ...
+# Subtest: only an initial Copilot draft without recorded resets can receive cloud review
+ok 12 - only an initial Copilot draft without recorded resets can receive cloud review
+  ---
+  duration_ms: 0.365125
+  type: 'test'
+  ...
+# Subtest: review intent is persisted before requesting, and replay does not request again
+ok 13 - review intent is persisted before requesting, and replay does not request again
+  ---
+  duration_ms: 0.920792
+  type: 'test'
+  ...
+# Subtest: failed required check permits one correction, then caps further dispatches
+ok 14 - failed required check permits one correction, then caps further dispatches
+  ---
+  duration_ms: 0.174833
+  type: 'test'
+  ...
+# Subtest: review cap and expired billing never request another metered review
+ok 15 - review cap and expired billing never request another metered review
+  ---
+  duration_ms: 0.574541
+  type: 'test'
+  ...
+# Subtest: reviewed record observes later human merge without another agent request
+ok 16 - reviewed record observes later human merge without another agent request
+  ---
+  duration_ms: 0.146833
+  type: 'test'
+  ...
+# Subtest: unconfirmed provider work and old evidence cannot pass
+ok 17 - unconfirmed provider work and old evidence cannot pass
+  ---
+  duration_ms: 0.075208
+  type: 'test'
+  ...
+# Subtest: a reviewed PR closed without merge becomes blocked
+ok 18 - a reviewed PR closed without merge becomes blocked
+  ---
+  duration_ms: 0.062083
+  type: 'test'
+  ...
+# Subtest: reviewed is invalidated by draft reset
+ok 19 - reviewed is invalidated by draft reset
+  ---
+  duration_ms: 0.14575
+  type: 'test'
+  ...
+# Subtest: reviewed is invalidated by changed base
+ok 20 - reviewed is invalidated by changed base
+  ---
+  duration_ms: 0.055708
+  type: 'test'
+  ...
+# Subtest: scope changed after dispatch blocks review or repair
+ok 21 - scope changed after dispatch blocks review or repair
+  ---
+  duration_ms: 0.220375
+  type: 'test'
+  ...
+# Subtest: dismissed prior review immediately invalidates reviewed even within pending request timeout
+ok 22 - dismissed prior review immediately invalidates reviewed even within pending request timeout
+  ---
+  duration_ms: 0.3445
+  type: 'test'
+  ...
+# Subtest: revoked approval persists blocked before inspecting PR: {}
+ok 23 - revoked approval persists blocked before inspecting PR: {}
+  ---
+  duration_ms: 0.1125
+  type: 'test'
+  ...
+# Subtest: revoked approval persists blocked before inspecting PR: {"83":{"scopeDigest":"replacement-digest"}}
+ok 24 - revoked approval persists blocked before inspecting PR: {"83":{"scopeDigest":"replacement-digest"}}
+  ---
+  duration_ms: 0.03825
+  type: 'test'
+  ...
+# Subtest: human merge releases reviewed run despite revoked approval {}
+ok 25 - human merge releases reviewed run despite revoked approval {}
+  ---
+  duration_ms: 0.133792
+  type: 'test'
+  ...
+# Subtest: human merge releases reviewed run despite revoked approval {"83":{"scopeDigest":"replacement-digest"}}
+ok 26 - human merge releases reviewed run despite revoked approval {"83":{"scopeDigest":"replacement-digest"}}
+  ---
+  duration_ms: 0.037792
+  type: 'test'
+  ...
+# Subtest: human merge releases blocked run despite revoked approval {}
+ok 27 - human merge releases blocked run despite revoked approval {}
+  ---
+  duration_ms: 0.035625
+  type: 'test'
+  ...
+# Subtest: human merge releases blocked run despite revoked approval {"83":{"scopeDigest":"replacement-digest"}}
+ok 28 - human merge releases blocked run despite revoked approval {"83":{"scopeDigest":"replacement-digest"}}
+  ---
+  duration_ms: 0.0315
+  type: 'test'
+  ...
+# Subtest: blocked run stays inert without an observed merge: null
+ok 29 - blocked run stays inert without an observed merge: null
+  ---
+  duration_ms: 0.040708
+  type: 'test'
+  ...
+# Subtest: blocked run stays inert without an observed merge: {"number":84,"state":"open"}
+ok 30 - blocked run stays inert without an observed merge: {"number":84,"state":"open"}
+  ---
+  duration_ms: 0.021458
+  type: 'test'
+  ...
+# Subtest: blocked run stays inert without an observed merge: {"number":84,"state":"closed","merged_at":null}
+ok 31 - blocked run stays inert without an observed merge: {"number":84,"state":"closed","merged_at":null}
+  ---
+  duration_ms: 0.019833
+  type: 'test'
+  ...
+# Subtest: human draft decision survives a reset racing cloud review preparation
+ok 32 - human draft decision survives a reset racing cloud review preparation
+  ---
+  duration_ms: 0.081333
+  type: 'test'
+  ...
+# Subtest: reviewed needs a separate current-head review and actual required check results
+ok 33 - reviewed needs a separate current-head review and actual required check results
+  ---
+  duration_ms: 1.583833
+  type: 'test'
+  ...
+# Subtest: cannot pass with old CI head
+ok 34 - cannot pass with old CI head
+  ---
+  duration_ms: 0.128666
+  type: 'test'
+  ...
+# Subtest: cannot pass with old CI base
+ok 35 - cannot pass with old CI base
+  ---
+  duration_ms: 0.04175
+  type: 'test'
+  ...
+# Subtest: cannot pass with still implementing
+ok 36 - cannot pass with still implementing
+  ---
+  duration_ms: 0.036417
+  type: 'test'
+  ...
+# Subtest: cannot pass with draft
+ok 37 - cannot pass with draft
+  ---
+  duration_ms: 0.039042
+  type: 'test'
+  ...
+# Subtest: cannot pass with protected path
+ok 38 - cannot pass with protected path
+  ---
+  duration_ms: 0.03375
+  type: 'test'
+  ...
+# Subtest: cannot pass with missing check
+ok 39 - cannot pass with missing check
+  ---
+  duration_ms: 0.03
+  type: 'test'
+  ...
+# Subtest: cannot pass with skipped check
+ok 40 - cannot pass with skipped check
+  ---
+  duration_ms: 0.028917
+  type: 'test'
+  ...
+# Subtest: cannot pass with failed check
+ok 41 - cannot pass with failed check
+  ---
+  duration_ms: 0.209333
+  type: 'test'
+  ...
+# Subtest: cannot pass with wrong reviewer
+ok 42 - cannot pass with wrong reviewer
+  ---
+  duration_ms: 0.279042
+  type: 'test'
+  ...
+# Subtest: cannot pass with review findings
+ok 43 - cannot pass with review findings
+  ---
+  duration_ms: 0.077709
+  type: 'test'
+  ...
+# Subtest: cannot pass with body-only uncertainty
+ok 44 - cannot pass with body-only uncertainty
+  ---
+  duration_ms: 0.070209
+  type: 'test'
+  ...
+# Subtest: cannot pass with open review threads
+ok 45 - cannot pass with open review threads
+  ---
+  duration_ms: 0.022041
+  type: 'test'
+  ...
+# Subtest: cannot pass with no behavior evidence
+ok 46 - cannot pass with no behavior evidence
+  ---
+  duration_ms: 0.02125
+  type: 'test'
+  ...
+# Subtest: cannot pass with old behavior evidence
+ok 47 - cannot pass with old behavior evidence
+  ---
+  duration_ms: 0.019209
+  type: 'test'
+  ...
+# Subtest: current Copilot v2 approval summary passes with all other evidence gates
+ok 48 - current Copilot v2 approval summary passes with all other evidence gates
+  ---
+  duration_ms: 0.14675
+  type: 'test'
+  ...
+# Subtest: a verified initial draft can pass cloud review without becoming ready for human review
+ok 49 - a verified initial draft can pass cloud review without becoming ready for human review
+  ---
+  duration_ms: 0.039709
+  type: 'test'
+  ...
+# Subtest: admission requires approved scope even when queue labels are present
+ok 50 - admission requires approved scope even when queue labels are present
+  ---
+  duration_ms: 0.545458
+  type: 'test'
+  ...
+# Subtest: admission rejects edited scope
+ok 51 - admission rejects edited scope
+  ---
+  duration_ms: 0.10225
+  type: 'test'
+  ...
+# Subtest: admission rejects local owner
+ok 52 - admission rejects local owner
+  ---
+  duration_ms: 0.041417
+  type: 'test'
+  ...
+# Subtest: admission rejects human blocked
+ok 53 - admission rejects human blocked
+  ---
+  duration_ms: 0.033833
+  type: 'test'
+  ...
+# Subtest: admission rejects no cloud reservation
+ok 54 - admission rejects no cloud reservation
+  ---
+  duration_ms: 0.038
+  type: 'test'
+  ...
+# Subtest: admission rejects not ready
+ok 55 - admission rejects not ready
+  ---
+  duration_ms: 0.031958
+  type: 'test'
+  ...
+# Subtest: admission rejects assigned elsewhere
+ok 56 - admission rejects assigned elsewhere
+  ---
+  duration_ms: 0.029792
+  type: 'test'
+  ...
+# Subtest: admission rejects off board
+ok 57 - admission rejects off board
+  ---
+  duration_ms: 0.028875
+  type: 'test'
+  ...
+# Subtest: admission rejects closed
+ok 58 - admission rejects closed
+  ---
+  duration_ms: 0.670417
+  type: 'test'
+  ...
+# Subtest: admission rejects duplicate run
+ok 59 - admission rejects duplicate run
+  ---
+  duration_ms: 0.230666
+  type: 'test'
+  ...
+# Subtest: admission rejects capacity
+ok 60 - admission rejects capacity
+  ---
+  duration_ms: 0.108458
+  type: 'test'
+  ...
+# Subtest: admission rejects existing PR
+ok 61 - admission rejects existing PR
+  ---
+  duration_ms: 0.03125
+  type: 'test'
+  ...
+# Subtest: admission rejects dependency incomplete
+ok 62 - admission rejects dependency incomplete
+  ---
+  duration_ms: 0.020041
+  type: 'test'
+  ...
+# Subtest: admission rejects unknown mode
+ok 63 - admission rejects unknown mode
+  ---
+  duration_ms: 0.017292
+  type: 'test'
+  ...
+# Subtest: admission rejects wrong repository
+ok 64 - admission rejects wrong repository
+  ---
+  duration_ms: 0.016709
+  type: 'test'
+  ...
+# Subtest: admission rejects unknown main
+ok 65 - admission rejects unknown main
+  ---
+  duration_ms: 0.016792
+  type: 'test'
+  ...
+# Subtest: admission rejects disabled
+ok 66 - admission rejects disabled
+  ---
+  duration_ms: 0.02425
+  type: 'test'
+  ...
+# Subtest: admission rejects billing unknown
+ok 67 - admission rejects billing unknown
+  ---
+  duration_ms: 0.016125
+  type: 'test'
+  ...
+# Subtest: admission rejects billing expired
+ok 68 - admission rejects billing expired
+  ---
+  duration_ms: 0.015917
+  type: 'test'
+  ...
+# Subtest: admission rejects paid usage enabled
+ok 69 - admission rejects paid usage enabled
+  ---
+  duration_ms: 0.016
+  type: 'test'
+  ...
+# Subtest: admission rejects undeployed local protection
+ok 70 - admission rejects undeployed local protection
+  ---
+  duration_ms: 0.015708
+  type: 'test'
+  ...
+# Subtest: approval digest uses fixed SHA256 and includes whitespace edits
+ok 71 - approval digest uses fixed SHA256 and includes whitespace edits
+  ---
+  duration_ms: 0.044333
+  type: 'test'
+  ...
+# Subtest: dry run has no mutations or assignment
+ok 72 - dry run has no mutations or assignment
+  ---
+  duration_ms: 0.404834
+  type: 'test'
+  ...
+# Subtest: reservation and fresh recheck precede the single assignment
+ok 73 - reservation and fresh recheck precede the single assignment
+  ---
+  duration_ms: 0.165292
+  type: 'test'
+  ...
+# Subtest: a local claim acquired after reservation blocks cloud assignment
+ok 74 - a local claim acquired after reservation blocks cloud assignment
+  ---
+  duration_ms: 0.07325
+  type: 'test'
+  ...
+# Subtest: ambiguous assignment never triggers a blind retry
+ok 75 - ambiguous assignment never triggers a blind retry
+  ---
+  duration_ms: 0.12675
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 75
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 50.522833

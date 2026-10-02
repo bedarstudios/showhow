@@ -1,0 +1,110 @@
+{
+	"schemaVersion": 1,
+	"started": "2026-10-02T03:24:58.801Z",
+	"platform": "darwin",
+	"saveDialogOverride": "pick-export-save-path only; production write-export-to-path untouched",
+	"harness": "shell (not asserted to be a Codex role profile)",
+	"roleShell": {
+		"role": null,
+		"zdotdir": null,
+		"nativeCodexProfileLaunched": false
+	},
+	"assertions": [
+		{
+			"status": "passed",
+			"label": "All prerequisites resolved before Electron launch"
+		},
+		{
+			"status": "failed",
+			"label": "isolation: electronApplication.evaluate: TypeError: A dynamic import callback was not specified.\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:279:9)\n    at eval (eval at evaluate (:302:30), <anonymous>:2:34)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at BrowserWindow.emit (node:events:455:44)"
+		},
+		{
+			"status": "passed",
+			"label": "Committed synthetic fixture hash unchanged"
+		},
+		{
+			"status": "passed",
+			"label": "All observed owned processes gone and private run root removed"
+		}
+	],
+	"fixture": {
+		"before": "34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6",
+		"bytes": 23869,
+		"after": "34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6"
+	},
+	"cleanup": {
+		"owned": [
+			{
+				"pid": 97658,
+				"ppid": 97598,
+				"birth": "Fri Oct  2 04:24:59 2026"
+			},
+			{
+				"pid": 97946,
+				"ppid": 97658,
+				"birth": "Fri Oct  2 04:25:01 2026"
+			},
+			{
+				"pid": 97947,
+				"ppid": 97658,
+				"birth": "Fri Oct  2 04:25:01 2026"
+			},
+			{
+				"pid": 97986,
+				"ppid": 97658,
+				"birth": "Fri Oct  2 04:25:01 2026"
+			}
+		],
+		"survivingPids": [],
+		"processesGone": true,
+		"trackingFailure": null,
+		"rootGone": true
+	},
+	"journey": false,
+	"doctor": {
+		"facts": {
+			"node": "v22.22.1",
+			"npm": "10.9.4",
+			"codex": "codex-cli 0.160.0",
+			"missing": []
+		},
+		"tools": {
+			"npm": {
+				"path": "<home>/.nvm/versions/node/v22.22.1/bin/npm",
+				"version": "10.9.4"
+			},
+			"codex": {
+				"path": "<home>/.npm-global/bin/codex",
+				"version": "codex-cli 0.160.0"
+			},
+			"ffmpeg": {
+				"path": "/opt/homebrew/bin/ffmpeg",
+				"version": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers"
+			},
+			"ffprobe": {
+				"path": "/opt/homebrew/bin/ffprobe",
+				"version": "ffprobe version 9.0.2 Copyright (c) 2007-2026 the FFmpeg developers"
+			},
+			"ps": {
+				"path": "/bin/ps",
+				"version": "system process table"
+			}
+		},
+		"electronBinary": "<repo>/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
+		"playwright": "<repo>/node_modules/playwright/index.js",
+		"nodePath": "<home>/.nvm/versions/node/v22.22.1/bin/node",
+		"electronVersion": "41.2.1",
+		"playwrightVersion": "1.59.1"
+	},
+	"source": {
+		"sha": "3013a2ec65384970b1569ce8371eb7b4c4e9cf03",
+		"dirty": "M package.json\n?? artifacts/verification-recipe/\n?? scripts/verify-showhow-export.mjs\n?? scripts/verify-showhow-export.node-test.mjs"
+	},
+	"electronPid": 97658,
+	"failure": {
+		"stage": "isolation",
+		"message": "electronApplication.evaluate: TypeError: A dynamic import callback was not specified.\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:279:9)\n    at eval (eval at evaluate (:302:30), <anonymous>:2:34)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at BrowserWindow.emit (node:events:455:44)"
+	},
+	"success": false,
+	"finished": "2026-10-02T03:25:02.944Z"
+}

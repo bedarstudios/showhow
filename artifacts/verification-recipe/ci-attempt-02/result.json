@@ -1,0 +1,40 @@
+{
+	"head": "8478f438c12c60848dc3b4e8cc2c59c01ba9d2c4",
+	"checks": [
+		{
+			"command": "npm run lint",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-attempt-02/01-npm-lint.txt"
+		},
+		{
+			"command": "npm run branding:check",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-attempt-02/02-npm-branding:check.txt"
+		},
+		{
+			"command": "npx tsc --noEmit",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-attempt-02/03-npx---noEmit.txt"
+		},
+		{
+			"command": "npm run test",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-attempt-02/04-npm-test.txt"
+		},
+		{
+			"command": "node --test .github/scripts/overnight-evidence-integration.node-test.mjs",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-attempt-02/05-node-.github-scripts-overnight-evidence-integration.node-test.mjs.txt"
+		},
+		{
+			"command": "npm run test:browser:install",
+			"exit": 0,
+			"log": "artifacts/verification-recipe/ci-attempt-02/06-npm-test:browser:install.txt"
+		},
+		{
+			"command": "npm run test:browser",
+			"exit": 1,
+			"log": "artifacts/verification-recipe/ci-attempt-02/07-npm-test:browser.txt"
+		}
+	]
+}

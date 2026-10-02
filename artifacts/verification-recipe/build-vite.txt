@@ -1,0 +1,237 @@
+
+> showhow@1.6.0 build-vite
+> tsc && vite build
+
+vite v7.3.2 building client environment for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+node_modules/onnxruntime-web/dist/ort-web.min.js (6:62546): Use of eval in "node_modules/onnxruntime-web/dist/ort-web.min.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+✓ 3241 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/audioPeaksWorker-BgD-138C.js                              0.43 kB
+dist/index.html                                                       0.76 kB │ gzip:   0.41 kB
+dist/assets/transcribe.worker-D4rdKWu0.js                             4.03 kB
+dist/assets/plus-jakarta-sans-vietnamese-400-normal-Cg2kxhWu.woff2    4.10 kB
+dist/assets/oswald-vietnamese-700-normal-_DkZZ6ID.woff2               4.19 kB
+dist/assets/space-grotesk-vietnamese-700-normal-DMty7AZE.woff2        4.20 kB
+dist/assets/fira-code-symbols2-400-normal-Cz-VMVza.woff2              4.21 kB
+dist/assets/plus-jakarta-sans-vietnamese-700-normal-CV6qDkkj.woff2    4.27 kB
+dist/assets/space-grotesk-vietnamese-400-normal-B7xT_GF5.woff2        4.30 kB
+dist/assets/plus-jakarta-sans-vietnamese-400-italic-DxHMt71w.woff2    4.33 kB
+dist/assets/manrope-vietnamese-400-normal-DHb3EETF.woff2              4.46 kB
+dist/assets/plus-jakarta-sans-vietnamese-700-italic-cvvPQL89.woff2    4.47 kB
+dist/assets/manrope-vietnamese-700-normal-CUqMx5-1.woff2              4.55 kB
+dist/assets/Cursor_Hand-(Pointing)-Byy2KbtA.svg                       4.63 kB │ gzip:   1.30 kB
+dist/assets/manrope-greek-700-normal-CHUG9PD8.woff2                   5.24 kB
+dist/assets/fira-code-greek-ext-700-normal-DcoM8WV0.woff2             5.24 kB
+dist/assets/manrope-greek-400-normal-CM4qok81.woff2                   5.28 kB
+dist/assets/lora-vietnamese-700-normal-BHDzxyiD.woff2                 5.29 kB
+dist/assets/lora-vietnamese-400-normal-BxA6xcFr.woff2                 5.29 kB
+dist/assets/fira-code-greek-ext-400-normal-DR7mBgIM.woff2             5.36 kB
+dist/assets/Cursor_Hand-(Open)-DGrW1tFF.svg                           5.46 kB │ gzip:   2.27 kB
+dist/assets/lora-vietnamese-400-italic-DFs7jfwN.woff2                 5.54 kB
+dist/assets/lora-vietnamese-700-italic-Pw0hn3GL.woff2                 5.55 kB
+dist/assets/playfair-display-vietnamese-400-normal-BV2APVTb.woff2     5.58 kB
+dist/assets/playfair-display-vietnamese-700-normal-CaKJSIny.woff2     5.66 kB
+dist/assets/playfair-display-vietnamese-400-italic-CD15TOr5.woff2     5.80 kB
+dist/assets/ibm-plex-mono-vietnamese-400-normal-BulugwFq.woff2        5.87 kB
+dist/assets/playfair-display-vietnamese-700-italic-BhFv1_vq.woff2     5.97 kB
+dist/assets/ibm-plex-mono-vietnamese-700-normal-apsD3J7v.woff2        6.07 kB
+dist/assets/ibm-plex-mono-vietnamese-400-italic-DRuN92E5.woff2        6.36 kB
+dist/assets/ibm-plex-mono-vietnamese-700-italic-D5yBhF4R.woff2        6.48 kB
+dist/assets/fira-code-cyrillic-700-normal-BzkQsJe8.woff2              6.64 kB
+dist/assets/merriweather-vietnamese-700-normal-Bp6kWjW5.woff2         6.66 kB
+dist/assets/merriweather-vietnamese-400-normal-hNacsVs_.woff2         6.66 kB
+dist/assets/fira-code-cyrillic-400-normal-UC0NFL4U.woff2              6.68 kB
+dist/assets/oswald-cyrillic-400-normal-Dakd8U79.woff2                 6.70 kB
+dist/assets/oswald-cyrillic-700-normal-BO0IwMyy.woff2                 6.75 kB
+dist/assets/ibm-plex-mono-cyrillic-ext-400-normal-xuaO2J-f.woff2      6.91 kB
+dist/assets/ibm-plex-mono-cyrillic-ext-700-normal-BDQ-w_bc.woff2      7.18 kB
+dist/assets/merriweather-vietnamese-400-italic-CpoqsQFt.woff2         7.31 kB
+dist/assets/merriweather-vietnamese-700-italic-Y3g3C9Eb.woff2         7.34 kB
+dist/assets/sora-latin-ext-400-normal-Twk1CgKs.woff2                  7.34 kB
+dist/assets/dm-sans-latin-ext-400-normal-BtiwyxMk.woff2               7.36 kB
+dist/assets/sora-latin-ext-700-normal-DM0oy5s8.woff2                  7.45 kB
+dist/assets/dm-sans-latin-ext-700-normal-CJIcxD6K.woff2               7.45 kB
+dist/assets/oswald-cyrillic-ext-400-normal-DaQSmjrl.woff2             7.69 kB
+dist/assets/fira-code-latin-ext-700-normal-HGNx6xyT.woff2             7.74 kB
+dist/assets/fira-code-greek-400-normal-B2Gh_Y8s.woff2                 7.83 kB
+dist/assets/manrope-cyrillic-400-normal-BMzJvInZ.woff2                7.84 kB
+dist/assets/manrope-cyrillic-700-normal-Dw_fZAg2.woff2                7.85 kB
+dist/assets/fira-code-latin-ext-400-normal-KSMg0QLl.woff2             7.86 kB
+dist/assets/ibm-plex-mono-cyrillic-ext-400-italic-CBjNughH.woff2      7.86 kB
+dist/assets/ibm-plex-mono-cyrillic-ext-700-italic-15GVjEKw.woff2      7.87 kB
+dist/assets/fira-code-greek-700-normal-Dxn_KKZg.woff2                 7.88 kB
+dist/assets/oswald-cyrillic-ext-700-normal-CtkJES1U.woff2             7.96 kB
+dist/assets/dm-sans-latin-ext-400-italic-BpitL8Uu.woff2               8.13 kB
+dist/assets/dm-sans-latin-ext-700-italic-C1c65SUs.woff2               8.17 kB
+dist/assets/ibm-plex-sans-vietnamese-400-normal-DG4YqDda.woff2        8.20 kB
+dist/assets/ibm-plex-sans-vietnamese-700-normal-CkEo6LDy.woff2        8.22 kB
+dist/assets/manrope-latin-ext-700-normal-DYOwVNan.woff2               8.28 kB
+dist/assets/manrope-latin-ext-400-normal-CMDvPJRp.woff2               8.29 kB
+dist/assets/ibm-plex-mono-cyrillic-400-normal-BSMlKf0J.woff2          8.36 kB
+dist/assets/ibm-plex-sans-vietnamese-700-italic-Dof4AuGQ.woff2        8.60 kB
+dist/assets/ibm-plex-mono-cyrillic-700-normal-Bp80XfeI.woff2          8.68 kB
+dist/assets/ibm-plex-sans-vietnamese-400-italic-BbRnwouv.woff2        8.69 kB
+dist/assets/bebas-neue-latin-ext-400-normal-DWiEslNC.woff2            8.93 kB
+dist/assets/lora-symbols-700-normal-zYsi5zvy.woff2                    9.40 kB
+dist/assets/lora-symbols-400-normal-DmcY0X7a.woff2                    9.48 kB
+dist/assets/ibm-plex-sans-greek-700-normal-wyJ6jzdA.woff2             9.93 kB
+dist/assets/ibm-plex-sans-greek-400-normal-_efipK4i.woff2             9.94 kB
+dist/assets/lora-symbols-700-italic-CnLrm660.woff2                   10.27 kB
+dist/assets/ibm-plex-mono-cyrillic-400-italic-CBJ8pzag.woff2         10.40 kB
+dist/assets/lora-symbols-400-italic-Bx3UNHSW.woff2                   10.52 kB
+dist/assets/ibm-plex-mono-cyrillic-700-italic-PsvAtmvF.woff2         10.53 kB
+dist/assets/plus-jakarta-sans-latin-ext-400-normal-D127hM_v.woff2    10.59 kB
+dist/assets/ibm-plex-sans-greek-400-italic-BEZwmy7D.woff2            10.60 kB
+dist/assets/ibm-plex-sans-greek-700-italic-MR1acr4S.woff2            10.64 kB
+dist/assets/plus-jakarta-sans-latin-ext-700-normal-BajbvANd.woff2    11.01 kB
+dist/assets/plus-jakarta-sans-latin-ext-400-italic--YfxA26p.woff2    11.14 kB
+dist/assets/lora-cyrillic-700-normal-CicHrsUU.woff2                  11.39 kB
+dist/assets/playfair-display-cyrillic-400-normal-CjW2EstV.woff2      11.44 kB
+dist/assets/lora-cyrillic-400-normal-CbVom6TB.woff2                  11.48 kB
+dist/assets/plus-jakarta-sans-latin-ext-700-italic-bFhnYJdU.woff2    11.56 kB
+dist/assets/oswald-latin-ext-400-normal-DbVOzfr-.woff2               11.62 kB
+dist/assets/fira-code-cyrillic-ext-700-normal-DoLWcase.woff2         11.76 kB
+dist/assets/plus-jakarta-sans-latin-400-normal-Dhut76fR.woff2        11.82 kB
+dist/assets/fira-code-cyrillic-ext-400-normal-txZ9Fk_1.woff2         11.96 kB
+dist/assets/lora-latin-ext-700-normal-DbHby4fw.woff2                 11.97 kB
+dist/assets/oswald-latin-ext-700-normal-BKErdSR5.woff2               11.98 kB
+dist/assets/space-grotesk-latin-ext-700-normal-BQnZhY3m.woff2        11.99 kB
+dist/assets/lora-latin-ext-400-normal-CyviI4c-.woff2                 12.02 kB
+dist/assets/ibm-plex-sans-cyrillic-ext-700-normal-BmRLXWpJ.woff2     12.06 kB
+dist/assets/ibm-plex-sans-cyrillic-ext-400-normal-g30qAdWV.woff2     12.15 kB
+dist/assets/plus-jakarta-sans-latin-700-normal-CfpNZvy6.woff2        12.24 kB
+dist/assets/oswald-latin-400-normal-BAFo8sP8.woff2                   12.25 kB
+dist/assets/space-grotesk-latin-ext-400-normal-CfP_5XZW.woff2        12.26 kB
+dist/assets/lora-latin-ext-700-italic-CUTsO9Nd.woff2                 12.26 kB
+dist/assets/playfair-display-latin-ext-400-normal-BxlSGspa.woff2     12.34 kB
+dist/assets/playfair-display-cyrillic-700-normal-Dw3uKy19.woff2      12.36 kB
+dist/assets/lora-latin-ext-400-italic-D02B-RQB.woff2                 12.46 kB
+dist/assets/lora-cyrillic-700-italic-DpRjPupg.woff2                  12.48 kB
+dist/assets/lora-cyrillic-400-italic-BZqWJcgY.woff2                  12.51 kB
+dist/assets/lora-cyrillic-ext-400-normal-DwaaZvol.woff2              12.53 kB
+dist/assets/plus-jakarta-sans-latin-400-italic-D5MFNpT-.woff2        12.59 kB
+dist/assets/lora-cyrillic-ext-700-normal-CH2Ef3pd.woff2              12.60 kB
+dist/assets/playfair-display-cyrillic-400-italic-drKdN10-.woff2      12.66 kB
+dist/assets/oswald-latin-700-normal-vy6hmKSr.woff2                   12.67 kB
+dist/assets/space-grotesk-latin-700-normal-RjhwGPKo.woff2            12.84 kB
+dist/assets/playfair-display-latin-ext-700-normal-C58ejOkc.woff2     12.90 kB
+dist/assets/plus-jakarta-sans-latin-700-italic-B6fOe9QJ.woff2        13.05 kB
+dist/assets/ibm-plex-sans-cyrillic-ext-700-italic-BJjHJKSo.woff2     13.28 kB
+dist/assets/ibm-plex-mono-latin-ext-400-normal-BmRBH3aV.woff2        13.35 kB
+dist/assets/ibm-plex-mono-latin-ext-700-normal-Dhimjc7-.woff2        13.38 kB
+dist/assets/space-grotesk-latin-400-normal-CJ-V5oYT.woff2            13.39 kB
+dist/assets/ibm-plex-sans-cyrillic-ext-400-italic-BELOEI8R.woff2     13.41 kB
+dist/assets/playfair-display-cyrillic-700-italic-DNZWWj68.woff2      13.52 kB
+dist/assets/playfair-display-latin-ext-400-italic-zVOgzDMq.woff2     13.67 kB
+dist/assets/bebas-neue-latin-400-normal-9mHNbWWO.woff2               13.77 kB
+dist/assets/manrope-latin-400-normal-PaqtzbVb.woff2                  14.11 kB
+dist/assets/playfair-display-latin-ext-700-italic-DsMbH0-z.woff2     14.13 kB
+dist/assets/dm-sans-latin-400-normal-CW0RaeGs.woff2                  14.20 kB
+dist/assets/manrope-latin-700-normal-BZp_XxE4.woff2                  14.21 kB
+dist/assets/dm-sans-latin-700-normal-DvUfVpUG.woff2                  14.35 kB
+dist/assets/lora-cyrillic-ext-400-italic-sNZZY6P_.woff2              14.43 kB
+dist/assets/lora-cyrillic-ext-700-italic-DjhWSXgN.woff2              14.46 kB
+dist/assets/ibm-plex-mono-latin-ext-400-italic-B7_fu1kp.woff2        14.52 kB
+dist/assets/ibm-plex-sans-cyrillic-700-normal-D_uavGvn.woff2         14.57 kB
+dist/assets/ibm-plex-mono-latin-ext-700-italic-Dxj0B7mx.woff2        14.68 kB
+dist/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2            14.71 kB
+dist/assets/sora-latin-400-normal-CRt88UEn.woff2                     14.72 kB
+dist/assets/ibm-plex-sans-cyrillic-400-normal-DZqxrq2p.woff2         14.80 kB
+dist/assets/ibm-plex-mono-latin-700-normal-7sUh57Bg.woff2            14.91 kB
+dist/assets/sora-latin-700-normal-9waGdLWo.woff2                     15.13 kB
+dist/assets/dm-sans-latin-400-italic-DRLHr0TN.woff2                  15.14 kB
+dist/assets/dm-sans-latin-700-italic-jlr8VNK_.woff2                  15.22 kB
+dist/assets/ibm-plex-sans-cyrillic-700-italic-CCqLH0Eg.woff2         15.69 kB
+dist/assets/ibm-plex-sans-latin-ext-400-normal-C5H60-Va.woff2        15.98 kB
+dist/assets/ibm-plex-sans-cyrillic-400-italic-D9J6q4_O.woff2         16.13 kB
+dist/assets/ibm-plex-sans-latin-ext-700-normal-aMgXseD4.woff2        16.19 kB
+dist/assets/lora-math-400-normal-D2gccGFf.woff2                      16.29 kB
+dist/assets/lora-math-700-normal-BdgFUNlJ.woff2                      16.36 kB
+dist/assets/ibm-plex-mono-latin-400-italic-BqAiT5Ww.woff2            16.45 kB
+dist/assets/ibm-plex-mono-latin-700-italic-J6kahdQd.woff2            16.54 kB
+dist/assets/gif.worker-CjkyQP34.js                                   16.64 kB
+dist/assets/ibm-plex-sans-latin-ext-400-italic-Du9zzoL2.woff2        17.01 kB
+dist/assets/ibm-plex-sans-latin-ext-700-italic-BKA4l2Ci.woff2        17.22 kB
+dist/assets/lora-math-700-italic-CaMk_6mS.woff2                      17.27 kB
+dist/assets/lora-math-400-italic-C8XPXhEM.woff2                      17.61 kB
+dist/assets/merriweather-cyrillic-ext-700-normal-Bk1p9YoV.woff2      18.56 kB
+dist/assets/merriweather-cyrillic-ext-400-normal-D9NYhYTq.woff2      18.60 kB
+dist/assets/caveat-latin-ext-400-normal-D7hBUiug.woff2               18.60 kB
+dist/assets/caveat-latin-ext-700-normal-DFbRgDry.woff2               19.57 kB
+dist/assets/instrument-serif-latin-400-normal-DnYpCC2O.woff2         21.03 kB
+dist/assets/lora-latin-700-normal-BHK4Pzk4.woff2                     21.04 kB
+dist/assets/lora-latin-400-normal-DnxXpLNu.woff2                     21.15 kB
+dist/assets/jetbrains-mono-latin-400-normal-V6pRDFza.woff2           21.17 kB
+dist/assets/merriweather-cyrillic-ext-400-italic-BzaozJoX.woff2      21.21 kB
+dist/assets/merriweather-cyrillic-ext-700-italic-CAdQUlwO.woff2      21.27 kB
+dist/assets/jetbrains-mono-latin-500-normal-BWZEU5yA.woff2           21.83 kB
+dist/assets/playfair-display-latin-400-normal-CFtfchNt.woff2         21.86 kB
+dist/assets/playfair-display-latin-400-italic-LeeEXsx5.woff2         21.88 kB
+dist/assets/inter-tight-latin-400-normal-iW8qmuJY.woff2              22.02 kB
+dist/assets/instrument-serif-latin-400-italic-DKMiL14s.woff2         22.13 kB
+dist/assets/lora-latin-700-italic-BzqHDNuv.woff2                     22.26 kB
+dist/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2            22.59 kB
+dist/assets/inter-tight-latin-500-normal-BFXNXuvF.woff2              22.62 kB
+dist/assets/lora-latin-400-italic-DYjZp4sZ.woff2                     22.76 kB
+dist/assets/ibm-plex-sans-latin-700-normal-Bxkt5Cjx.woff2            22.83 kB
+dist/assets/fira-code-latin-700-normal-aa0XcSUK.woff2                23.04 kB
+dist/assets/playfair-display-latin-700-italic-CB566L-e.woff2         23.20 kB
+dist/assets/playfair-display-latin-700-normal-CuDiGg7c.woff2         23.22 kB
+dist/assets/fira-code-latin-400-normal-DGosTW8U.woff2                23.31 kB
+dist/assets/inter-latin-400-normal-C38fXH4l.woff2                    23.66 kB
+dist/assets/caveat-cyrillic-ext-400-normal-3iEGd-c5.woff2            24.23 kB
+dist/assets/inter-latin-500-normal-Cerq10X2.woff2                    24.27 kB
+dist/assets/ibm-plex-sans-latin-400-italic-CZTNEAuW.woff2            24.36 kB
+dist/assets/inter-latin-600-normal-LgqL8muc.woff2                    24.45 kB
+dist/assets/ibm-plex-sans-latin-700-italic-KpevCRgq.woff2            24.70 kB
+dist/assets/caveat-cyrillic-ext-700-normal-CrK2-ngJ.woff2            25.34 kB
+dist/assets/merriweather-cyrillic-400-normal-AvfsDsMQ.woff2          25.48 kB
+dist/assets/merriweather-cyrillic-700-normal-wbY04GlL.woff2          25.49 kB
+dist/assets/merriweather-cyrillic-700-italic-CgXU60A9.woff2          27.54 kB
+dist/assets/merriweather-cyrillic-400-italic-_pNjnltw.woff2          27.59 kB
+dist/assets/permanent-marker-latin-400-normal-BF23djCy.woff2         29.56 kB
+dist/assets/merriweather-latin-ext-700-normal-jHnxg2Kc.woff2         42.88 kB
+dist/assets/merriweather-latin-ext-400-normal-CWVzVQq3.woff2         42.95 kB
+dist/assets/merriweather-latin-ext-400-italic-menzxlp4.woff2         44.92 kB
+dist/assets/merriweather-latin-ext-700-italic-BsBsg6vZ.woff2         44.94 kB
+dist/assets/caveat-cyrillic-400-normal-9cDH9rLW.woff2                45.12 kB
+dist/assets/caveat-cyrillic-700-normal-BIyejhEL.woff2                45.40 kB
+dist/assets/merriweather-latin-700-normal-DoUP8Ce-.woff2             48.66 kB
+dist/assets/caveat-latin-400-normal-D6LQsQ_v.woff2                   48.84 kB
+dist/assets/merriweather-latin-400-normal-G4kZaoXi.woff2             49.17 kB
+dist/assets/caveat-latin-700-normal-D8_1Nw6V.woff2                   51.02 kB
+dist/assets/merriweather-latin-700-italic-D8D7WEYy.woff2             51.31 kB
+dist/assets/merriweather-latin-400-italic-CuD3zK4B.woff2             51.84 kB
+dist/assets/transformers-DUibZdtY.js                                820.54 kB
+dist/assets/VideoEditor-CLxjtTzq.css                                  3.13 kB │ gzip:   0.77 kB
+dist/assets/index-CwKx8-s7.css                                      158.72 kB │ gzip:  32.12 kB
+dist/assets/ShortcutsConfigDialog-DXQ0TPrX.js                         5.61 kB │ gzip:   2.26 kB
+dist/assets/dialog-CHiM9FTU.js                                       24.18 kB │ gzip:   8.72 kB
+dist/assets/video-processing-DRhAGN7T.js                            125.40 kB │ gzip:  31.99 kB
+dist/assets/react-vendor-CBv3jUbp.js                                457.76 kB │ gzip: 141.99 kB
+dist/assets/pixi-BXozQCwi.js                                        542.50 kB │ gzip: 154.16 kB
+dist/assets/index-7qjG2O1P.js                                       643.52 kB │ gzip: 190.65 kB
+dist/assets/VideoEditor-CXR4YX9F.js                                 715.50 kB │ gzip: 219.29 kB
+✓ built in 8.16s
+vite v7.3.2 building client environment for production...
+transforming...
+✓ 93 modules transformed.
+Circular chunk: windows -> main -> windows. Consider disabling the "output.onlyExplicitManualChunks" option, as enabling it causes the static dependencies of the manual chunk "main" to be bundled into the chunk "windows".
+rendering chunks...
+computing gzip size...
+dist-electron/main.js                1.27 kB │ gzip:  0.52 kB
+dist-electron/main-BdQU09Uo.js      10.91 kB │ gzip:  3.45 kB
+dist-electron/windows--MIeWR3n.js  240.46 kB │ gzip: 62.07 kB
+✓ built in 129ms
+vite v7.3.2 building client environment for production...
+transforming...
+✓ 2 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-electron/preload.mjs  7.75 kB │ gzip: 1.89 kB
+✓ built in 7ms

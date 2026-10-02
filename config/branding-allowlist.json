@@ -325,6 +325,138 @@
 		{
 			"file": "tests/e2e/windows-native-checklist.spec.ts",
 			"reason": "Legacy temp paths and project extension in an e2e fixture"
+		},
+		{
+			"file": "scripts/verify-showhow-export.mjs",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "const locks = [\"showhow-single-instance\", \"openscreen-single-instance\"].map(prefix => {",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-02/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-03/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-04/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-05/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-06/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-07/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-08/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/native-09/result.json",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "\"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				}
+			]
+		},
+		{
+			"file": "artifacts/verification-recipe/ci-attempt-01/02-npm-branding:check.txt",
+			"reason": "Exact compatibility lock name observation required to prove private legacy lock isolation; retained failure evidence is not product branding.",
+			"lines": [
+				{
+					"text": "artifacts/verification-recipe/native-02/result.json:150 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "artifacts/verification-recipe/native-03/result.json:150 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "artifacts/verification-recipe/native-04/result.json:154 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "artifacts/verification-recipe/native-05/result.json:163 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "artifacts/verification-recipe/native-06/result.json:164 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "artifacts/verification-recipe/native-07/result.json:164 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "artifacts/verification-recipe/native-08/result.json:164 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "artifacts/verification-recipe/native-09/result.json:164 \"path\": \"<run>/temp/openscreen-single-instance-uid-501.lock\",",
+					"count": 1
+				},
+				{
+					"text": "scripts/verify-showhow-export.mjs:69 const locks = [\"showhow-single-instance\", \"openscreen-single-instance\"].map(prefix => {",
+					"count": 1
+				}
+			]
 		}
 	]
 }

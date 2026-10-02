@@ -10,7 +10,26 @@ export default defineConfig({
 	cacheDir: path.resolve(__dirname, ".vitest-cache/browser"),
 	optimizeDeps: {
 		entries: ["src/**/*.browser.test.{ts,tsx}"],
-		include: ["gif.js"],
+		// These imports were discovered after cold startup and reloaded a running
+		// browser test. Prebundle the exact observed list before tests begin.
+		include: [
+			"gif.js",
+			"react-dom/client",
+			"@tiptap/react",
+			"@tiptap/starter-kit",
+			"@radix-ui/react-tooltip",
+			"sonner",
+			"react-icons/md",
+			"lucide-react",
+			"react-dom",
+			"react-icons/bs",
+			"react-icons/fa",
+			"react-icons/fa6",
+			"react-icons/fi",
+			"react-icons/rx",
+			"@radix-ui/react-tabs",
+			"@fix-webm-duration/fix",
+		],
 	},
 	server: {
 		fs: {
