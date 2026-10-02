@@ -1,0 +1,16 @@
+{
+	"command": "PATH=\"$HOME/.nvm/versions/node/v22.22.1/bin:$HOME/.npm-global/bin:$PATH\" ruby ~/.local/bin/bedar-runtime.rb run --resource heavy -- npm run test:browser",
+	"exit": 0,
+	"sourceHeadBeforeCorrectionCommit": "8478f438c12c60848dc3b4e8cc2c59c01ba9d2c4",
+	"configSha256": "c4ede5938fe95bcdc3f28a77940ad2f06642aba0e8bb8830b1fb08d1d944c8c8",
+	"driverSha256": "616061302965e26e512749a735ad8b2888d224367edcd16495795d159ea22169",
+	"coldCacheBeforeRun": "browser absent after rename to .vitest-cache/browser-before102",
+	"preservedCachePresent": true,
+	"freshCacheCreated": true,
+	"filesPassed": 8,
+	"testsPassed": 17,
+	"filesSkipped": 1,
+	"testsSkipped": 1,
+	"unexpectedReloadObserved": false,
+	"scope": "Only exact observed optimizeDeps imports; inherited skip and assertions unchanged"
+}
