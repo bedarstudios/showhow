@@ -16,7 +16,8 @@ This is macOS native evidence from the isolated ticket lane. Final acceptance ru
 - [passed] Both fixture hashes equal `34e62f67d3d9dd50ea7fa0b76cbfe7ed568ddb4be2d6b0a63513d2a97dda95d6`.
 - [passed] All observed owned processes were gone; private run roots were removed.
 - [passed] Executor inspected synthetic editor, completion and decoded GIF images.
-- [untested] Full CI parity and independent review are the lead's next gates.
+- [untested] At the initial source handoff, full CI and review remained next gates.
+  The completed lead checks are recorded below; independent review follows them.
 
 ## Commands and exits
 
@@ -61,3 +62,23 @@ Text paths are normalized as `<home>`, `<repo>`, and `<run>` for publication; ex
 ## Limits
 
 This proves synthetic editor load, production renderer GIF export, real filesystem save, independent full decode and isolated cleanup on this macOS machine. It requires the observed first-load editor reload. It does not prove recording permissions, recording bundles, native save-dialog interaction, MP4, packaging, Windows or Linux. No personal recordings, default profile, source fixture, production code, dependencies, global skills, HOME or OS permissions were changed.
+
+## Lead CI completion
+
+The following checks ran sequentially through the heavy wrapper with Node 22.22.1/npm 10.9.4. Each command's output and exit was recorded immediately in the accompanying result JSON and log. `ci-attempt-01` preserves the branding failure; `ci-attempt-02` preserves the cold browser failure and the single warm-cache diagnostic. Both failures remain failed records.
+
+- [passed] `npm run lint`: exit 0; one unchanged empty-block warning.
+- [passed] `npm run branding:check`: exit 0 after exact-line classification.
+- [passed] `npx tsc --noEmit`: exit 0.
+- [passed] `npm run test`: exit 0; 96 files and 822 tests passed.
+- [passed] Evidence integration Node test: exit 0; one test passed.
+- [passed] `npm run test:browser:install`: exit 0.
+- [passed] Fresh cold browser suite: exit 0; 8 files and 17 tests passed.
+- [passed] `npx vite build`: exit 0.
+- [passed] Cloud controller Node suites: exit 0; all 75 tests passed.
+- [passed] Lead independently viewed final native completion and decoded GIF images.
+- [passed] Final driver, test and package hashes still match native 08/09.
+
+The browser suite retains its existing one skipped test/file. A cold optimizer reload initially invalidated the fonts test import; a single warm diagnostic passed. The scoped correction adds only the 15 imports named by that observed optimizer message. The previous lane cache was renamed intact, and one fresh-cache run passed without a dependency reload. See `browser-correction/result.json` and `cold-browser.txt`. This changes browser test setup, not product behavior or dependency versions.
+
+`ci-attempt-02/result.json` links the first six passing checks and the failed browser run. `browser-correction/result.json` links the corrected cold browser pass. `ci-final/result.json` links the remaining build and 75-test cloud suite on source commit `03897af59b04e562662b37fd8dcee0fb64da07ff`. Branding's four policy regression tests passed separately; the scanner was unchanged. Translation files did not change, so conditional i18n checking is not applicable. Conditional cloud-evidence CI is not applicable to this local ticket branch; semantic PR title validation and current-head GitHub CI are required after PR creation.

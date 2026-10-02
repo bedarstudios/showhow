@@ -1,0 +1,6 @@
+Command: npm run test:browser:install
+Exit: 0
+
+> showhow@1.6.0 test:browser:install
+> playwright install --with-deps chromium-headless-shell
+

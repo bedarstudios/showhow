@@ -1,0 +1,36 @@
+Command: npm run test:browser
+Exit: 1
+
+> showhow@1.6.0 test:browser
+> vitest --config vitest.browser.config.ts --run
+
+
+ RUN  v4.1.5 <repo>
+
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+4:47:55 AM [vite] (client) ✨ new dependencies optimized: react-dom/client, @tiptap/react, @tiptap/starter-kit, @radix-ui/react-tooltip, sonner, react-icons/md, lucide-react, react-dom, react-icons/bs, react-icons/fa, react-icons/fa6, react-icons/fi, react-icons/rx, @radix-ui/react-tabs, @fix-webm-duration/fix
+4:47:55 AM [vite] (client) ✨ optimized dependencies changed. reloading
+
+[vitest] Vite unexpectedly reloaded a test. This may cause tests to fail, lead to flaky behaviour or duplicated test runs.
+For a stable experience, please add mentioned dependencies to your config's `optimizeDeps.include` field manually.
+
+
+ ❯ |chromium| src/assets/fonts/fonts.browser.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |chromium| src/assets/fonts/fonts.browser.test.ts [ src/assets/fonts/fonts.browser.test.ts ]
+Error: Failed to import test file <repo>/src/assets/fonts/fonts.browser.test.ts
+Caused by: TypeError: Cannot read properties of undefined (reading 'config')
+ ❯ src/assets/fonts/fonts.browser.test.ts:13:0
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 passed | 1 skipped (9)
+      Tests  12 passed | 1 skipped (13)
+   Start at  04:47:48
+   Duration  7.31s (transform 0ms, setup 0ms, import 908ms, tests 4.03s, environment 0ms)
+

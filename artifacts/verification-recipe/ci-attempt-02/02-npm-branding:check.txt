@@ -1,0 +1,7 @@
+Command: npm run branding:check
+Exit: 0
+
+> showhow@1.6.0 branding:check
+> node scripts/branding-check.mjs
+
+Branding check passed: all legacy-brand references are classified.
