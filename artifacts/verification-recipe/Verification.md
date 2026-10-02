@@ -82,3 +82,10 @@ The following checks ran sequentially through the heavy wrapper with Node 22.22.
 The browser suite retains its existing one skipped test/file. A cold optimizer reload initially invalidated the fonts test import; a single warm diagnostic passed. The scoped correction adds only the 15 imports named by that observed optimizer message. The previous lane cache was renamed intact, and one fresh-cache run passed without a dependency reload. See `browser-correction/result.json` and `cold-browser.txt`. This changes browser test setup, not product behavior or dependency versions.
 
 `ci-attempt-02/result.json` links the first six passing checks and the failed browser run. `browser-correction/result.json` links the corrected cold browser pass. `ci-final/result.json` links the remaining build and 75-test cloud suite on source commit `03897af59b04e562662b37fd8dcee0fb64da07ff`. Branding's four policy regression tests passed separately; the scanner was unchanged. Translation files did not change, so conditional i18n checking is not applicable. Conditional cloud-evidence CI is not applicable to this local ticket branch; semantic PR title validation and current-head GitHub CI are required after PR creation.
+
+## Independent review
+
+- [passed] Fresh independent Standards review: zero blockers.
+- [passed] Fresh independent Requirements review: zero blockers.
+
+Pinned candidate and reviewed evidence are recorded in `Review.md`. Preserved raw-log whitespace is nonblocking. This follow-up commit adds only review records; driver, tests, package commands and browser configuration remain unchanged. Current-head GitHub CI is the final Ship check.
