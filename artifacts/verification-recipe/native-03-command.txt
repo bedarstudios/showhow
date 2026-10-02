@@ -1,0 +1,4 @@
+
+> showhow@1.6.0 verify:export
+> node scripts/verify-showhow-export.mjs --evidence-dir artifacts/verification-recipe/native-03
+

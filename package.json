@@ -64,7 +64,9 @@
 		"test:browser:install": "playwright install --with-deps chromium-headless-shell",
 		"test:e2e": "playwright test",
 		"test:e2e:windows-native-checklist": "playwright test tests/e2e/windows-native-checklist.spec.ts",
-		"prepare": "husky"
+		"prepare": "husky",
+		"verify:export": "node scripts/verify-showhow-export.mjs",
+		"test:verify:export": "node --test scripts/verify-showhow-export.node-test.mjs"
 	},
 	"dependencies": {
 		"@fix-webm-duration/fix": "^1.0.1",

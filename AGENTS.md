@@ -72,6 +72,7 @@ canonical guide for coding agents in `bedarstudios/showhow`.
 - Unit tests live beside source as `*.test.ts` and `*.test.tsx`.
 - Browser tests use `vitest.browser.config.ts`; run them when DOM or Pixi rendering matters.
 - E2E tests live in `tests/e2e/`; some are platform-specific.
+- When verifying editor or export work, use `docs/testing/verification-recipe.md` for the isolated native GIF journey.
 - Add a same-package test for every new behavior.
 - Run the smallest relevant test during iteration, then the affected full suites before a PR.
 - CI runs unit and browser tests on every PR. Run TypeScript, Biome, i18n, and branding checks when
