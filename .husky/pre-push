@@ -1,5 +1,4 @@
 guard="$HOME/dev/OS/.agents/loop-config/roles/git-guard"
 if [ -x "$guard" ]; then
-	"$guard" pre-commit
+	"$guard" pre-push "$@"
 fi
-npx lint-staged
