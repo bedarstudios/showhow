@@ -10,10 +10,12 @@ On 2026-10-12 the owner locked a five-step order in `NEXT-SESSION.md`: assess th
 
 ## Next action
 
-Step 1 of `NEXT-SESSION.md`: refresh the upstream v2 assessment in `docs/research/`. It assessed upstream `eff86dc` (v2.0.0); upstream `main` was 266 commits ahead on 2026-10-12. This supersedes the earlier "unpark Phase 6, #54 first" action.
+Step 1 is done: the upstream v2 assessment in `docs/research/` was refreshed against upstream `main` `9c55596e` on 2026-10-12. Next is step 2 of `NEXT-SESSION.md`: design the full experience in `design/showhow.pen`, using the assessment's "Design inputs for step 2".
 
 ## Open decisions
 
+- Cursor packs: remove the 17 bundled third-party packs from shipped builds, or find redistribution terms for each first. This blocks release.
+- Whether to run the three confirmed macOS recorder fixes (no microphone input, HUD timer anchor, failed-start cleanup) as one standalone ticket alongside the design work.
 - Whether Phase 10 issues #93–#96 are rewritten or closed once the full-experience Pen design is approved. They predate guides, agent briefs and AI settings.
 
 ## Rejected paths
