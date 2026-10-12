@@ -1,22 +1,24 @@
 # Project handoff
 
-Updated: 2026-10-02
+Updated: 2026-10-12
 
 ## In flight
 
 No phase in flight. Phases 6 and 10 are parked: their `mode:` was removed by PR #100 on 2026-09-28.
 
+On 2026-10-12 the owner locked a five-step order in `NEXT-SESSION.md`: assess the upstream v2 release, design the full experience in `design/showhow.pen`, build an interactive dummy-data UI, connect real features in small steps, then check complete workflows. Design work, research docs and shaders are on branch `design/full-experience`.
+
 ## Next action
 
-Unpark Phase 6 with `mode: maintenance`; #54 first.
+Step 1 of `NEXT-SESSION.md`: refresh the upstream v2 assessment in `docs/research/`. It assessed upstream `eff86dc` (v2.0.0); upstream `main` was 266 commits ahead on 2026-10-12. This supersedes the earlier "unpark Phase 6, #54 first" action.
 
 ## Open decisions
 
-None
+- Whether Phase 10 issues #93–#96 are rewritten or closed once the full-experience Pen design is approved. They predate guides, agent briefs and AI settings.
 
 ## Rejected paths
 
-None
+- Design Max layout directions (Document Desk, Evidence Bench), rejected by the owner on 2026-10-12 and deleted. Do not revive them; the earlier dither frames remain the visual reference.
 
 ## Test state
 
