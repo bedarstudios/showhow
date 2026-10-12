@@ -1,6 +1,6 @@
 # Showhow — next session
 
-Owner-approved order, locked on 2026-10-12. Start at step 1. Do not begin implementation or a new design exploration before that assessment.
+Owner-approved order, locked on 2026-10-12. **Status 2026-10-12 wrap-up:** step 1 done; step 2 in progress. See `.agents/HANDOFF.md` for the next action. Do not begin implementation or a new design exploration before that assessment.
 
 1. **Assess OpenScreen v2.** Identify useful features and their effects on Showhow’s screens and workflows.
 2. **Design the full Showhow experience.** Update the Pen file to cover the library, recorder, editor, guides, agent briefs, and AI settings.

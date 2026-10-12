@@ -1,16 +1,20 @@
 # Project handoff
 
-Updated: 2026-10-12
+Updated: 2026-10-12 (session wrap-up)
 
 ## In flight
 
-No phase in flight. Phases 6 and 10 are parked: their `mode:` was removed by PR #100 on 2026-09-28.
+Step 2 of `NEXT-SESSION.md` (design the full experience), on local branch `design/full-experience`. The branch is not pushed; the repository is public, so the owner decides before any push.
 
-On 2026-10-12 the owner locked a five-step order in `NEXT-SESSION.md`: assess the upstream v2 release, design the full experience in `design/showhow.pen`, build an interactive dummy-data UI, connect real features in small steps, then check complete workflows. Design work, research docs and shaders are on branch `design/full-experience`.
+- Step 1 is done: the upstream v2 assessment in `docs/research/` was refreshed.
+- Unknowns-pass interview is done; answers are in `.agents/decisions.md` (2026-10-12, step 2 interview).
+- A throwaway flow mock was built and checked in Chrome (28 screens, no console errors, four click-paths pass): `design/mocks/2026-10-12-full-experience-flow/index.html`, spec `SPEC.md` beside it.
+- Owner reaction (2026-10-12): "The designs need more work." Specifics were not yet given.
+- The repository cleanup is done (decision log, 2026-10-12).
 
 ## Next action
 
-Step 1 is done: the upstream v2 assessment in `docs/research/` was refreshed against upstream `main` `9c55596e` on 2026-10-12. Next is step 2 of `NEXT-SESSION.md`: design the full experience in `design/showhow.pen`, using the assessment's "Design inputs for step 2". The owner expects to rebuild Showhow on the upstream v2 codebase after step 2 (decision log, 2026-10-12), so design against v2's editor capabilities, not only the inherited editor's.
+Ask the owner what is not working in the mock: structure, visual feel, or specific screens, plus any reference. Run one revision round on the mock (spec by Claude, build by Codex GPT 6.1 Sol in a right-hand Herdr pane). Then do the assumptions sign-off and get the owner's explicit confirmation before putting anything into `design/showhow.pen`. Tidy the Pen file's "OLD · …" frames as part of step 2.
 
 ## Open decisions
 
