@@ -207,7 +207,7 @@
 			"reason": "Migrates the legacy application-data directory; must name every legacy casing"
 		},
 		{
-			"file": "implementation-notes.md",
+			"file": "Archive/implementation-notes.md",
 			"reason": "Historical Phase 1 implementation notes describing inherited source behavior"
 		},
 		{
