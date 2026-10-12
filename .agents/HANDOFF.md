@@ -10,12 +10,13 @@ On 2026-10-12 the owner locked a five-step order in `NEXT-SESSION.md`: assess th
 
 ## Next action
 
-Step 1 is done: the upstream v2 assessment in `docs/research/` was refreshed against upstream `main` `9c55596e` on 2026-10-12. Next is step 2 of `NEXT-SESSION.md`: design the full experience in `design/showhow.pen`, using the assessment's "Design inputs for step 2".
+Step 1 is done: the upstream v2 assessment in `docs/research/` was refreshed against upstream `main` `9c55596e` on 2026-10-12. Next is step 2 of `NEXT-SESSION.md`: design the full experience in `design/showhow.pen`, using the assessment's "Design inputs for step 2". The owner expects to rebuild Showhow on the upstream v2 codebase after step 2 (decision log, 2026-10-12), so design against v2's editor capabilities, not only the inherited editor's.
 
 ## Open decisions
 
 - Cursor packs: remove the 17 bundled third-party packs from shipped builds, or find redistribution terms for each first. This blocks release.
-- Whether to run the three confirmed macOS recorder fixes (no microphone input, HUD timer anchor, failed-start cleanup) as one standalone ticket alongside the design work.
+- Rebuild on upstream v2 after step 2: confirm once the design is approved. A rebuild needs an `UPSTREAM.md` policy change and a migration plan for bundles, legacy project-file compatibility and `<video path>.cursor.json`.
+- The three confirmed macOS recorder fixes are on hold: v2 already contains them, so port them only if the rebuild does not happen.
 - Whether Phase 10 issues #93–#96 are rewritten or closed once the full-experience Pen design is approved. They predate guides, agent briefs and AI settings.
 
 ## Rejected paths
