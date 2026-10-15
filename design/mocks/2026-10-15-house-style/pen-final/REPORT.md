@@ -70,3 +70,59 @@ All five built new in the house style: sidebar as in the Library row with the Se
 5. Final · Settings — agents -> F1m40C -> kiLdT (27) -> copy-format select and a disabled MCP server row marked "coming later" (only place MCP appears).
 
 Not built: APPEARANCE tab content (not in the brief's frame list). The "partially clipped" lane and waveform nodes in the Editor frames are intentional timeline overflow from the owner's frames.
+
+# Component pass and audit states — 2026-10-15
+
+This section supersedes the earlier “Not built” and first-pass totals. The canvas now contains **50 Final frames: Library 28, HUD 8, Editor 8, Settings 6**. The earlier sections remain as the record of the first pass. Work follows `../CODEX-HANDOFF.md` and the owner resolutions in `../DESIGN-AUDIT.md`; this is design evidence, not implemented app behaviour.
+
+## Component pass
+
+- Screenshot-checked all 37 original Final frames before editing, then checked each new frame and every changed frame after its final edit. No broken component swap was found.
+- Kept the 25 components listed in the handoff. Added a separate usage line for each in `Design system — usage` (`cgdpI`). Added two small shared components: `Library search` (`cbQ32`) and `AI review link` (`sa5dC`), with their own usage lines (27 total).
+- Rebound 11 source fills or gradient stops: six in `Sidebar/Final`, `HUD bar/Idle` and `HUD bar/Recording`, and five gradient stops in the Final source selector and Editor background swatches. Final frames now contain zero literal `#2F2F2F` / `#FFFCF7` fills or gradient stops outside fake Ledgerly screenshots. Original components used by owner frames were not changed.
+- All 22 existing non-Final, non-component root-frame schema fingerprints match the pre-edit baseline. No owner, OLD or Dither frame was edited or moved.
+
+## New frames and audit mapping
+
+All are built from the existing component set plus the shared search and review-link components. New Library frames continue the row at y = 20371, x = 23400 through 35100; new HUD frames are at y = 21950, x = 7800 and 9100; Appearance is at y = 23800, x = 6500.
+
+| PNG | Node | Audit finding closed | State shown |
+| --- | --- | --- | --- |
+| `Library-19-ai-not-connected.png` | `fHcgR` | 1 | “Connect AI to make guides” review-sheet step, with ChatGPT and OpenRouter connection actions. |
+| `Library-20-agent-brief-not-made.png` | `NASmj` | 4 | Agent brief tab before generation, MAKE BRIEF and evidence-review link. |
+| `Library-21-making-brief.png` | `IEfsd` | 4 | Shared progress card/task rows and processing library-row edge. |
+| `Library-22-brief-failed.png` | `FEdEA` | 4 | Stopped orange frontier, safe-recording message, TRY AGAIN / CHANGE PROVIDER. |
+| `Library-23-copy-for-agent-making-brief.png` | `NQBra` | 5 | COPY FOR AGENT becomes MAKING BRIEF… at the same 151 px width. State annotation records generation before copying brief + local bundle path. |
+| `Library-24-copied.png` | `U0oZV` | 5, 10 | COPIED ✓ at the same width, plus the shared brief-and-path clipboard toast; 2-second feedback annotation. |
+| `Library-25-pdf-saved.png` | `M93vH` | 10 | Export sheet success: “PDF saved · Show in Finder”, saved folder and DONE. |
+| `Library-26-search.png` | `B9zp9k` | 8 | Search field directly below LIBRARY · 5; “invoice” filters to one recording. |
+| `Library-27-no-results.png` | `tL9bn` | 8 | “receipt” has no matches; explanatory empty state and CLEAR SEARCH. |
+| `Library-28-no-speech-found.png` | `zWKjh` | 9 | Recording preserved, no speech available for a guide, NEW RECORDING / COPY PATH recovery. |
+| `HUD-07-screen-recording-permission.png` | `q5EKg` | 9 | Permission sheet before source selection; CANCEL / OPEN SETTINGS. |
+| `HUD-08-no-microphone.png` | `lkbPe` | 9 | Missing microphone with reconnect/input guidance; CANCEL / TRY AGAIN. |
+| `Settings-06-appearance.png` | `E4tJI9` | 14 | LIGHT / DARK / SYSTEM shared segmented control; SYSTEM selected, Mac-following explanation. |
+
+## Revised existing frames
+
+- `Library-08-review-before-ai.png` (`WRKFc`): checked “Always send transcript and frames” preference and “Check what's sent” link (finding 6). The state annotation specifies first review per provider, then reuse of the checked preference. The review link remains reachable in all 23 Final detail views with output tabs.
+- Every Library sidebar and Settings sidebar has the shared search field, including empty/loading states (finding 8). The just-saved frame grew to fit its six rows. Detail frames grew by 29 px for the review link; tall frames remain in their original area row.
+- All Final labels use MAKE GUIDE / MAKE BRIEF and COPY FOR AGENT. The ready brief's secondary handoff now reads COPY PATH (finding 11). “Everything runs on this Mac” was aligned with the approved optional-provider copy in the three not-made-guide views: local transcription, connected AI writing the guide.
+- All Final BROWSER metadata now reads WINDOW · CHROME · … (finding 3).
+- All six Settings frames use ordinary, unselected library-row instances while Settings is active (finding 12).
+- Findings 7 and 13 are addressed by the shared components, usage notes and colour bindings above. Finding 2 was resolved by the owner's decision to include MP4 import in V1; its button and two existing frames are retained.
+- The existing Notes window frame remains as a reference. The owner excluded Notes from V1; retaining the frame does not add it to the ship list. Per-feature goals and milestone metrics remain undecided.
+
+## Exports and verification
+
+- Exported all 50 Final frames as PNG at scale 1, retaining the original 37 filenames and continuing their numbering for the 13 additions.
+- Exported six supporting component references: `Components-01-usage.png`, `Components-02-sidebar-final.png`, `Components-03-hud-idle.png`, `Components-04-hud-recording.png`, `Components-05-library-search.png`, `Components-06-ai-review-link.png`. The search control uses on-panel colours and a transparent background; its screen context is shown in the Final Library/Settings exports.
+- `EXPORTS.json` records node ids, positions, layout dimensions, PNG dimensions, byte sizes and SHA-256 hashes. All 50 Final PNG dimensions exactly match their frame dimensions at scale 1. Component PNG extents include strokes and offset shadows.
+- `VERIFICATION.json` records the canvas checks and protected-frame fingerprints. Checks pass for stale copy, literal neutral fills (including gradient stops), missing search/review links, selected rows in Settings and unfinished placeholders.
+- The only 25 visible layout warnings are the original partial clips in four Editor timelines (lanes, waveforms, playhead and knob). They match the baseline and remain intentional. Disabled off-canvas tag layers are not visible clipping failures. Replacement operations also emitted warnings for removed ids; subsequent checks confirmed those nodes no longer exist and the replacement layouts fit.
+- These are static design states. Frozen mosaic frontiers, fake screenshots and the original rendering caveats still apply. No Electron, native recorder, provider, clipboard or PDF runtime acceptance is claimed. No app code changed, so app test suites were not run.
+
+## Save and local commit gate
+
+Exports and this report are ready. The owner must press **Cmd+S in pen.dev** and reply **saved**, as required by the handoff, before the local commit. Commit only `design/showhow.pen`, `design/assets/`, `design/mocks/2026-10-15-house-style/` and `.agents/decisions.md`, with message `design: componentise final frames and draw audit states`. Exclude `.pi/`. Do not push.
+
+Save confirmation — 2026-10-16: the owner replied “Saved”. The Pen file is changed on disk; Pencil's 50 Final frame ids and dimensions match the export manifest, and all 56 PNG hashes still pass. The save gate is satisfied for the scoped local commit above.
