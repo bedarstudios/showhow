@@ -74,3 +74,6 @@ result-*
 
 # Owner-only notes; never commit
 private/
+
+# Local agent tooling
+.pi/

@@ -5,6 +5,10 @@
 			"reason": "Documents which legacy identifiers are kept and why"
 		},
 		{
+			"file": ".agents/HANDOFF.md",
+			"reason": "Names the upstream project and legacy project-file format for the planned v2 migration"
+		},
+		{
 			"file": ".bedar/project-plan.yml",
 			"reason": "Dated project plan referencing the inherited baseline"
 		},
@@ -49,7 +53,7 @@
 			"reason": "Required attribution to the upstream project"
 		},
 		{
-			"file": "NEXT-SESSION.md",
+			"file": "Archive/NEXT-SESSION.md",
 			"reason": "Owner's session plan; step 1 names the upstream release to assess"
 		},
 		{
@@ -83,7 +87,7 @@
 			]
 		},
 		{
-			"file": "design/DESIGN-MAX-HANDOFF.md",
+			"file": "Archive/design/DESIGN-MAX-HANDOFF.md",
 			"reason": "Closed design brief that names the upstream intake research"
 		},
 		{
