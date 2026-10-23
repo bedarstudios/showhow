@@ -337,3 +337,53 @@ it.each([
 	await user.click(screen.getByRole("button", { name: "Cancel" }));
 	await waitFor(() => expect(make).toHaveFocus());
 });
+
+it("#200 shows the empty state instead of Make guide, Check or Retry when a recording has no clicks or speech", async () => {
+	status.mockResolvedValue({
+		...connected,
+		noInput: true,
+		noSpeech: true,
+		guide: {
+			status: "failed",
+			provider: "openrouter",
+			model: "fake",
+			editedSinceAi: false,
+			error: "The guide response could not be validated.",
+		},
+	});
+	render(<AiGuidePanel entry={{ ...entry, steps: [] }} onEntryChange={onChange} />);
+	expect(
+		await screen.findByRole("heading", { name: "Nothing to turn into a guide" }),
+	).toBeVisible();
+	expect(
+		screen.getByText(
+			"This recording has no clicks or speech. Record again with the microphone on, or narrate while you click.",
+		),
+	).toBeVisible();
+	expect(screen.queryByRole("button", { name: "Make guide" })).not.toBeInTheDocument();
+	expect(screen.queryByRole("button", { name: "Check what gets sent" })).not.toBeInTheDocument();
+	expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+	expect(screen.queryByText("The guide response could not be validated.")).not.toBeInTheDocument();
+	expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+	expect(preview).not.toHaveBeenCalled();
+	expect(run).not.toHaveBeenCalled();
+	expect(consent).not.toHaveBeenCalled();
+});
+it("#200 review sheet does not allow sending 0 words and 0 frames", async () => {
+	preview.mockResolvedValue({ ...payload, wordCount: 0, transcript: [], frames: [], steps: [] });
+	render(<AiGuidePanel entry={entry} onEntryChange={onChange} />);
+	fireEvent.click(screen.getByRole("button", { name: "Make guide" }));
+	const dialog = await screen.findByRole("dialog");
+	await within(dialog).findByText("Transcript · 0 words");
+	expect(within(dialog).getByText("Frames · 0 selected")).toBeVisible();
+	expect(
+		within(dialog).getByText(
+			"This recording has no clicks or speech, so there is nothing to send.",
+		),
+	).toBeVisible();
+	const make = within(dialog).getByRole("button", { name: "Make guide" });
+	expect(make).toBeDisabled();
+	fireEvent.click(make);
+	expect(run).not.toHaveBeenCalled();
+	expect(consent).not.toHaveBeenCalled();
+});

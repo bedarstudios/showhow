@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom";
-import { act, cleanup, render as rtlRender, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render as rtlRender, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -388,5 +388,56 @@ describe("Agent brief states", () => {
 		current = { ...base, state: "making", phase: "writing" };
 		render(<Harness bundleDir="/scratch/one" />);
 		expect(await screen.findByText("Step 2 of 3")).toBeVisible();
+	});
+});
+
+describe("#200 no clicks or speech", () => {
+	const body =
+		"This recording has no clicks or speech. Record again with the microphone on, or narrate while you click.";
+	it("shows the empty state and hides Copy for agent, Make brief and Check what's sent", async () => {
+		current = { ...base, noInput: true };
+		render(<Harness bundleDir="/scratch/one" />);
+		expect(
+			await screen.findByRole("heading", { name: "Nothing to turn into a brief" }),
+		).toBeVisible();
+		expect(screen.getByText(body)).toBeVisible();
+		expect(screen.queryByRole("button", { name: /copy for agent/i })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Make brief" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Check what's sent" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+		expect(preview).not.toHaveBeenCalled();
+		expect(run).not.toHaveBeenCalled();
+	});
+	it("shows the empty state, not the validation error, for a failure recorded before this fix", async () => {
+		current = { ...base, noInput: true, state: "failed", error: "invalid" };
+		render(<Harness bundleDir="/scratch/one" />);
+		expect(
+			await screen.findByRole("heading", { name: "Nothing to turn into a brief" }),
+		).toBeVisible();
+		expect(screen.queryByText("Response couldn't be validated")).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole("heading", { name: "Couldn't make the brief" }),
+		).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+	});
+	it("review sheet does not allow sending 0 words and 0 frames", async () => {
+		current = { ...base, reviewed: false, alwaysSend: false };
+		preview.mockImplementation(async () => {
+			calls.push("preview");
+			return { ...payload, wordCount: 0, transcript: [], frames: [], steps: [] };
+		});
+		render(<Harness bundleDir="/scratch/one" />);
+		await userEvent.click(await screen.findByRole("button", { name: "Make brief" }));
+		const dialog = await screen.findByRole("dialog", { name: "Check what's sent" });
+		expect(within(dialog).getByText("Transcript · 0 words")).toBeVisible();
+		expect(within(dialog).getByText("Frames · 0 selected")).toBeVisible();
+		expect(
+			within(dialog).getByText(
+				"This recording has no clicks or speech, so there is nothing to send.",
+			),
+		).toBeVisible();
+		expect(within(dialog).getByRole("button", { name: "Make brief" })).toBeDisabled();
+		expect(run).not.toHaveBeenCalled();
+		expect(consent).not.toHaveBeenCalled();
 	});
 });
