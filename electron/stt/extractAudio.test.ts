@@ -34,6 +34,37 @@ function f32le(values: number[]): Buffer {
 	return buf;
 }
 
+function probeOutput(audioTracks: number): string {
+	return [
+		"Input #0, mov, from 'fixture':",
+		...Array.from({ length: audioTracks }, (_, i) => `  Stream #0:${i}: Audio: aac`),
+		"Stream mapping:",
+		...Array.from({ length: audioTracks }, (_, i) => `  Stream #0:${i} -> #0:${i}`),
+	].join("\n");
+}
+
+async function startExtraction(
+	filePath: string,
+	options: { signal?: AbortSignal } = {},
+	audioTracks = 1,
+) {
+	const probe = fakeChild();
+	const decode = fakeChild();
+	let markDecodeSpawned!: () => void;
+	const decodeSpawned = new Promise<void>((resolve) => {
+		markDecodeSpawned = resolve;
+	});
+	spawnMock.mockReturnValueOnce(probe).mockImplementationOnce(() => {
+		markDecodeSpawned();
+		return decode;
+	});
+	const promise = extractMono16kPcm(filePath, options);
+	probe.stderr.emit("data", Buffer.from(probeOutput(audioTracks)));
+	probe.emit("close", 0);
+	await decodeSpawned;
+	return { decode, promise };
+}
+
 beforeEach(() => {
 	vi.clearAllMocks();
 	resolveFfmpegMock.mockReturnValue("/usr/bin/ffmpeg");
@@ -41,14 +72,12 @@ beforeEach(() => {
 
 describe("extractMono16kPcm", () => {
 	it("asks ffmpeg for exactly what whisper wants", async () => {
-		const child = fakeChild();
-		spawnMock.mockReturnValue(child);
-		const promise = extractMono16kPcm("/tmp/a.mp3");
-		child.stdout.end(f32le([0.5]));
-		child.emit("close", 0);
+		const { decode, promise } = await startExtraction("/tmp/a.mp3");
+		decode.stdout.end(f32le([0.5]));
+		decode.emit("close", 0);
 		await promise;
 
-		const args = spawnMock.mock.calls[0][1] as string[];
+		const args = spawnMock.mock.calls[1][1] as string[];
 		// Mono, 16 kHz, float32 little-endian, no video. Anything else and whisper is
 		// reading the samples wrong rather than failing loudly.
 		expect(args).toContain("-vn");
@@ -58,11 +87,9 @@ describe("extractMono16kPcm", () => {
 	});
 
 	it("decodes the samples ffmpeg writes", async () => {
-		const child = fakeChild();
-		spawnMock.mockReturnValue(child);
-		const promise = extractMono16kPcm("/tmp/a.mp3");
-		child.stdout.end(f32le([0, 0.5, -0.25]));
-		child.emit("close", 0);
+		const { decode, promise } = await startExtraction("/tmp/a.mp3");
+		decode.stdout.end(f32le([0, 0.5, -0.25]));
+		decode.emit("close", 0);
 
 		const out = await promise;
 		expect(Array.from(out)).toEqual([0, 0.5, -0.25]);
@@ -72,54 +99,62 @@ describe("extractMono16kPcm", () => {
 		// THE defect worth a test here: stdout chunk boundaries do not respect sample
 		// boundaries. Dropping the partial tail would shift every following sample and
 		// detune the whole track — audible, and invisible in a length check.
-		const child = fakeChild();
-		spawnMock.mockReturnValue(child);
-		const promise = extractMono16kPcm("/tmp/a.mp3");
+		const { decode, promise } = await startExtraction("/tmp/a.mp3");
 		const bytes = f32le([0.25, -0.75, 1]);
-		child.stdout.write(bytes.subarray(0, 6)); // one whole float + half of the next
-		child.stdout.write(bytes.subarray(6));
-		child.stdout.end();
-		child.emit("close", 0);
+		decode.stdout.write(bytes.subarray(0, 6)); // one whole float + half of the next
+		decode.stdout.write(bytes.subarray(6));
+		decode.stdout.end();
+		decode.emit("close", 0);
 
 		const out = await promise;
 		expect(Array.from(out)).toEqual([0.25, -0.75, 1]);
 	});
 
 	it("reports a file with no audio track", async () => {
-		const child = fakeChild();
-		spawnMock.mockReturnValue(child);
+		const probe = fakeChild();
+		spawnMock.mockReturnValueOnce(probe);
 		const promise = extractMono16kPcm("/tmp/silent.mp4");
-		child.stderr.end("Stream map '0:a' matches no streams");
-		child.stdout.end();
-		child.emit("close", 1);
+		probe.stderr.emit("data", Buffer.from("Stream map '0:a' matches no streams"));
+		probe.emit("close", 1);
 
 		await expect(promise).rejects.toBeInstanceOf(NoAudioTrackError);
+		expect(spawnMock).toHaveBeenCalledTimes(1);
 	});
 
 	// Issue #968: the renderer explains these as "check folder access" and retries
 	// them, so both must carry the marker, which is all that survives the IPC.
 	it("reports a read the OS refused as unreadable media, not as no audio", async () => {
-		const child = fakeChild();
-		spawnMock.mockReturnValue(child);
+		const probe = fakeChild();
+		spawnMock.mockReturnValueOnce(probe);
 		const promise = extractMono16kPcm("/Users/me/Downloads/a.mp4");
-		child.stderr.end("/Users/me/Downloads/a.mp4: Operation not permitted");
-		child.stdout.end();
-		child.emit("close", 1);
+		probe.stderr.emit("data", Buffer.from("/Users/me/Downloads/a.mp4: Operation not permitted"));
+		probe.emit("close", 1);
 
 		await expect(promise).rejects.toBeInstanceOf(MediaUnreadableError);
 		await expect(promise).rejects.toThrow(STT_MEDIA_UNREADABLE);
 	});
 
+	it("propagates a stream-count spawn error without starting decode", async () => {
+		const probe = fakeChild();
+		const spawnError = new Error("ffmpeg spawn failed");
+		spawnMock.mockReturnValueOnce(probe);
+		const promise = extractMono16kPcm("/tmp/a.mp4");
+		probe.emit("error", spawnError);
+
+		await expect(promise).rejects.toBe(spawnError);
+		expect(spawnMock).toHaveBeenCalledTimes(1);
+	});
+
 	it("reports an ffmpeg that hangs opening the file as unreadable media", async () => {
 		vi.useFakeTimers();
 		try {
-			const child = fakeChild();
-			spawnMock.mockReturnValue(child);
+			const probe = fakeChild();
+			spawnMock.mockReturnValueOnce(probe);
 			const promise = extractMono16kPcm("/Users/me/Downloads/a.mp4");
 			const settled = expect(promise).rejects.toThrow(STT_MEDIA_UNREADABLE);
 			await vi.advanceTimersByTimeAsync(60_000);
 			await settled;
-			expect(child.kill).toHaveBeenCalled();
+			expect(probe.kill).toHaveBeenCalled();
 		} finally {
 			vi.useRealTimers();
 		}
@@ -129,22 +164,20 @@ describe("extractMono16kPcm", () => {
 		// The file was readable; pointing the user at folder access would be wrong.
 		vi.useFakeTimers();
 		try {
-			const child = fakeChild();
-			spawnMock.mockReturnValue(child);
-			const promise = extractMono16kPcm("/Users/me/Downloads/a.mp4");
+			const { decode, promise } = await startExtraction("/Users/me/Downloads/a.mp4");
 			const settled = promise.then(
 				() => {
 					throw new Error("expected a rejection");
 				},
 				(error: Error) => error,
 			);
-			child.stdout.write(f32le([0.5]));
+			decode.stdout.write(f32le([0.5]));
 			await vi.advanceTimersByTimeAsync(60_000);
 			const error = await settled;
 			expect(error).not.toBeInstanceOf(MediaUnreadableError);
 			expect(error.message).not.toContain(STT_MEDIA_UNREADABLE);
 			expect(error.message).toBe("ffmpeg timed out after 60000ms on /Users/me/Downloads/a.mp4");
-			expect(child.kill).toHaveBeenCalledWith("SIGKILL");
+			expect(decode.kill).toHaveBeenCalledWith("SIGKILL");
 		} finally {
 			vi.useRealTimers();
 		}
@@ -153,11 +186,9 @@ describe("extractMono16kPcm", () => {
 	it("keeps the samples when ffmpeg exits non-zero AFTER writing audio", async () => {
 		// A truncated file still yields usable audio; throwing it away would lose a
 		// transcript over a trailing byte.
-		const child = fakeChild();
-		spawnMock.mockReturnValue(child);
-		const promise = extractMono16kPcm("/tmp/truncated.mp3");
-		child.stdout.end(f32le([0.1, 0.2]));
-		child.emit("close", 1);
+		const { decode, promise } = await startExtraction("/tmp/truncated.mp3");
+		decode.stdout.end(f32le([0.1, 0.2]));
+		decode.emit("close", 1);
 
 		expect(Array.from(await promise)).toEqual([expect.closeTo(0.1, 6), expect.closeTo(0.2, 6)]);
 	});
@@ -172,9 +203,9 @@ describe("extractMono16kPcm", () => {
 		expect(spawnMock).not.toHaveBeenCalled();
 	});
 
-	it("kills the child when the caller aborts", async () => {
-		const child = fakeChild();
-		spawnMock.mockReturnValue(child);
+	it("kills the probe when the caller aborts during stream counting", async () => {
+		const probe = fakeChild();
+		spawnMock.mockReturnValueOnce(probe);
 		const controller = new AbortController();
 		const promise = extractMono16kPcm("/tmp/a.mp3", { signal: controller.signal });
 		controller.abort();
@@ -182,7 +213,19 @@ describe("extractMono16kPcm", () => {
 		await expect(promise).rejects.toMatchObject({ name: "AbortError" });
 		// Not merely stopping to await: ffmpeg would keep decoding a long file for
 		// minutes, which is the same leak the STT cancel path exists to prevent.
-		expect(child.kill).toHaveBeenCalled();
+		expect(probe.kill).toHaveBeenCalled();
+		expect(spawnMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("kills the active decode when the caller aborts", async () => {
+		const controller = new AbortController();
+		const { decode, promise } = await startExtraction("/tmp/a.mp3", {
+			signal: controller.signal,
+		});
+		controller.abort();
+
+		await expect(promise).rejects.toMatchObject({ name: "AbortError" });
+		expect(decode.kill).toHaveBeenCalledWith("SIGKILL");
 	});
 
 	it("does not spawn at all when the signal is already aborted", async () => {
