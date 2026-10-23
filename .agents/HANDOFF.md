@@ -1,8 +1,17 @@
 # Project handoff
 
-Updated: 2026-10-23
+Updated: 2026-10-23 (overnight wrap-up)
 
 ## In flight
+
+Nothing is in flight. No ticket lanes, no open PRs, no stashes; the only worktree is the main checkout. Overnight 2026-10-23 (owner /goal, supervisor-merged with explicit authority) cleared the queue:
+- Merged: #175 (PR #190), #187 (#191), #170 (#192), #178 (#193), #179 (#194), #180 (#195), #181 (#196), #182 (#197), #148 (#198), #137 (#206, landing page live at https://showhow-agy.pages.dev/), #207 (#208, new logo icons). Plan docs PR #189.
+- Closed: stale #56–#59, #61–#63; #128 not planned (branch `ticket/128-chatgpt-connect` kept on GitHub); outside fork PR #214 closed unmerged on owner instruction.
+- Open for owner triage: end-to-end findings #199–#205, #209–#213, #215. Highest impact: #215 (transcription reads only the first audio track, so mic speech is lost), #200, #201. #204 repeats the accepted 2026-10-19 "MP4 Cancel disabled" decision.
+- Uncommitted on main (another session's work, preserved): `PLAN.md` gains "Showhow landing share image, favicon fallbacks and Mac icon delivery Plan". Untracked owner file `design/landing-export.html`.
+- Evidence: `~/dev/loop-evidence/showhow-e2e-20261023/` (BRIEF*.md, FINDINGS.md to FINDINGS-4.md, verified/). Report: vault inbox "2026-10-23 Showhow end-to-end test report".
+
+### Earlier in flight (before the 2026-10-23 overnight run; historical)
 
 - **#122 AI guide shipped** (PR #126, merged 2026-10-17 as `500cea16`). Make guide runs an AI pass over the deterministic steps through OpenRouter, with `anthropic/claude-haiku-5.5` as the default model (owner decision 2026-10-17, no bake-off). Plan: "Showhow AI guide Plan" in `PLAN.md`. Evidence: `~/dev/loop-evidence/showhow-122/` (READY.md, PROVE.md, PROVE-CI.md, `live-smoke/run-OKsXUE/`). Lane removed; card Done.
 - **#128 Connect ChatGPT** is published and deferred (`needs-human`, Creating plan/spec). Retain parked lane w6Q; no implementation or auth changes. The installed Codex version lacks the required proven tool/config isolation. Original approved scope remains in: "Showhow Connect ChatGPT Plan" in `PLAN.md`, mock in `design/mocks/2026-10-17-chatgpt-connect/`. It uses the owner's own Codex login (`codex app-server`) for Make guide only. Issue #128 is published. Resume only after owner direction and supported isolation controls.
@@ -38,6 +47,10 @@ The move onto upstream v2 is shaped and published: milestone "Move onto upstream
 
 ## Next action
 
+Owner triages the open findings and picks the first fix: recommended #215, then #200 and #201 (a first tester with the microphone on or off hits them immediately). Dispatch each as a normal Loop ticket from current `main`. Before that, the owner runs one recording with the microphone on and the real OpenRouter key, then a guide and PDF (owner-only; never entered by agents).
+
+### Superseded next action (historical)
+
 The approved replacement pass is complete for this seat: w79:p3 used the exact private Electron runtime and documented native CUA, retained all earlier failures, and reconciled the three owned docs to e1fab904. Journey B, fixture-backed guide failure/Retry, import cancel, validated brief/copy through a private clipboard adapter, real GIF cancellation and independent 2-second GIF decode, independent 2-second MP4 decode, writable 2-page PDF decode, editor Undo, keyboard focus movement, and app-only Light→Dark pixel propagation are observed. Journey A remains blocked at corrected safe source selection: the exact readonly Alpha/Beta/Gamma TextEdit fixture was bound by unique file URL, all three helper/addon overrides were active, capture controls were OFF, but the selector never exposed that exact target and no safe Record/Stop action became available. Per supervisor authority this is an accepted owner-owed limitation; a missing Screen Recording grant is hypothesis only. Dependent completed-take/#175 rows, owner clipboard/provider, reduced-motion, reference, and minimum-size remain unverified. The fixture was closed normally with its hash unchanged; the private Showhow tree was empty after normal Quit. Next: lead performs one fresh independent review, then the conventional documentation PR if passed. No native/CUA retry, tool change, product fix, staging, commit, push or merge.
 
 Owed native checks:
@@ -50,6 +63,9 @@ Keep #128 parked and the #134 worktree intact for pen.dev cache safety.
 
 ## Open decisions
 
+- #199: should Showhow stay in the menu bar after its last window closes on macOS? Recommended yes; #213 (Cmd+W) depends on it.
+- Cloudflare: add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` so `pages.yml` deploys `site/` changes; until then deploy manually (docs/landing/deploy.md).
+- Account-wide interaction limit needs the `user` gh token scope (`gh auth refresh -h github.com -s user`); Showhow's repo-level collaborators-only limit expires 2027-04-23.
 - Cursor packs: #116 removes the 17 Sweezy packs and takes upstream's seven original packs. #116 has merged; confirm the packs shipped as planned before a release tag.
 - Per-feature goals and milestone metrics (audit questions B1 and J2). Weekly use is the only metric for now.
 
@@ -62,12 +78,26 @@ Keep #128 parked and the #134 worktree intact for pen.dev cache safety.
 - In role panes, answer Codex hooks prompts with "Continue without trusting". "Trust all" writes hook trust into the role profile and breaks later launches (profile backup from 2026-10-16: `~/.local/share/bedar-loop/profile-fix-20261016/`).
 - A ticket lead cannot prompt the coordinator across Herdr workspaces. It writes `STOP.md` in `~/dev/loop-evidence/<repo>-<n>/`, so the coordinator or a supervisor must poll it.
 
+- Codex Computer Use clicks are not seen by Showhow's click capture; during a take, post real clicks with `~/dev/loop-evidence/showhow-e2e-20261023/realclick.swift`. Use GPT-6 Luna Extra High per session (`/model` → `s`, not Enter, which rewrites `~/.codex/config.toml`).
+- Test the packaged app on an isolated profile with `~/dev/loop-evidence/showhow-e2e-20261023/launch-isolated.mjs` (or `-fakeai.mjs` for a fake OpenRouter); never drive `/Applications/Showhow.app`. Screenshots must be window-only (`screencapture -x -o -l <windowId>`); full-screen captures leaked the owner's terminal.
+- On this Mac another app swallows the Escape key system-wide; Escape tests are unreliable here.
+- Packaging needs `npm run build:whisper-binaries` and a fresh `build:native:compositor:mac`; both dirty tracked/cache files, so restore `compositor_view.node` and delete `.cache/` after.
+
 ## Rejected paths
 
 - Design Max layout directions (Document Desk, Evidence Bench), the serif display face, and the editorial polish-pass layout, all rejected by the owner. The base is the owner's Pen frames 23–46.
 - A permanent sidebar dither floor. Mosaic dither appears only where content is not real yet.
+- Merging or approving CI for outside-contributor PRs (#214 closed). Converting the landing site to Cloudflare Workers.
 
 ## Test state
+
+2026-10-23, packaged arm64 build of `001b202a` on isolated profiles (`launch-isolated*.mjs`, fake OpenRouter in main), native Computer Use, window-only evidence:
+- Four Codex passes plus supervisor runs: recording a TextEdit window with real clicks (`realclick.swift`), guide, brief, step edit, PDF export (options verified by file size/images), import, trim/Undo, MP4/GIF export, GIF cancel, Trash/Undo, keyboard Tab, Settings folder Move/Keep. All observed working except the filed findings.
+- Speech take: both audio tracks recorded; transcription read the silent first track (#215). System-audio track silent although `say` played (unverified cause).
+- Not run: real OpenRouter key, dark menu bar, screen reader, Windows/Linux/macOS 13, signed/installed build.
+- #208 (icons): generator test 7, trayIcon 3, package-contents 19/19, brand test 4 pass; all 10 CI checks on 5d7b0a82.
+
+### Earlier test state (historical)
 
 CURRENT 2026-10-23, #148 candidate `e1fab904`: frozen renderer/main/preload build binding PASS, 308/308 outputs, no rerun. Platform is macOS 26.6.2 build 25G83 arm64 (`PLATFORM-METADATA-20261023.json`). Helper/addon files exist and are hash-bound; external child-launch overrides correct the private `app.getAppPath()` discovery root. Journey B is the actual MP4 import → Library → editor path; Import Cancel returns unchanged Library; editor trim → Undo is observed; fixture fake-provider guide failure → Retry and actual validated #142 brief shape → native Copy for agent/Copy path through a private clipboard adapter are observed. Final unique-path outputs independently decode as PDF 2 pages, GIF 608×480/15 FPS/30 frames/2 s, and MP4 H.264/AAC 608×480/24 FPS/2 s; real GIF Cancel returned to the export sheet with no cancelled output. Journey A remains blocked: the exact readonly Alpha/Beta/Gamma TextEdit file was verified by AX/file URL, but native source selection did not expose that exact target, so Record/countdown, harmless click/selection, Stop/save-to-Library and all later guide/edit-step/brief/PDF/editor/export/return substeps are unverified as Journey A; separate fixtures are not substitutes. Per supervisor authority this is owner-owed and no retry is authorized. App-only Light→Dark pixel propagation and Tab focus movement were observed; reduced motion, reference/minimum, owner provider/clipboard, and #175 remain unverified. Carried followups are individually explicit: #175 completed take → last-window tray switch/countdown/window-all-closed without background harness unverified/blocked; #179 Trash-cancel focus for each Library/editor entry and context-menu opening/movement/activation/Escape/focus return unverified; #180 folder-sheet close/cancel → Recording CHANGE button focus unverified; #180 moveFile EXDEV copy/delete is source risk with runtime unverified and supervisor-owned filing; #181 delayed initial list → newer NAMING/title ordering unverified. Exact fixture hash and private-root cleanup receipts are under `~/dev/loop-evidence/showhow-148/`; the fixture hash was unchanged and no private Showhow processes remained after normal Quit. No current review or CI run; failed-review count 0; no broad suite or product/harness change.
 
@@ -107,6 +137,10 @@ Not tested:
 No tests were rerun for this handoff. Historical: the #122 real-key macOS smoke passed C1–C7 at `500cea16`, and the #110 packaged smoke passed at `fc50566a`.
 
 ## Cloud blockers
+
+Native macOS proof (recording, menu bar, permissions) cannot run in the cloud. Real-provider checks need the owner's key. Codex weekly limit was ~13% at session end.
+
+### Earlier cloud blockers (historical)
 
 Historical #148 package/tool STOP is superseded by the 23 October supervisor-approved alternate route. Current Journey A limitation is owner-owed under `SUPERVISOR-JOURNEY-A-LIMIT-APPROVAL.txt`; do not rerun native/CUA/source selection, doctor or tools. Preserve `STOP.md` and all failed receipts. One fresh review then a conventional documentation PR is authorized; owner-only provider/clipboard and permission changes remain separate.
 
