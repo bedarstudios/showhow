@@ -3,6 +3,7 @@ import path from "node:path";
 import { app } from "electron";
 import { formatTranscript } from "../../src/lib/showhow/transcriptFormat";
 import { SttManager } from "../stt";
+import { NoAudioTrackError } from "../stt/extractAudio";
 import { regenerateDocArtifacts } from "./bundle";
 
 const jobs = new Map<string, Promise<void>>();
@@ -32,7 +33,17 @@ export function requestBundleTranscript(
 				content = formatTranscript(result.segments);
 				transcriptReady = true;
 			} catch (error) {
-				console.error("Showhow native transcript generation failed:", error);
+				if (error instanceof NoAudioTrackError) {
+					// A take with the microphone off has no audio track at all. That is a
+					// verdict about the media, the same as whisper hearing nothing on a
+					// silent track, so it settles as "no speech" rather than as a failure
+					// (issue #201). MediaUnreadableError stays a failure: it clears once
+					// the OS grants access, so it must not be remembered as silence.
+					content = formatTranscript([]);
+					transcriptReady = true;
+				} else {
+					console.error("Showhow native transcript generation failed:", error);
+				}
 			} finally {
 				await manager
 					.shutdown()
