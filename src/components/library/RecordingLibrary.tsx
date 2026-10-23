@@ -694,6 +694,25 @@ function MissingDocSection({
 	);
 }
 
+/**
+ * Why there is no transcript to fall back on, or null when one exists or its
+ * state is unknown (legacy bundle without transcript.txt). A silent take settles
+ * as "no-speech" (issue #201); the doc state must not promise a transcript-only
+ * fallback for it.
+ */
+function missingTranscriptNote(status: RecordingLibraryEntry["transcriptStatus"]): string | null {
+	switch (status) {
+		case "pending":
+			return "Transcription is still running.";
+		case "no-speech":
+			return "No speech was detected, so there is no transcript to fall back on.";
+		case "failed":
+			return "Transcription failed, so there is no transcript to fall back on.";
+		default:
+			return null;
+	}
+}
+
 function getStepCaptureCopy(
 	entry: RecordingLibraryEntry,
 	fallback: { heading: string; explanation: string },
@@ -725,16 +744,29 @@ function getStepCaptureCopy(
 			explanation: `${detail} The desktop tier fallback is available for this recording.`,
 		};
 	}
+	const transcriptNote = missingTranscriptNote(entry.transcriptStatus);
+	const fallbackNote = transcriptNote ?? "The transcript-only fallback is available.";
 	if (reason === "accessibility-denied") {
 		return {
 			heading: "Accessibility permission unavailable",
-			explanation: `${detail} The transcript-only fallback is available.`,
+			explanation: `${detail} ${fallbackNote}`,
 		};
 	}
 	if (frameExtractionFailed) {
 		return {
 			heading: "Click frames unavailable",
-			explanation: `${detail} The transcript-only fallback is available.`,
+			explanation: `${detail} ${fallbackNote}`,
+		};
+	}
+	if (transcriptNote !== null) {
+		// The stored message says "this bundle has a transcript-only doc", which is
+		// not true without a transcript; say what is there and what to do instead.
+		return {
+			heading: "No desktop clicks captured",
+			explanation:
+				entry.transcriptStatus === "no-speech"
+					? "No desktop clicks were captured and no speech was detected, so there is nothing to document yet. Record again with the microphone on, or click through the steps you want captured."
+					: `No desktop clicks were captured. ${transcriptNote}`,
 		};
 	}
 	return {
