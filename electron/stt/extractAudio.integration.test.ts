@@ -22,6 +22,7 @@ let silentThenTone = "";
 let toneThenSilent = "";
 let bothTones = "";
 let loudTones = "";
+let stereoHotMix = "";
 let noAudio = "";
 const previousFfmpegPath = process.env.OPENSCREEN_FFMPEG_PATH;
 
@@ -35,6 +36,7 @@ describe.runIf(ffmpeg !== null)("extracting real multi-track media", () => {
 		toneThenSilent = path.join(scratch, "tone-first-silent-second.m4a");
 		bothTones = path.join(scratch, "both-tones.m4a");
 		loudTones = path.join(scratch, "loud-tones.m4a");
+		stereoHotMix = path.join(scratch, "stereo-hot-mix.mka");
 		noAudio = path.join(scratch, "no-audio.mp4");
 		await createAudioFixture(oneTrack, ["sine=frequency=440:sample_rate=48000:duration=1"]);
 		await createAudioFixture(silentThenTone, [
@@ -52,6 +54,10 @@ describe.runIf(ffmpeg !== null)("extracting real multi-track media", () => {
 		await createAudioFixture(loudTones, [
 			"sine=frequency=440:sample_rate=48000:duration=0.75,volume=8",
 			"sine=frequency=440:sample_rate=48000:duration=0.75,volume=8",
+		]);
+		await createAudioFixture(stereoHotMix, [
+			"aevalsrc=0.9*sin(2*PI*440*t)|0.9*sin(2*PI*440*t):s=48000:d=0.75",
+			"aevalsrc=0.9*sin(2*PI*440*t)|0.9*sin(2*PI*440*t):s=48000:d=0.75",
 		]);
 		await exec(ffmpeg, [
 			"-hide_banner",
@@ -114,6 +120,13 @@ describe.runIf(ffmpeg !== null)("extracting real multi-track media", () => {
 
 	it("keeps a multi-track peak below clipping", async () => {
 		const samples = await extractMono16kPcm(loudTones);
+		const peak = samples.reduce((maximum, sample) => Math.max(maximum, Math.abs(sample)), 0);
+
+		expect(peak).toBeLessThanOrEqual(0.951);
+	});
+
+	it("keeps hot stereo PCM below full scale after mono downmix", async () => {
+		const samples = await extractMono16kPcm(stereoHotMix);
 		const peak = samples.reduce((maximum, sample) => Math.max(maximum, Math.abs(sample)), 0);
 
 		expect(peak).toBeLessThanOrEqual(0.951);

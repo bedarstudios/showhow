@@ -11,8 +11,9 @@ handles any number of audio streams without adding an `ffprobe` dependency. A
 single-track input keeps the existing direct decode path. Multi-track audio is
 mixed for the longest input duration with normalization disabled, then limited to
 0.95 peak with auto-leveling disabled. Disabling `amix` normalization preserves a
-quiet speech track when a companion track is silent; the limiter bounds summed
-levels when multiple tracks are active.
+quiet speech track when a companion track is silent. The mix is downmixed to mono
+before limiting so stereo channel summing cannot raise the final STT samples above
+the 0.95 peak bound; limiter auto-leveling stays disabled.
 
 The regression evidence is in `/Users/mohamedb/dev/loop-evidence/showhow-215`:
 
@@ -23,6 +24,10 @@ The regression evidence is in `/Users/mohamedb/dev/loop-evidence/showhow-215`:
   regression before the extractor change.
 - `RED-QUIET-AMPLITUDE.log` records the normalized mix at 0.50 of the one-track
   control level and a hot two-track peak of 1.000396 before the quiet-speech fix.
+- `HOT-STEREO-PROBE.log` records the later stereo safety defect (PCM peak
+  `1.344012856`). `RED-HOT-STEREO-INTEGRATION.log` reproduces it with actual
+  FFmpeg stereo media before the repair (`1.3439537`); the repair inserts
+  `aformat=channel_layouts=mono` before `alimiter`.
 - `GREEN-QUIET-MIX.log` records focused GREEN for actual FFmpeg fixtures covering
   one track, either track order with a silent companion, both non-silent tracks,
   longest-track duration, quiet-track level preservation, peak limiting, and

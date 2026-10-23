@@ -175,7 +175,7 @@ export async function extractMono16kPcm(
 	if (audioTracks > 1) {
 		args.push(
 			"-filter_complex",
-			`[0:a]amix=inputs=${audioTracks}:duration=longest:dropout_transition=0:normalize=0,alimiter=limit=0.95:level=0:latency=1[aout]`,
+			`[0:a]amix=inputs=${audioTracks}:duration=longest:dropout_transition=0:normalize=0,aformat=channel_layouts=mono,alimiter=limit=0.95:level=0:latency=1[aout]`,
 			"-map",
 			"[aout]",
 		);
