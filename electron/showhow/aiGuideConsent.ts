@@ -137,6 +137,8 @@ export function registerAiGuideHandlers(deps: {
 			guide,
 			narrationOnly: source?.inputSteps[0]?.kind === "narration",
 			noSpeech: source ? source.segments.length === 0 : undefined,
+			// No clicks, no narration and a settled transcript: nothing to make a guide from.
+			noInput: source ? source.inputSteps.length === 0 && !source.transcriptPending : undefined,
 		};
 	});
 	handle("preview", async (event, bundle, rawOptions) => {
@@ -251,6 +253,11 @@ export function registerAiGuideHandlers(deps: {
 		const brief = await readAgentBrief(resolved);
 		const run = briefRuns.get(resolved);
 		const failure = briefFailures.get(resolved);
+		// No clicks, no narration and a settled transcript: nothing to make a brief from. An
+		// unreadable bundle keeps reporting through preview, as before.
+		const noInput = await readBriefSources(resolved)
+			.then((source) => source.steps.length === 0 && !source.transcriptPending)
+			.catch(() => false);
 		return {
 			connected: Boolean(deps.getStore().getApiKey("openrouter")),
 			model: getModel(),
@@ -261,6 +268,7 @@ export function registerAiGuideHandlers(deps: {
 			phase: run?.phase,
 			brief,
 			error: run ? undefined : failure,
+			noInput,
 		} satisfies AgentBriefStatus;
 	});
 	briefHandle("preview", async (event, bundle, rawOptions) => {

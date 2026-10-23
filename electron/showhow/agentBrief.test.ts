@@ -179,6 +179,27 @@ describe("runAgentBrief", () => {
 		expect(await sources(dir)).toEqual(before);
 	});
 
+	it("#200 reports no input without calling the model when the recording has no clicks or speech", async () => {
+		const dir = await mkdtemp(path.join(os.tmpdir(), "showhow-brief-silent-"));
+		await writeFile(
+			path.join(dir, "meta.json"),
+			JSON.stringify({ title: "Silent", video: "video.mp4" }),
+		);
+		await writeFile(path.join(dir, "steps.json"), "[]\n");
+		await writeFile(path.join(dir, "steps.md"), "");
+		await writeFile(path.join(dir, "transcript.txt"), "(no speech detected)\n");
+		const model = vi.fn(async () => JSON.stringify(response));
+		const before = await sources(dir);
+		expect(await runAgentBrief(dir, { model, modelSlug: "m" })).toEqual({
+			success: false,
+			error: "noInput",
+		});
+		expect(model).not.toHaveBeenCalled();
+		expect(await readAgentBrief(dir)).toBeUndefined();
+		expect(await readdir(dir)).not.toEqual(expect.arrayContaining([AGENT_BRIEF_JSON]));
+		expect(await sources(dir)).toEqual(before);
+	});
+
 	it("writes nothing when cancelled, even if the provider answers after the cancel", async () => {
 		const dir = await bundle();
 		const controller = new AbortController();

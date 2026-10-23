@@ -40,6 +40,8 @@ export interface AgentBriefStatus {
 	phase?: BriefPhase;
 	brief?: AgentBrief;
 	error?: string;
+	/** No clicks, no narration and a settled transcript: nothing to make a brief from. */
+	noInput?: boolean;
 }
 export interface AgentBriefPreview {
 	token: string;
