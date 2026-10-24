@@ -24,9 +24,9 @@
 
 import { execFileSync, spawn } from "node:child_process";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveRustTool } from "./rustToolchain.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
@@ -88,9 +88,11 @@ if (!fs.existsSync(path.join(macFfmpegDir, "include"))) {
 	);
 }
 
-const cargo = path.join(os.homedir(), ".cargo", "bin", "cargo");
-if (!fs.existsSync(cargo)) {
-	throw new Error(`cargo not found at ${cargo}. Install Rust (https://rustup.rs) first.`);
+const cargo = resolveRustTool("cargo");
+if (!cargo) {
+	throw new Error(
+		"cargo not found on PATH or in ~/.cargo/bin. Install Rust (https://rustup.rs) first.",
+	);
 }
 
 // cwd = crates/ so cargo picks up crates/.cargo/config.toml, same as the Windows script.
