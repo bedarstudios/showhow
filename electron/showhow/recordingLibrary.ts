@@ -5,8 +5,9 @@ import path from "node:path";
 import type {
 	RecordingLibraryEntry,
 	StepCaptureReason,
+	TranscriptStatus,
 } from "../../src/lib/showhow/recordingLibrary";
-import { getRecordingsRoot, regenerateDocArtifacts } from "./bundle";
+import { getRecordingsRoot, parseTranscript, regenerateDocArtifacts } from "./bundle";
 import { createShowhowMediaUrl } from "./mediaProtocol";
 
 export type { RecordingLibraryEntry };
@@ -128,6 +129,24 @@ function isFiniteStep(value: RawStep): value is { label: string; ts: number; scr
 	);
 }
 
+/**
+ * Classify `transcript.txt` by the marker the transcript job wrote, or by
+ * whether it holds any timestamped line the doc engine can use. Returns
+ * undefined when the file is absent so legacy bundles serialize unchanged.
+ */
+async function readTranscriptStatus(bundleDir: string): Promise<TranscriptStatus | undefined> {
+	let content: string;
+	try {
+		content = await readFile(path.join(bundleDir, "transcript.txt"), "utf-8");
+	} catch {
+		return undefined;
+	}
+	const marker = content.trim();
+	if (marker === "(transcription pending)") return "pending";
+	if (marker === "(transcription failed)") return "failed";
+	return parseTranscript(content).length > 0 ? "ready" : "no-speech";
+}
+
 async function readEntryForDir(
 	recordingsRoot: string,
 	name: string,
@@ -179,6 +198,10 @@ async function readEntryForDir(
 	const steps = await readSteps(bundleDir);
 	if (steps !== undefined) {
 		entry.steps = steps;
+	}
+	const transcriptStatus = await readTranscriptStatus(bundleDir);
+	if (transcriptStatus !== undefined) {
+		entry.transcriptStatus = transcriptStatus;
 	}
 	return entry;
 }

@@ -52,6 +52,14 @@ export interface StepCaptureStatus {
 }
 
 /**
+ * What the bundle's `transcript.txt` holds, classified from the marker the
+ * transcript job wrote. Only `ready` means there are timestamped lines the doc
+ * engine and guides can use; the renderer must not offer a transcript-only
+ * fallback for any other value (issue #201).
+ */
+export type TranscriptStatus = "pending" | "ready" | "no-speech" | "failed";
+
+/**
  * A local recording-library entry.
  *
  * The core fields (`bundleDir`, `title`, `source`, `createdAt`, `durationMs`)
@@ -85,6 +93,8 @@ export interface RecordingLibraryEntry {
 	steps?: WorkflowStep[];
 	/** Step-capture availability from meta.json, when present. */
 	stepCapture?: StepCaptureStatus;
+	/** Classified `transcript.txt` content. Only present when the file exists. */
+	transcriptStatus?: TranscriptStatus;
 }
 
 export type RecordingTitleStatusEvent =
