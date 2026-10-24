@@ -26,6 +26,8 @@ export interface GuideStatus {
 	alwaysSend?: boolean;
 	narrationOnly?: boolean;
 	noSpeech?: boolean;
+	/** No clicks, no narration and a settled transcript: nothing to make a guide from. */
+	noInput?: boolean;
 	connected: boolean;
 	model: string;
 	reviewed: boolean;
@@ -50,6 +52,8 @@ export function guidePanelTransition(
 ): GuidePanelState {
 	switch (event.type) {
 		case "begin":
+			// Nothing to send, so neither a connection nor a review is asked for.
+			if (event.status.noInput) return { view: "idle" };
 			if (!event.status.connected) return { view: "connect" };
 			if (event.status.guide?.editedSinceAi && !event.confirmed) return { view: "confirm" };
 			return event.status.reviewed ? { view: "making", phase: "transcript" } : { view: "review" };

@@ -72,3 +72,15 @@ describe("guide state machine C1–C7", () => {
 			}).view,
 		).toBe("making"));
 });
+
+it("#200 begin stays idle for a recording with no clicks or speech, even before connecting", () => {
+	expect(
+		guidePanelTransition(idle, { type: "begin", status: { ...connected, noInput: true } }),
+	).toEqual(idle);
+	expect(
+		guidePanelTransition(
+			{ view: "failed" },
+			{ type: "begin", status: { ...connected, connected: false, noInput: true } },
+		),
+	).toEqual(idle);
+});

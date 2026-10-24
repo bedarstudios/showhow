@@ -529,3 +529,42 @@ describe("agent brief IPC boundary", () => {
 		expect(await readFile(path.join(s.bundle, "agent-brief.json"), "utf8")).toBe(saved);
 	});
 });
+
+describe("#200 no clicks or speech", () => {
+	const silence = async (
+		s: Awaited<ReturnType<typeof setup>>,
+		transcript = "(no speech detected)\n",
+	) => {
+		await writeFile(path.join(s.bundle, "steps.json"), "[]\n");
+		await writeFile(path.join(s.bundle, "transcript.txt"), transcript);
+	};
+	it("status reports no input for guide and brief, and neither run calls the provider", async () => {
+		const s = await setup();
+		await silence(s);
+		expect(await s.call("status", s.bundle)).toMatchObject({ noInput: true });
+		expect(await s.brief("status", s.bundle)).toMatchObject({ noInput: true, state: "none" });
+		const preview = await s.call("preview", s.bundle, { transcript: true, frames: true });
+		expect(await s.call("consent", s.bundle, preview.token, true)).toMatchObject({ success: true });
+		expect(await s.call("run", s.bundle, preview.token)).toMatchObject({ success: false });
+		const briefPreview = await s.brief("preview", s.bundle, { transcript: true, frames: true });
+		expect(await s.brief("consent", s.bundle, briefPreview.token, true)).toMatchObject({
+			success: true,
+		});
+		expect(await s.brief("run", s.bundle, briefPreview.token)).toMatchObject({
+			success: false,
+			error: "noInput",
+		});
+		expect(s.createModel).not.toHaveBeenCalled();
+		expect(
+			JSON.parse(await readFile(path.join(s.bundle, "meta.json"), "utf8")).guide,
+		).toBeUndefined();
+	});
+	it("status does not report no input with clicks, or while the transcript is still pending", async () => {
+		const s = await setup();
+		expect(await s.call("status", s.bundle)).toMatchObject({ noInput: false });
+		expect(await s.brief("status", s.bundle)).toMatchObject({ noInput: false });
+		await silence(s, "(transcription pending)\n");
+		expect(await s.call("status", s.bundle)).toMatchObject({ noInput: false });
+		expect(await s.brief("status", s.bundle)).toMatchObject({ noInput: false });
+	});
+});

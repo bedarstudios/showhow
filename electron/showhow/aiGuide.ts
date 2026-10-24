@@ -186,10 +186,13 @@ export async function readGuideSources(bundleDir: string) {
 		throw new GuideValidationError("Invalid bundle video");
 	const segments = parseTranscript(transcript);
 	const inputSteps: Step[] = baseline.length ? baseline : narrationSteps(segments);
+	// finishRecording and importRecording leave this marker until the transcript job completes;
+	// it parses to no segments, which is not the same as no speech.
+	const transcriptPending = transcript.trim() === "(transcription pending)";
 	const signature = createHash("sha256")
 		.update(JSON.stringify([metaRaw, currentRaw, baselineRaw, transcript]))
 		.digest("hex");
-	return { meta, baselineRaw, currentRaw, inputSteps, segments, signature };
+	return { meta, baselineRaw, currentRaw, inputSteps, segments, signature, transcriptPending };
 }
 export function isSourceStep(value: unknown): value is Step {
 	if (!isRecord(value) || !isRecord(value.coords)) return false;
@@ -228,6 +231,9 @@ export async function runAiGuide(
 				options: { transcript: true, frames: true },
 			}),
 		};
+		// No clicks and no narration: there is nothing a model could build from, so leave the
+		// bundle untouched rather than record a failure that no retry can fix (#200).
+		if (!prepared.inputSteps.length) return { success: false };
 		const backup = path.join(bundleDir, "steps.deterministic.json");
 		// Exclusive creation preserves the first deterministic source byte for byte.
 		try {
@@ -248,8 +254,6 @@ export async function runAiGuide(
 		try {
 			await writeGuideFiles(bundleDir, { "meta.json": JSON.stringify(meta, null, 2) + "\n" });
 			options.onPhase?.("transcript");
-			if (!prepared.inputSteps.length)
-				throw new GuideValidationError("No source steps or narration");
 			options.onPhase?.("sorting");
 			const raw = await options.model(prepared.request.messages);
 			const result = parseGuideResponse(raw, prepared.inputSteps);
