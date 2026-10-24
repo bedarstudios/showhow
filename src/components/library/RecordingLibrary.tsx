@@ -137,6 +137,7 @@ function RecordingDetail({
 	const [revealedSteps, setRevealedSteps] = useState<Set<number>>(() => new Set());
 	const [docStatus, setDocStatus] = useState<"idle" | "generating" | "failure">("idle");
 	const [tab, setTab] = useState("guide");
+	const briefTab = useRef<HTMLButtonElement>(null);
 	const [pdfOpen, setPdfOpen] = useState(false);
 	const pdfButton = useRef<HTMLButtonElement>(null);
 	const moreButton = useRef<HTMLButtonElement>(null);
@@ -280,7 +281,9 @@ function RecordingDetail({
 	const tabList = (
 		<TabsList className="border-b-0">
 			<TabsTrigger value="guide">{t("showhowGuide.walkthrough")}</TabsTrigger>
-			<TabsTrigger value="brief">{t("showhowBrief.tab")}</TabsTrigger>
+			<TabsTrigger ref={briefTab} value="brief">
+				{t("showhowBrief.tab")}
+			</TabsTrigger>
 		</TabsList>
 	);
 	const guideBody = (
@@ -609,7 +612,15 @@ function RecordingDetail({
 					<AgentBriefPanel brief={brief} />
 				</TabsContent>
 			</Tabs>
-			<AgentBriefSheets brief={brief} />
+			<AgentBriefSheets
+				brief={brief}
+				briefShown={tab === "brief"}
+				onOpenBrief={() => {
+					setTab("brief");
+					// The toast closes as the tab opens; keep keyboard focus on the tab it led to.
+					briefTab.current?.focus();
+				}}
+			/>
 			<ExportPdfSheet
 				entry={entry}
 				open={pdfOpen}
