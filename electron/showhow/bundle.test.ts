@@ -11,6 +11,7 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import { formatTimestamp } from "@/lib/showhow/transcriptFormat";
 import {
@@ -19,6 +20,7 @@ import {
 	bundleDirName,
 	type ClickInput,
 	createRecordingBundle,
+	extractDesktopStepFrames,
 	type FrameExtractor,
 	formatStepTimestamp,
 	isInsideRecordingsRoot,
@@ -31,6 +33,51 @@ import {
 	updateWorkflowDocument,
 	type WriteDocArtifactsSeam,
 } from "./bundle";
+
+describe("desktop step frame marker (issue #209)", () => {
+	it("keeps the clicked pixel visible inside a brand-orange outline", async () => {
+		const work = await mkdtemp(path.join(os.tmpdir(), "showhow-click-marker-"));
+		const screenshotsDir = path.join(work, "screenshots");
+		const width = 96;
+		const height = 96;
+		const center = Math.floor(width / 2);
+		const sourcePixels = Buffer.alloc(width * height * 3, 40);
+
+		for (let y = center - 6; y <= center + 6; y++) {
+			for (let x = center - 6; x <= center + 6; x++) {
+				if (x === center || y === center) {
+					const offset = (y * width + x) * 3;
+					sourcePixels.fill(255, offset, offset + 3);
+				}
+			}
+		}
+
+		try {
+			await mkdir(screenshotsDir);
+			const sourcePath = path.join(work, "source.png");
+			const outputPath = path.join(screenshotsDir, "step-01.png");
+			await sharp(sourcePixels, { raw: { width, height, channels: 3 } })
+				.png()
+				.toFile(sourcePath);
+			await extractDesktopStepFrames({
+				videoPath: sourcePath,
+				screenshotsDir,
+				clicks: [{ timeMs: 0, cx: 0.5, cy: 0.5, outputPath: "step-01.png" }],
+			});
+
+			const source = await sharp(sourcePath).removeAlpha().raw().toBuffer();
+			const output = await sharp(outputPath).removeAlpha().raw().toBuffer();
+			const centerOffset = (center * width + center) * 3;
+			const borderOffset = ((center - 20) * width + center) * 3;
+			expect([...output.subarray(centerOffset, centerOffset + 3)]).toEqual([
+				...source.subarray(centerOffset, centerOffset + 3),
+			]);
+			expect([...output.subarray(borderOffset, borderOffset + 3)]).toEqual([228, 87, 46]);
+		} finally {
+			await rm(work, { recursive: true, force: true });
+		}
+	});
+});
 
 describe("bundleDirName", () => {
 	it("formats createdAt as YYYY-MM-DD_HHMMSS-recording in local time", () => {
