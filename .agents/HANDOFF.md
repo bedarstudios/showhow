@@ -1,10 +1,19 @@
 # Project handoff
 
-Updated: 2026-10-23 (overnight wrap-up)
+Updated: 2026-10-24 (#215 close-out)
 
 ## In flight
 
-Nothing is in flight. No ticket lanes, no open PRs, no stashes; the only worktree is the main checkout. Overnight 2026-10-23 (owner /goal, supervisor-merged with explicit authority) cleared the queue:
+#215 is merged and Done: PR #225, reviewed head `58076b5c2103dd2c5b2e0d08def1bf8aea596de8`, merge `297ea752cccabc306e111f6623ffc7151b021775` (owner/supervisor merge, 2026-10-24). Fresh Standards and Requirements review passed; all 10 CI checks passed. The initial CI duration failures were reproduced on FFmpeg 6.1.1 and repaired without weakening assertions. Evidence: `~/dev/loop-evidence/showhow-215/READY.md`, `PORTABLE-PROVE.md`, `COORDINATOR-PR-READY.json`.
+
+- The #215 private runtime is stopped; its clean worktree, lane w8H and local branch are removed. The remote ticket branch was already absent after merge. Preserve all external proof, failed receipts, source bundle and owner media. Other sessions own the #202/#203 worktrees and PR #226 evidence-cleanup worktree; leave them untouched.
+- Separate follow-up #223: app-managed VAD took about 600 s per pass on an 86 s recording and timed out. Owner/supervisor accepted the exact extractor/real-helper speech proof for #215; no app-guide completion is claimed. Cause remains unknown. Issue #223 is Todo, with its owner:ai vault idea note.
+- Settled owner decisions: #199 option A keeps Showhow in the menu bar after the last macOS window closes; Cmd+Q quits. Pair #199 with #213 (Cmd+W closes only the window). #204 is closed as not planned; MP4 has no Cancel, preserving the 2026-10-19 decision. These are recorded in `.agents/decisions.md`.
+- Main was fast-forwarded to `297ea752`. Unrelated dirty `PLAN.md` and untracked `design/landing-export.html` were preserved byte-for-byte. No new product ticket was dispatched during this close-out.
+
+### Historical overnight wrap-up — 2026-10-23
+
+Historical snapshot: Overnight 2026-10-23 (owner /goal, supervisor-merged with explicit authority) cleared the queue:
 - Merged: #175 (PR #190), #187 (#191), #170 (#192), #178 (#193), #179 (#194), #180 (#195), #181 (#196), #182 (#197), #148 (#198), #137 (#206, landing page live at https://showhow-agy.pages.dev/), #207 (#208, new logo icons). Plan docs PR #189.
 - Closed: stale #56–#59, #61–#63; #128 not planned (branch `ticket/128-chatgpt-connect` kept on GitHub); outside fork PR #214 closed unmerged on owner instruction.
 - Open for owner triage: end-to-end findings #199–#205, #209–#213, #215. Highest impact: #215 (transcription reads only the first audio track, so mic speech is lost), #200, #201. #204 repeats the accepted 2026-10-19 "MP4 Cancel disabled" decision.
@@ -47,7 +56,7 @@ The move onto upstream v2 is shaped and published: milestone "Move onto upstream
 
 ## Next action
 
-Owner triages the open findings and picks the first fix: recommended #215, then #200 and #201 (a first tester with the microphone on or off hits them immediately). Dispatch each as a normal Loop ticket from current `main`. Before that, the owner runs one recording with the microphone on and the real OpenRouter key, then a guide and PDF (owner-only; never entered by agents).
+Prepare #199 together with #213 through the normal Loop route from current main, using the settled macOS window/menu-bar decisions. Coordinate with the supervisor before creating a lane so another session does not dispatch the same work. Keep slow VAD #223 separate; do not reopen #204.
 
 ### Superseded next action (historical)
 
@@ -63,7 +72,6 @@ Keep #128 parked and the #134 worktree intact for pen.dev cache safety.
 
 ## Open decisions
 
-- #199: should Showhow stay in the menu bar after its last window closes on macOS? Recommended yes; #213 (Cmd+W) depends on it.
 - Cloudflare: add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` so `pages.yml` deploys `site/` changes; until then deploy manually (docs/landing/deploy.md).
 - Account-wide interaction limit needs the `user` gh token scope (`gh auth refresh -h github.com -s user`); Showhow's repo-level collaborators-only limit expires 2027-04-23.
 - Cursor packs: #116 removes the 17 Sweezy packs and takes upstream's seven original packs. #116 has merged; confirm the packs shipped as planned before a release tag.
@@ -73,7 +81,7 @@ Keep #128 parked and the #134 worktree intact for pen.dev cache safety.
 
 - Keep the main checkout on `main` while a ticket lane is open: lane verification fails ("Git branch differs") if the coordinator switches it. Write plans in a separate worktree.
 - Owner's Mac runs Vorssaint with Auto Quit; it sends Quit Apple Events to Showhow/Electron when only the HUD is left. The owner turned Auto Quit off on 2026-10-17. Not a product bug.
-- Dev builds (`npm run dev`) lack the whisper STT helper (`scripts/build-whisper-stt.sh`), so dev recordings stay "(transcription pending)".
+- An unpackaged run needs an explicitly resolved STT helper and caption assets. Missing staging can leave transcription pending, but do not infer that cause without checking: the #215 private run had the verified helper/models and instead hit slow VAD/timeouts (#223).
 
 - In role panes, answer Codex hooks prompts with "Continue without trusting". "Trust all" writes hook trust into the role profile and breaks later launches (profile backup from 2026-10-16: `~/.local/share/bedar-loop/profile-fix-20261016/`).
 - A ticket lead cannot prompt the coordinator across Herdr workspaces. It writes `STOP.md` in `~/dev/loop-evidence/<repo>-<n>/`, so the coordinator or a supervisor must poll it.
@@ -90,6 +98,10 @@ Keep #128 parked and the #134 worktree intact for pen.dev cache safety.
 - Merging or approving CI for outside-contributor PRs (#214 closed). Converting the landing site to Cloudflare Workers.
 
 ## Test state
+
+2026-10-24, #215 reviewed head `58076b5c` / merge `297ea752`: 486 affected tests across 33 files, 22 focused tests, 9/9 real integration tests on FFmpeg 6.1.1 and 9/9 on 9.0.2, source/test TypeScript, Biome and build passed; hosted CI 10/10. The owner-live take has system mean/peak -91/-91 dBFS and Brio mic -44.8/-15.8 dBFS. Final mixed mono mean/peak -41.84/-13.84 dBFS; verified real helper text: "testing is this working? do you have anything?". Final owner/quiet text and VAD match their microphone-only controls; original media hashes unchanged. The app-managed job timed out separately (#223), explicitly accepted as nonblocking for #215. Windows/Linux native runtime, live provider and app-guide completion are unverified. Tests were not rerun solely for close-out documentation.
+
+### Historical test snapshot — 2026-10-23
 
 2026-10-23, packaged arm64 build of `001b202a` on isolated profiles (`launch-isolated*.mjs`, fake OpenRouter in main), native Computer Use, window-only evidence:
 - Four Codex passes plus supervisor runs: recording a TextEdit window with real clicks (`realclick.swift`), guide, brief, step edit, PDF export (options verified by file size/images), import, trim/Undo, MP4/GIF export, GIF cancel, Trash/Undo, keyboard Tab, Settings folder Move/Keep. All observed working except the filed findings.
