@@ -119,7 +119,7 @@
 		"noSpeech": "No speech found",
 		"clickOnly": "Your guide uses clicks and screenshots. Your recording is saved.",
 		"remakeTitle": "Remake the guide?",
-		"previousStays": "Your current guide stays until the new one is ready.",
+		"remakeReplacesEdits": "Remake replaces your edited steps with a new guide.",
 		"reviewTitle": "Check what gets sent",
 		"sentOnly": "Sent only when you continue.",
 		"transcriptWords": "Transcript · {{count}} words",
