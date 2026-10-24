@@ -81,7 +81,7 @@ describe("MainLogBuffer", () => {
 	});
 });
 
-// #212: a diagnostic the product wants in Save Diagnostics regardless of OPENSCREEN_DIAGNOSTIC
+// #212: a diagnostic the product wants in Save Diagnostics with or without diagnostic mode
 // is recorded directly, and still reaches the console exactly once.
 describe("MainLogBuffer.record", () => {
 	const buffers: MainLogBuffer[] = [];
