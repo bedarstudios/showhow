@@ -122,7 +122,7 @@
 		"noInputBody": "This recording has no clicks or speech. Record again with the microphone on, or narrate while you click.",
 		"noInputSend": "This recording has no clicks or speech, so there is nothing to send.",
 		"remakeTitle": "Remake the guide?",
-		"previousStays": "Your current guide stays until the new one is ready.",
+		"remakeReplacesEdits": "Remake replaces your edited steps with a new guide.",
 		"reviewTitle": "Check what gets sent",
 		"sentOnly": "Sent only when you continue.",
 		"transcriptWords": "Transcript · {{count}} words",

@@ -352,7 +352,7 @@ export function AiGuidePanel({
 					{state.view === "confirm" && (
 						<GuideSheet
 							title={t("showhowGuide.remakeTitle")}
-							description={t("showhowGuide.previousStays")}
+							description={t("showhowGuide.remakeReplacesEdits")}
 							returnFocusTo={invoker.current}
 							onClose={close}
 						>

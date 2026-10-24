@@ -338,6 +338,21 @@ it.each([
 	await waitFor(() => expect(make).toHaveFocus());
 });
 
+it("#211 edited Remake warns that the edited steps will be replaced", async () => {
+	status.mockResolvedValue({
+		...connected,
+		reviewed: true,
+		guide: { status: "ready", provider: "openrouter", model: "fake", editedSinceAi: true },
+	});
+	render(<AiGuidePanel entry={entry} onEntryChange={onChange} />);
+	fireEvent.click(await screen.findByRole("button", { name: "Remake" }));
+	const dialog = await screen.findByRole("dialog", { name: "Remake the guide?" });
+	expect(dialog).toHaveAccessibleDescription("Remake replaces your edited steps with a new guide.");
+	expect(within(dialog).getByRole("button", { name: "Remake" })).toBeVisible();
+	expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeVisible();
+	expect(run).not.toHaveBeenCalled();
+});
+
 it("#200 shows the empty state instead of Make guide, Check or Retry when a recording has no clicks or speech", async () => {
 	status.mockResolvedValue({
 		...connected,
