@@ -271,6 +271,26 @@ describe("Move an open recording to Trash", () => {
 		expect(screen.getByTestId("topbar-save-state")).toHaveAttribute("data-dirty", "true");
 	});
 
+	it("returns focus to the editor ⋯ button after cancelling Move to Trash", async () => {
+		setOpenRecording();
+		const user = userEvent.setup();
+		renderShell();
+
+		await openTrashSheet(user);
+		const dialog = screen.getByRole("dialog", { name: "common.showhowTrash.title" });
+		const cancel = within(dialog).getByRole("button", { name: "common.actions.cancel" });
+		await waitFor(() => expect(cancel).toHaveFocus());
+		await user.click(cancel);
+		await waitFor(() =>
+			expect(
+				screen.queryByRole("dialog", { name: "common.showhowTrash.title" }),
+			).not.toBeInTheDocument(),
+		);
+		await waitFor(() =>
+			expect(screen.getByRole("button", { name: "common.showhowTrash.moreActions" })).toHaveFocus(),
+		);
+	});
+
 	it("discards only after the user chooses Discard, then moves the recording", async () => {
 		const { document, saveDocument, trashRecording } = setOpenRecording();
 		const user = userEvent.setup();

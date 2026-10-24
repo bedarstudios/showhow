@@ -1,4 +1,4 @@
-import type { MouseEventHandler, ReactNode } from "react";
+import { forwardRef, type MouseEventHandler, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { SwapText } from "./SwapText";
 
@@ -13,18 +13,13 @@ export interface LibraryRowProps {
 	onContextMenu?: MouseEventHandler<HTMLButtonElement>;
 }
 
-export function LibraryRow({
-	title,
-	meta,
-	isNew,
-	selected,
-	onSelect,
-	trailing,
-	processing,
-	onContextMenu,
-}: LibraryRowProps) {
+export const LibraryRow = forwardRef<HTMLButtonElement, LibraryRowProps>(function LibraryRow(
+	{ title, meta, isNew, selected, onSelect, trailing, processing, onContextMenu },
+	ref,
+) {
 	return (
 		<button
+			ref={ref}
 			type="button"
 			className={cn(
 				"relative flex w-full flex-col items-stretch gap-[5px] rounded-[6px] p-[10px] text-left transition-colors [transition-duration:120ms] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ds-accent motion-reduce:transition-none",
@@ -54,4 +49,4 @@ export function LibraryRow({
 			)}
 		</button>
 	);
-}
+});

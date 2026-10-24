@@ -113,7 +113,7 @@ function RecordingDetail({
 }: {
 	entry: RecordingLibraryEntry;
 	showTrashAction: boolean;
-	onTrashRequest: (entry: RecordingLibraryEntry) => void;
+	onTrashRequest: (entry: RecordingLibraryEntry, returnFocusTo: HTMLElement | null) => void;
 	onEntryChange: (entry: RecordingLibraryEntry) => void;
 	onTitleChange: (bundleDir: string, title: string) => void;
 	onStepsChange: (bundleDir: string, steps: RecordingLibraryEntry["steps"]) => void;
@@ -139,6 +139,7 @@ function RecordingDetail({
 	const [tab, setTab] = useState("guide");
 	const [pdfOpen, setPdfOpen] = useState(false);
 	const pdfButton = useRef<HTMLButtonElement>(null);
+	const moreButton = useRef<HTMLButtonElement>(null);
 	const brief = useAgentBrief(entry.bundleDir);
 	const isMountedRef = useRef(true);
 	useEffect(() => {
@@ -498,6 +499,7 @@ function RecordingDetail({
 								<DropdownMenu.Root>
 									<DropdownMenu.Trigger asChild>
 										<button
+											ref={moreButton}
 											type="button"
 											aria-label={t("showhowTrash.moreActions")}
 											className="inline-flex size-10 items-center justify-center rounded-[4px] border border-ds-line text-ds-ink-soft hover:bg-ds-ink-wash focus-visible:outline focus-visible:outline-2 focus-visible:outline-ds-accent"
@@ -513,7 +515,7 @@ function RecordingDetail({
 										>
 											<DropdownMenu.Item
 												className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-left text-sm outline-none data-[highlighted]:bg-ds-ink-wash"
-												onSelect={() => onTrashRequest(entry)}
+												onSelect={() => onTrashRequest(entry, moreButton.current)}
 											>
 												<Trash2 size={14} aria-hidden="true" />
 												{t("showhowTrash.menuItem")}
@@ -844,6 +846,18 @@ export function RecordingLibrary() {
 		y: number;
 	} | null>(null);
 	const contextMenuRef = useRef<HTMLDivElement>(null);
+	// The Trash sheet has no trigger, so focus returns to whatever asked for it: the row the
+	// context menu or ⌘⌫ acted on, or the detail pane's ⋯ button. After a successful move the
+	// row is gone, and the next selected row takes focus instead.
+	const rowButtons = useRef(new Map<string, HTMLButtonElement>());
+	const trashReturnFocus = useRef<HTMLElement | null>(null);
+	const requestTrash = useCallback(
+		(entry: RecordingLibraryEntry, returnFocusTo: HTMLElement | null) => {
+			trashReturnFocus.current = returnFocusTo;
+			setTrashEntry(entry);
+		},
+		[],
+	);
 	const loadRequest = useRef(0);
 	const reloadRecordings = useCallback(async () => {
 		const request = ++loadRequest.current;
@@ -1033,11 +1047,11 @@ export function RecordingLibrary() {
 			const selected = entries.find((entry) => entry.bundleDir === selectedBundleDir);
 			if (!selected) return;
 			event.preventDefault();
-			setTrashEntry(selected);
+			requestTrash(selected, rowButtons.current.get(selected.bundleDir) ?? null);
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [entries, mac, overview, selectedBundleDir, settingsOpen, trashEntry]);
+	}, [entries, mac, overview, requestTrash, selectedBundleDir, settingsOpen, trashEntry]);
 	return (
 		<Shell
 			className="h-screen"
@@ -1093,6 +1107,10 @@ export function RecordingLibrary() {
 						visibleEntries.map((entry) => (
 							<LibraryRow
 								key={entry.bundleDir}
+								ref={(node) => {
+									if (node) rowButtons.current.set(entry.bundleDir, node);
+									else rowButtons.current.delete(entry.bundleDir);
+								}}
 								title={entry.title}
 								meta={`${entry.source === "imported" ? t("importVideo.imported") : entry.source === "browser" ? "Browser" : "Desktop"}${entry.durationMs === undefined ? "" : ` · ${formatDuration(entry.durationMs)}`}`}
 								trailing={
@@ -1158,6 +1176,13 @@ export function RecordingLibrary() {
 					if (!open) setTrashEntry(null);
 				}}
 				onConfirm={() => void handleTrashConfirm()}
+				onCloseAutoFocus={(event) => {
+					event.preventDefault();
+					const target = trashReturnFocus.current;
+					trashReturnFocus.current = null;
+					if (target?.isConnected) target.focus();
+					else if (activeEntry) rowButtons.current.get(activeEntry.bundleDir)?.focus();
+				}}
 			/>
 			{contextMenu && (
 				<div
@@ -1186,7 +1211,10 @@ export function RecordingLibrary() {
 							autoFocus
 							className="flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-left text-sm outline-none hover:bg-ds-ink-wash focus:bg-ds-ink-wash"
 							onClick={() => {
-								setTrashEntry(contextMenu.entry);
+								requestTrash(
+									contextMenu.entry,
+									rowButtons.current.get(contextMenu.entry.bundleDir) ?? null,
+								);
 								setContextMenu(null);
 							}}
 						>
@@ -1262,7 +1290,7 @@ export function RecordingLibrary() {
 								key={activeEntry.bundleDir}
 								entry={activeEntry}
 								showTrashAction={mac}
-								onTrashRequest={setTrashEntry}
+								onTrashRequest={requestTrash}
 								onEntryChange={replaceEntry}
 								onTitleChange={updateTitle}
 								onStepsChange={updateSteps}

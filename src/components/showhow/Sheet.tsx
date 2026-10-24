@@ -20,6 +20,7 @@ export interface SheetProps extends ComponentProps<typeof Dialog> {
 	description?: string;
 	trigger?: ReactNode;
 	footer?: ReactNode;
+	onOpenAutoFocus?: ComponentProps<typeof DialogPrimitive.Content>["onOpenAutoFocus"];
 	onCloseAutoFocus?: ComponentProps<typeof DialogPrimitive.Content>["onCloseAutoFocus"];
 }
 
@@ -29,6 +30,7 @@ export function Sheet({
 	description,
 	trigger,
 	footer,
+	onOpenAutoFocus,
 	onCloseAutoFocus,
 	children,
 	...props
@@ -43,6 +45,7 @@ export function Sheet({
 					className="motion-reduce:!animate-none motion-reduce:!transition-none"
 				/>
 				<DialogPrimitive.Content
+					onOpenAutoFocus={onOpenAutoFocus}
 					onCloseAutoFocus={onCloseAutoFocus}
 					aria-modal="true"
 					aria-describedby={description ? descriptionId : undefined}
