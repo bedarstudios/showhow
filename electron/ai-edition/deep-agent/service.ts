@@ -25,6 +25,8 @@ import type { AxcutDocument } from "../../../src/lib/ai-edition/schema";
 // (`depth/2 + 0.5`) that was purged from two rendering sites and survived here,
 // wrong at both ends of a table that actually runs 1.25× to 5.0×.
 import { ZOOM_DEPTH_LEGEND } from "../../../src/lib/ai-edition/timeline/zoom-scale";
+import type { AiEditionChatErrorCode } from "../../../src/native/contracts";
+import { mainLogBuffer } from "../../diagnostics/main-log-buffer";
 import {
 	type AgentToolExecution,
 	addAnnotationArgs,
@@ -62,6 +64,7 @@ import {
 	messageContentToThinking,
 	type OpenScreenChatModelConfig,
 } from "./chat-model";
+import { EMPTY_REPLY_CODE, EMPTY_REPLY_MESSAGE } from "./empty-reply";
 
 export interface OpenScreenAgentSink {
 	text: (delta: string) => void;
@@ -474,9 +477,23 @@ export interface InvokeResult {
 	mutated: boolean;
 	/** Set when the stream finished without producing a final text (e.g. all
 	 * chunks had empty `content`, or the provider returned no
-	 * `content_block_delta` events). Carries a short diagnostic describing
-	 * what the LangChain layer actually saw. */
+	 * `content_block_delta` events). The sentence the sink already received;
+	 * what the LangChain layer actually saw went to the main-process log (#212). */
 	reason?: string;
+	/** Machine-readable twin of `reason`, for the renderer's localised copy. */
+	code?: AiEditionChatErrorCode;
+}
+
+/**
+ * Where the why of an empty reply goes: the main-process console and the ring buffer that
+ * Save Diagnostics exports. Never the sink — the renderer used to print this, stack frames
+ * and `app.asar` paths included, as the toast (#212).
+ */
+function recordEmptyReply(detail: string, lastChunkSample: string): void {
+	mainLogBuffer.record(
+		"error",
+		`[ai-edit] empty reply (${detail}). Last chunk: ${lastChunkSample}`,
+	);
 }
 
 export async function invokeOpenScreenAgent(args: InvokeArgs): Promise<InvokeResult> {
@@ -567,52 +584,57 @@ export async function invokeOpenScreenAgent(args: InvokeArgs): Promise<InvokeRes
 
 		const mutated = JSON.stringify(holder.current) !== initialDocumentJSON;
 		if (!finalText.trim()) {
-			// ponytail: surface the upstream payload so we can see why MiniMax
+			// ponytail: keep the upstream payload so we can see why MiniMax
 			// (or any other anthropic-shaped provider) is producing no text.
 			// The chat-model chunks are the post-parse LangChain views of
 			// each SSE event; their `content`/`additional_kwargs`/
 			// `response_metadata` fields tell us whether the issue is in the
 			// wire format, the parser, or our `messageContentToText` shape.
-			// Capped at
-			// 1 chunk + a 1kB slice to keep the toast readable.
+			// Capped at 1 chunk + a 1kB slice. It is a log line, not a toast.
 			const lastChunk = chatModelChunks[chatModelChunks.length - 1];
 			const sample = lastChunk
 				? JSON.stringify(lastChunk).slice(0, 1024)
 				: "(no on_chat_model_stream events)";
-			const reason =
-				`Empty response from model (provider=${model.provider}, ` +
-				`model=${model.model}, chat_model_chunks=${chatModelChunks.length}, ` +
-				`other_events=${nonChatEvents.length}:${nonChatEvents
-					.slice(0, 5)
-					.map((e) => e.event)
-					.join(",")}). Last chunk: ${sample}`;
-			sink.error(reason);
-			return { text: "", document: holder.current, mutated, reason };
+			recordEmptyReply(
+				`provider=${model.provider}, model=${model.model}, ` +
+					`chat_model_chunks=${chatModelChunks.length}, ` +
+					`other_events=${nonChatEvents.length}:${nonChatEvents
+						.slice(0, 5)
+						.map((e) => e.event)
+						.join(",")}`,
+				sample,
+			);
+			sink.error(EMPTY_REPLY_MESSAGE);
+			return {
+				text: "",
+				document: holder.current,
+				mutated,
+				reason: EMPTY_REPLY_MESSAGE,
+				code: EMPTY_REPLY_CODE,
+			};
 		}
 		return { text: finalText.trim(), document: holder.current, mutated };
 	} catch (err) {
-		// ponytail: surface the LangChain/HTTP error (with name + truncated
+		// ponytail: keep the LangChain/HTTP error (with name + truncated
 		// stack) so we can tell whether the stream threw (e.g. MiniMax
 		// returning a non-Anthropic JSON envelope that the SDK rejects) or
 		// completed with empty content. Mirrors the diagnostic shape used in
-		// the success-but-empty path above.
+		// the success-but-empty path above, and goes to the same log.
 		const e = err instanceof Error ? err : new Error(String(err));
 		const stackHead = (e.stack ?? "").split("\n").slice(0, 3).join(" | ");
-		const reason =
-			`Empty response from model (provider=${model.provider}, ` +
-			`model=${model.model}, error=${e.name}: ${e.message}` +
-			(stackHead ? ` stack=${stackHead}` : "") +
-			`). Last chunk: ${(
-				chatModelChunks[chatModelChunks.length - 1]
-					? JSON.stringify(chatModelChunks[chatModelChunks.length - 1])
-					: "(no on_chat_model_stream events)"
-			).slice(0, 1024)}`;
-		sink.error(reason);
+		const lastChunk = chatModelChunks[chatModelChunks.length - 1];
+		recordEmptyReply(
+			`provider=${model.provider}, model=${model.model}, error=${e.name}: ${e.message}` +
+				(stackHead ? ` stack=${stackHead}` : ""),
+			lastChunk ? JSON.stringify(lastChunk).slice(0, 1024) : "(no on_chat_model_stream events)",
+		);
+		sink.error(EMPTY_REPLY_MESSAGE);
 		return {
 			text: "",
 			document: holder.current,
 			mutated: JSON.stringify(holder.current) !== initialDocumentJSON,
-			reason,
+			reason: EMPTY_REPLY_MESSAGE,
+			code: EMPTY_REPLY_CODE,
 		};
 	}
 }

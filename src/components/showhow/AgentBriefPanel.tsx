@@ -166,6 +166,8 @@ export function useAgentBrief(bundleDir: string) {
 			setStatus(fresh);
 			setOptions(fresh.options);
 			setAlwaysSend(fresh.alwaysSend);
+			// No clicks and no speech: the panel shows its empty state instead of a review or run.
+			if (fresh.noInput && !fresh.brief) return;
 			if (!fresh.connected) {
 				dispatch({ type: "connect", copyAfter });
 				return;
@@ -224,6 +226,8 @@ export function useAgentBrief(bundleDir: string) {
 		copy,
 		settings,
 		invoker,
+		/** Nothing to make a brief from: Copy for agent, Make and Check are not offered (#200). */
+		noInput: Boolean(status?.noInput || error === "noInput") && !state.hasBrief,
 		setAlwaysSend,
 		setSettings,
 		begin,
@@ -254,6 +258,7 @@ export function CopyForAgentButton({ brief }: { brief: AgentBriefController }) {
 	useLayoutEffect(() => {
 		if (idle && button.current) idleWidth.current = button.current.offsetWidth;
 	});
+	if (brief.noInput) return null;
 	return (
 		<Button
 			ref={button}
@@ -301,7 +306,9 @@ function errorKey(error?: string) {
 				? "showhowBrief.errorSave"
 				: error === "prepare"
 					? "showhowBrief.errorPrepare"
-					: "showhowBrief.errorProvider";
+					: error === "noInput"
+						? "showhowBrief.errorNoInput"
+						: "showhowBrief.errorProvider";
 }
 
 function PhaseList({
@@ -436,6 +443,7 @@ function BriefCard({ brief }: { brief: AgentBriefController }) {
 export function AgentBriefPanel({ brief }: { brief: AgentBriefController }) {
 	const t = useScopedT("common");
 	const { view, phase, hasBrief } = brief.state;
+	const { noInput } = brief;
 	const failedAt: BriefPhase =
 		brief.error === "save"
 			? "evidence"
@@ -444,17 +452,19 @@ export function AgentBriefPanel({ brief }: { brief: AgentBriefController }) {
 				: "writing";
 	return (
 		<section aria-label={t("showhowBrief.panel")} className="font-ds-body text-ds-ink">
-			<button
-				type="button"
-				disabled={brief.busy || view === "making"}
-				className="mb-4 text-sm text-ds-ink-soft underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2"
-				onClick={(event) => {
-					brief.invoker.current = event.currentTarget;
-					void brief.begin({ reviewOnly: true });
-				}}
-			>
-				{t("showhowBrief.check")}
-			</button>
+			{!noInput && (
+				<button
+					type="button"
+					disabled={brief.busy || view === "making"}
+					className="mb-4 text-sm text-ds-ink-soft underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2"
+					onClick={(event) => {
+						brief.invoker.current = event.currentTarget;
+						void brief.begin({ reviewOnly: true });
+					}}
+				>
+					{t("showhowBrief.check")}
+				</button>
+			)}
 			{view === "making" && (
 				<>
 					<div
@@ -489,7 +499,7 @@ export function AgentBriefPanel({ brief }: { brief: AgentBriefController }) {
 					<p className="mt-3 text-sm text-ds-ink-soft">{t("showhowBrief.safeMaking")}</p>
 				</>
 			)}
-			{view === "failed" && (
+			{view === "failed" && !noInput && (
 				<>
 					<div
 						role="alert"
@@ -540,7 +550,15 @@ export function AgentBriefPanel({ brief }: { brief: AgentBriefController }) {
 				</>
 			)}
 			{hasBrief && <BriefCard brief={brief} />}
-			{!hasBrief && view !== "making" && view !== "failed" && (
+			{noInput && view !== "making" && (
+				<div className="rounded-[8px] border border-ds-line bg-ds-surface-raised p-6">
+					<h3 className="mb-2 text-xl font-medium">{t("showhowBrief.noInputTitle")}</h3>
+					<p className="max-w-xl text-sm leading-relaxed text-ds-ink-soft">
+						{t("showhowGuide.noInputBody")}
+					</p>
+				</div>
+			)}
+			{!hasBrief && !noInput && view !== "making" && view !== "failed" && (
 				<>
 					<div className="rounded-[8px] border border-ds-line bg-ds-surface-raised p-5">
 						<Label>{t("showhowBrief.nextStep")}</Label>
@@ -572,6 +590,8 @@ export function AgentBriefSheets({ brief }: { brief: AgentBriefController }) {
 	const t = useScopedT("common");
 	const { view, copyAfter } = brief.state;
 	const preview = brief.preview;
+	// A reviewed payload with no steps carries no words and no frames either.
+	const nothingToSend = preview !== undefined && preview.steps.length === 0;
 	return (
 		<>
 			{brief.copy === "copied" && (
@@ -666,6 +686,11 @@ export function AgentBriefSheets({ brief }: { brief: AgentBriefController }) {
 							/>
 						))}
 					</div>
+					{nothingToSend && (
+						<p className="border-t border-ds-line py-3 text-sm text-ds-ink-soft">
+							{t("showhowGuide.noInputSend")}
+						</p>
+					)}
 					<p className="border-t border-ds-line py-3 text-sm">
 						OpenRouter · {preview?.model ?? brief.status?.model}
 					</p>
@@ -689,9 +714,9 @@ export function AgentBriefSheets({ brief }: { brief: AgentBriefController }) {
 						</Button>
 						<Button
 							type="button"
-							disabled={!preview}
+							disabled={!preview || nothingToSend}
 							onClick={() => {
-								if (preview) void brief.run(preview, true, copyAfter);
+								if (preview && !nothingToSend) void brief.run(preview, true, copyAfter);
 							}}
 						>
 							{copyAfter ? t("showhowBrief.makeAndCopy") : t("showhowBrief.make")}

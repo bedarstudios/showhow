@@ -85,6 +85,12 @@ The job writes `transcript.txt` directly inside its already-owned bundle and reg
 document artifacts through the existing main-process equivalent of `showhow:write-transcript`.
 Model absence/digest mismatch, engine errors and zero-length audio produce
 `(transcription failed)`. These failures preserve the recording and bundle inputs.
+A recording with no audio track at all (microphone off, no system audio) settles as
+`(no speech detected)`, the same marker a silent track gets; an unreadable media file
+(`MediaUnreadableError`) stays `(transcription failed)` because it can clear later.
+The library scanner classifies `transcript.txt` into `transcriptStatus`
+(`pending`, `ready`, `no-speech`, `failed`) so the renderer only offers the
+transcript-only fallback when timestamped lines exist.
 A transcript write error is logged and leaves the pending marker for a later resume.
 The existing renderer IPC retains its root validation for other callers.
 

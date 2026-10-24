@@ -314,7 +314,8 @@ export async function runAgentBrief(
 			frames: [],
 			options: { transcript: true, frames: false },
 		});
-	if (!steps.length) return { success: false, error: "invalid" };
+	// Nothing to build from is not an invalid model response: no provider call is made (#200).
+	if (!steps.length) return { success: false, error: "noInput" };
 	options.onPhase?.("reading");
 	if (options.signal?.aborted) return cancelled;
 	let raw: string;

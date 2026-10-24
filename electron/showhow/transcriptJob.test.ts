@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
+import { MediaUnreadableError, NoAudioTrackError } from "../stt/extractAudio";
 
 const engine = vi.hoisted(() => ({ init: vi.fn(), transcribe: vi.fn(), shutdown: vi.fn() }));
 vi.mock("electron", () => ({ app: { isPackaged: false, getAppPath: () => "/scratch/app" } }));
@@ -85,3 +86,55 @@ for (const failure of ["model file missing", "engine error", "zero-length audio"
 		}
 	});
 }
+
+it("a recording with no audio track settles as no speech, not as a failed transcription", async () => {
+	// Issue #201: a take with the microphone off has a video stream only. ffmpeg
+	// cannot decode audio from it, and the extractor reports that as
+	// NoAudioTrackError. That is a verdict about the media, like whisper hearing
+	// nothing, so the bundle must carry the same marker a silent track gets.
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), "showhow-job-no-audio-"));
+	try {
+		const video = path.join(root, "video.mp4");
+		const original = await fs.readFile("tests/fixtures/sample.webm");
+		await fs.writeFile(video, original);
+		engine.init.mockResolvedValue(undefined);
+		engine.shutdown.mockResolvedValue(undefined);
+		engine.transcribe.mockRejectedValue(
+			new NoAudioTrackError(video, "Output file #0 does not contain any stream"),
+		);
+		vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const onTranscriptReady = vi.fn();
+		await requestBundleTranscript(root, video, onTranscriptReady);
+		expect(await fs.readFile(path.join(root, "transcript.txt"), "utf8")).toBe(
+			"(no speech detected)\n",
+		);
+		// Settled like a silent track: downstream readers see a finished transcript.
+		expect(onTranscriptReady).toHaveBeenCalledWith(root);
+		expect(await fs.readFile(video)).toEqual(original);
+		expect(engine.shutdown).toHaveBeenCalledOnce();
+	} finally {
+		await fs.rm(root, { recursive: true, force: true });
+	}
+});
+
+it("an unreadable media file keeps the failure marker rather than a permanent no-speech verdict", async () => {
+	// MediaUnreadableError clears once the OS grants access, so it must not be
+	// remembered as "no speech"; it stays a failure like any other engine error.
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), "showhow-job-unreadable-"));
+	try {
+		const video = path.join(root, "video.mp4");
+		await fs.writeFile(video, await fs.readFile("tests/fixtures/sample.webm"));
+		engine.init.mockResolvedValue(undefined);
+		engine.shutdown.mockResolvedValue(undefined);
+		engine.transcribe.mockRejectedValue(new MediaUnreadableError(video, "Operation not permitted"));
+		vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const onTranscriptReady = vi.fn();
+		await requestBundleTranscript(root, video, onTranscriptReady);
+		expect(await fs.readFile(path.join(root, "transcript.txt"), "utf8")).toBe(
+			"(transcription failed)\n",
+		);
+		expect(onTranscriptReady).not.toHaveBeenCalled();
+	} finally {
+		await fs.rm(root, { recursive: true, force: true });
+	}
+});

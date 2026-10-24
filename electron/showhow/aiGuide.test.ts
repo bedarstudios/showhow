@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { parseGuideResponse } from "./aiGuide";
 import type { Step } from "./bundle";
 
@@ -272,4 +272,62 @@ it("does not mark a guide edited when saving unchanged title or instruction", as
 	expect(
 		JSON.parse(await fs.readFile(path.join(dir, "meta.json"), "utf8")).guide.editedSinceAi,
 	).toBe(false);
+});
+
+async function silentBundle(prefix: string) {
+	const fs = await import("node:fs/promises");
+	const os = await import("node:os");
+	const path = await import("node:path");
+	const dir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
+	const meta = JSON.stringify({ title: "Silent import", video: "video.mp4", source: "imported" });
+	await fs.writeFile(path.join(dir, "meta.json"), meta);
+	await fs.writeFile(path.join(dir, "steps.json"), "[]\n");
+	await fs.writeFile(path.join(dir, "steps.md"), "");
+	await fs.writeFile(path.join(dir, "transcript.txt"), "(no speech detected)\n");
+	return { dir, meta };
+}
+it("#200 makes no provider call and writes nothing when a recording has no clicks or speech", async () => {
+	const fs = await import("node:fs/promises");
+	const path = await import("node:path");
+	const { runAiGuide, readGuideSources } = await import("./aiGuide");
+	const { dir, meta } = await silentBundle("showhow-ai-silent-");
+	const model = vi.fn(async () => "{}");
+	expect(await runAiGuide(dir, { model })).toEqual({ success: false });
+	expect(model).not.toHaveBeenCalled();
+	expect(await fs.readFile(path.join(dir, "meta.json"), "utf8")).toBe(meta);
+	expect(await fs.readFile(path.join(dir, "steps.json"), "utf8")).toBe("[]\n");
+	await expect(fs.access(path.join(dir, "steps.deterministic.json"))).rejects.toThrow();
+	expect((await readGuideSources(dir)).transcriptPending).toBe(false);
+});
+it("#200 reads a pending transcript as pending, not as silence", async () => {
+	const fs = await import("node:fs/promises");
+	const path = await import("node:path");
+	const { readGuideSources } = await import("./aiGuide");
+	const { dir } = await silentBundle("showhow-ai-pending-");
+	await fs.writeFile(path.join(dir, "transcript.txt"), "(transcription pending)\n");
+	const source = await readGuideSources(dir);
+	expect(source.inputSteps).toEqual([]);
+	expect(source.transcriptPending).toBe(true);
+});
+it("#200 keeps the validation message for a real invalid model response", async () => {
+	const fs = await import("node:fs/promises");
+	const os = await import("node:os");
+	const path = await import("node:path");
+	const { runAiGuide } = await import("./aiGuide");
+	const { serializeStepsJson, renderStepsMarkdown } = await import("./bundle");
+	const dir = await fs.mkdtemp(path.join(os.tmpdir(), "showhow-ai-invalid-"));
+	await fs.writeFile(
+		path.join(dir, "meta.json"),
+		JSON.stringify({ title: "T", video: "video.mp4" }),
+	);
+	await fs.writeFile(path.join(dir, "steps.json"), serializeStepsJson(steps));
+	await fs.writeFile(path.join(dir, "steps.md"), renderStepsMarkdown(steps));
+	await fs.writeFile(path.join(dir, "transcript.txt"), "[0:01] Narration\n");
+	const model = vi.fn(async () => "{}");
+	expect(await runAiGuide(dir, { model })).toEqual({ success: false });
+	expect(model).toHaveBeenCalledTimes(1);
+	expect(JSON.parse(await fs.readFile(path.join(dir, "meta.json"), "utf8")).guide).toMatchObject({
+		status: "failed",
+		error: "The guide response could not be validated.",
+	});
 });

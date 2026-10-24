@@ -30,6 +30,7 @@ import {
 	compactionSplitIndex,
 	DEFAULT_BUDGET_TOKENS,
 } from "./chat-compaction";
+import { EMPTY_REPLY_CODE, EMPTY_REPLY_MESSAGE } from "./deep-agent/empty-reply";
 import type { CursorTelemetryReader } from "./deep-agent/service";
 import type { DocumentService } from "./document-service";
 import type { LlmConfigStore } from "./llm-config-store";
@@ -414,14 +415,15 @@ export async function runChat(
 	});
 
 	if (!result.text) {
-		// ponytail: surface the deep-agent's diagnostic so the user can see
-		// *why* the model produced no text (e.g. MiniMax streaming only
-		// thinking blocks, or a non-text content shape that our extractor
-		// missed). Falls back to the generic message when the agent didn't
-		// provide a reason.
+		// The deep agent has already logged *why* the model produced no text
+		// (provider, model, stack, chunk sample) where Save Diagnostics finds
+		// it. The renderer gets a code it turns into localised copy and a
+		// Try again action, plus the plain sentence for callers without a
+		// localiser (#212).
 		return {
 			success: false,
-			error: result.reason ?? "Empty response from model.",
+			error: result.reason ?? EMPTY_REPLY_MESSAGE,
+			errorCode: result.code ?? EMPTY_REPLY_CODE,
 		};
 	}
 

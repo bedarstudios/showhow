@@ -421,6 +421,60 @@ describe("readRecordingEntry", () => {
 		expect(entry?.stepCapture).toEqual({ status: "unavailable", message: "legacy no reason" });
 	});
 
+	for (const [content, status] of [
+		["(transcription pending)\n", "pending"],
+		["(no speech detected)\n", "no-speech"],
+		["(transcription failed)\n", "failed"],
+		["[0:02] Open settings\n[0:09] Save the workflow\n", "ready"],
+	] as const) {
+		it(`reports transcriptStatus "${status}" for transcript.txt ${JSON.stringify(content)}`, async () => {
+			// Issue #201: the renderer must know whether a transcript exists before it
+			// offers the transcript-only fallback, so the scanner classifies the
+			// marker the transcript job wrote.
+			const root = await makeTempRoot();
+			const dir = path.join(root, "2026-10-23_113642-recording");
+			await mkdir(dir);
+			await writeFile(
+				path.join(dir, "meta.json"),
+				JSON.stringify({
+					schemaVersion: 1,
+					title: "Recording 2026-10-23 11:36",
+					source: "desktop",
+					createdAt: 1792751802022,
+					video: "video.mp4",
+					transcript: "transcript.txt",
+					steps: null,
+					stepCapture: {
+						status: "unavailable",
+						reason: "no-clicks",
+						message: "No desktop clicks.",
+					},
+				}),
+			);
+			await writeFile(path.join(dir, "transcript.txt"), content);
+
+			const entry = await readRecordingEntry(dir);
+
+			expect(entry?.transcriptStatus).toBe(status);
+			expect(await readFile(path.join(dir, "transcript.txt"), "utf-8")).toBe(content);
+		});
+	}
+
+	it("omits transcriptStatus when the bundle has no transcript.txt (legacy read)", async () => {
+		const root = await makeTempRoot();
+		const dir = path.join(root, "legacy-recording");
+		await mkdir(dir);
+		await writeFile(
+			path.join(dir, "meta.json"),
+			JSON.stringify({ title: "Legacy", source: "desktop", createdAt: 1, video: "video.webm" }),
+		);
+
+		const entry = await readRecordingEntry(dir);
+
+		expect(entry).not.toBeNull();
+		expect(entry).not.toHaveProperty("transcriptStatus");
+	});
+
 	it("returns null when the bundle's meta.json is missing", async () => {
 		const root = await makeTempRoot();
 		const dir = path.join(root, "no-meta");

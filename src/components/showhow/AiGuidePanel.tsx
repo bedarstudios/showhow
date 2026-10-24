@@ -150,7 +150,8 @@ export function AiGuidePanel({
 			setAlwaysSend(fresh.alwaysSend ?? true);
 			const next = guidePanelTransition(state, { type: "begin", status: fresh, confirmed });
 			dispatch({ type: "begin", status: fresh, confirmed });
-			if (next.view === "connect" || next.view === "confirm") return;
+			// Idle here means the recording has no clicks or speech: the panel shows its empty state.
+			if (next.view === "connect" || next.view === "confirm" || next.view === "idle") return;
 			if (reviewOnly) dispatch({ type: "review" });
 			const value = await loadPreview(fresh.options, id);
 			if (value && isCurrentRequest(id) && next.view === "making" && !reviewOnly) await run(value);
@@ -183,6 +184,11 @@ export function AiGuidePanel({
 	const isReady = status?.guide?.status === "ready" || state.view === "ready";
 	const failed =
 		state.view === "failed" || (state.view === "idle" && status?.guide?.status === "failed");
+	// No clicks and no speech: nothing to send, so Make, Check and Retry are not offered, and a
+	// failure recorded before this rule existed stays hidden (#200).
+	const noInput = Boolean(status?.noInput) && !isReady;
+	// A reviewed payload with no steps carries no words and no frames either.
+	const nothingToSend = preview !== undefined && preview.steps.length === 0;
 	return (
 		<section aria-label={t("showhowGuide.panel")} className="my-7 font-ds-body text-ds-ink">
 			<div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -192,7 +198,7 @@ export function AiGuidePanel({
 					</h2>
 				)}
 				<div className="flex flex-wrap gap-2">
-					{selected && (
+					{selected && !noInput && (
 						<Button
 							type="button"
 							variant="secondary"
@@ -210,7 +216,7 @@ export function AiGuidePanel({
 			</div>
 			{selected && (
 				<>
-					{!isReady && (
+					{!isReady && !noInput && (
 						<button
 							type="button"
 							disabled={busy || state.view === "making"}
@@ -223,7 +229,15 @@ export function AiGuidePanel({
 							{t("showhowGuide.check")}
 						</button>
 					)}
-					{!isReady && state.view !== "making" && !failed && (
+					{noInput && state.view !== "making" && (
+						<div className="rounded-[8px] border border-ds-line bg-ds-surface-raised p-6">
+							<h3 className="mb-2 text-xl font-medium">{t("showhowGuide.noInputTitle")}</h3>
+							<p className="max-w-xl text-sm leading-relaxed text-ds-ink-soft">
+								{t("showhowGuide.noInputBody")}
+							</p>
+						</div>
+					)}
+					{!isReady && !noInput && state.view !== "making" && !failed && (
 						<div className="rounded-[8px] border border-ds-line bg-ds-surface-raised p-6">
 							<h3 className="mb-2 text-xl font-medium">{t("showhowGuide.turnInto")}</h3>
 							<p className="max-w-xl text-sm leading-relaxed text-ds-ink-soft">
@@ -267,7 +281,7 @@ export function AiGuidePanel({
 							<p className="mt-4 text-xs text-ds-ink-soft">{t("showhowGuide.keepUsing")}</p>
 						</div>
 					)}
-					{failed && (
+					{failed && !noInput && (
 						<div
 							role="alert"
 							className="overflow-hidden rounded-[8px] border border-ds-rec bg-ds-rec-wash p-6"
@@ -396,6 +410,11 @@ export function AiGuidePanel({
 									/>
 								))}
 							</div>
+							{nothingToSend && (
+								<p className="border-t border-ds-line py-3 text-sm text-ds-ink-soft">
+									{t("showhowGuide.noInputSend")}
+								</p>
+							)}
 							<p className="border-t border-ds-line py-3 text-sm">
 								OpenRouter · {preview?.model ?? status?.model}
 							</p>
@@ -424,9 +443,9 @@ export function AiGuidePanel({
 								</Button>
 								<Button
 									type="button"
-									disabled={busy || !preview}
+									disabled={busy || !preview || nothingToSend}
 									onClick={() => {
-										if (preview) void run(preview, true);
+										if (preview && !nothingToSend) void run(preview, true);
 									}}
 								>
 									{t("showhowGuide.make")}

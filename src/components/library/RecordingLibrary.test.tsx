@@ -1507,6 +1507,79 @@ describe("RecordingLibrary — missing-doc resilience (issue #27)", () => {
 		).toBeInTheDocument();
 	});
 
+	it("does not promise a transcript-only fallback for a silent no-click take", async () => {
+		// Issue #201: a take with the microphone off settles as "(no speech detected)".
+		// The doc state must say so instead of offering a transcript that is empty.
+		const silentNoClickTake: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			steps: [],
+			transcriptStatus: "no-speech",
+			stepCapture: {
+				status: "unavailable",
+				reason: "no-clicks",
+				message: "No desktop clicks were captured; this bundle has a transcript-only doc.",
+			},
+		};
+		mockShowhowListRecordings.mockResolvedValue([silentNoClickTake]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("transcript-only-doc-state");
+		const text = docState.textContent ?? "";
+		expect(text).toMatch(/no desktop clicks captured/iu);
+		expect(text).toMatch(/no speech was detected/iu);
+		expect(text).toMatch(/microphone on/iu);
+		expect(text).not.toMatch(/transcript-only fallback is available/iu);
+		expect(text).not.toMatch(/has a transcript-only doc/iu);
+	});
+
+	it("still offers the transcript-only fallback when the no-click take has speech", async () => {
+		const narratedNoClickTake: RecordingLibraryEntry = {
+			...desktopEntry,
+			video: "video.mp4",
+			steps: [],
+			transcriptStatus: "ready",
+			stepCapture: {
+				status: "unavailable",
+				reason: "no-clicks",
+				message: "No desktop clicks were captured; this bundle has a transcript-only doc.",
+			},
+		};
+		mockShowhowListRecordings.mockResolvedValue([narratedNoClickTake]);
+		render(<RecordingLibrary />);
+
+		const docState = await screen.findByTestId("transcript-only-doc-state");
+		expect(docState.textContent ?? "").toMatch(/transcript-only fallback is available/iu);
+	});
+
+	for (const [transcriptStatus, expected] of [
+		["failed", /transcription failed, so there is no transcript to fall back on/iu],
+		["pending", /transcription is still running/iu],
+	] as const) {
+		it(`names a ${transcriptStatus} transcript instead of the fallback for a degraded capture`, async () => {
+			const desktopAccessibilityDenied: RecordingLibraryEntry = {
+				...desktopEntry,
+				video: "video.mp4",
+				transcriptStatus,
+				stepCapture: {
+					status: "unavailable",
+					reason: "accessibility-denied",
+					message:
+						"macOS accessibility was denied; recorded in system-cursor mode, so semantic steps are unavailable.",
+				},
+			};
+			mockShowhowListRecordings.mockResolvedValue([desktopAccessibilityDenied]);
+			render(<RecordingLibrary />);
+
+			const docState = await screen.findByTestId("missing-doc-state");
+			const text = docState.textContent ?? "";
+			// The capture cause is kept; only the false promise goes.
+			expect(text).toMatch(/accessibility was denied/iu);
+			expect(text).toMatch(expected);
+			expect(text).not.toMatch(/transcript-only fallback is available/iu);
+		});
+	}
+
 	it("explains accessibility-denied click capture with the transcript-only fallback", async () => {
 		const desktopAccessibilityDenied: RecordingLibraryEntry = {
 			...desktopEntry,
