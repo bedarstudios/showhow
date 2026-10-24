@@ -776,8 +776,10 @@ export function ChatStripPanel() {
 				// The main process keeps the why (provider, model, stack, chunk sample) in its
 				// log and in Save Diagnostics; here the person gets what happened and a way
 				// back (#212). No description with the raw error: it was the stack trace.
+				// No auto-dismiss: the next step is the point, and the close button is there.
 				toast.error(t("chat.emptyReply"), {
 					description: t("chat.emptyReplyNextStep"),
+					duration: Number.POSITIVE_INFINITY,
 					action: { label: t("chat.tryAgain"), onClick: () => void sendRef.current(text) },
 				});
 			} else {

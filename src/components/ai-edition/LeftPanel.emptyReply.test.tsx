@@ -112,11 +112,18 @@ describe("Edit with AI toast when the AI sent no reply (#212)", () => {
 		await waitFor(() => expect(toastError).toHaveBeenCalledTimes(1));
 		const [message, options] = toastError.mock.calls[0] as [
 			string,
-			{ description?: string; action?: { label: string; onClick: () => void } },
+			{
+				description?: string;
+				duration?: number;
+				action?: { label: string; onClick: () => void };
+			},
 		];
 		expect(message).toBe("chat.emptyReply");
 		expect(options.description).toBe("chat.emptyReplyNextStep");
 		expect(options.action?.label).toBe("chat.tryAgain");
+		// The next step has to outlive the Toaster's 3 s default: an error with an action stays
+		// until the person dismisses it or takes the action (review round 1, finding 1).
+		expect(options.duration).toBe(Number.POSITIVE_INFINITY);
 		expect(JSON.stringify(toastError.mock.calls)).not.toMatch(
 			/app\.asar|file:\/\/|stack=|provider=|_generateUncached/,
 		);
