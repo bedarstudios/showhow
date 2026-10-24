@@ -56,23 +56,6 @@ Showhow is that recorder plus a workflow-doc and agent-handoff layer. All Showho
 
 If you want a polished, cross-platform, general-purpose screen recorder, **use OpenScreen** — it's the better choice and it's excellent. Showhow is a narrower tool aimed at one workflow.
 
-## Installation
-
-Showhow is not yet published as an installer. Build from source:
-
-```bash
-npm install
-npm run dev
-```
-
-Requires Node 22.22.1 and macOS 13+. On first launch, grant **Screen Recording** and **Accessibility** permission in System Settings → Privacy & Security.
-
-Build the native macOS helper when working on capture, or to run a native recording locally:
-
-```bash
-npm run build:native:mac
-```
-
 ## Verification
 
 ```bash
