@@ -36,7 +36,17 @@ export function MoveRecordingToTrashSheet({
 			description={t("showhowTrash.body", { title })}
 			footer={
 				<>
-					<Button variant="secondary" disabled={busy} onClick={() => onOpenChange(false)}>
+					{/* Focus starts on Cancel, the safe action. The ring shows on plain :focus too: a
+					    sheet opened with the mouse would otherwise hide where focus starts. The style is
+					    an arbitrary property because tailwind-merge 3 drops Tailwind 3's `outline`
+					    utility beside `outline-2`. */}
+					<Button
+						variant="secondary"
+						disabled={busy}
+						autoFocus
+						className="focus:[outline-style:solid] focus:outline-2 focus:outline-offset-2 focus:outline-ds-ink"
+						onClick={() => onOpenChange(false)}
+					>
 						{t("actions.cancel")}
 					</Button>
 					<Button variant="rec" disabled={busy} onClick={onConfirm}>
