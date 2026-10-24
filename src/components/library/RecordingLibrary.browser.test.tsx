@@ -1,5 +1,6 @@
 import "@/index.css";
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { I18nProvider } from "@/contexts/I18nContext";
@@ -118,6 +119,92 @@ describe("RecordingLibrary Sidebar titlebar inset in Chromium", () => {
 			if (!animation) throw new Error("Summary entrance animation is missing");
 			animation.currentTime = 0;
 			expect(new DOMMatrixReadOnly(getComputedStyle(summary).transform).m42).toBe(4);
+		} finally {
+			unmount();
+			if (previousElectronApi) {
+				Object.defineProperty(window, "electronAPI", previousElectronApi);
+			} else {
+				Reflect.deleteProperty(window, "electronAPI");
+			}
+		}
+	});
+});
+
+describe("RecordingLibrary guide step editing in Chromium", () => {
+	it("fills the step text column, wraps long instructions, and keeps keyboard actions", async () => {
+		await page.viewport(1440, 900);
+
+		const previousElectronApi = Object.getOwnPropertyDescriptor(window, "electronAPI");
+		const instructionText =
+			"Click into the document, review the instructions, and press Save after confirming the final paragraph. "
+				.repeat(8)
+				.trim();
+		const entry: RecordingLibraryEntry = {
+			bundleDir: "/Users/user/Showhow/Recordings/2026-10-24_100000-guide-width",
+			title: "A guide with a long instruction",
+			source: "desktop",
+			createdAt: new Date(2026, 9, 24, 10, 0, 0).getTime(),
+			steps: [{ label: instructionText, ts: 1_000, screenshot: "" }],
+		};
+		const updateWorkflowDocument = vi.fn(async () => ({ success: true }));
+		Object.defineProperty(window, "electronAPI", {
+			configurable: true,
+			value: {
+				showhowListRecordings: async () => [entry],
+				showhowUpdateWorkflowDocument: updateWorkflowDocument,
+				switchToHud: async () => undefined,
+			},
+		});
+		const { unmount } = render(
+			<I18nProvider>
+				<RecordingLibrary />
+			</I18nProvider>,
+		);
+
+		try {
+			await screen.findByRole("heading", { level: 1, name: entry.title });
+			await userEvent.click(screen.getByRole("button", { name: "Edit step 1" }));
+
+			const instruction = await screen.findByRole("textbox", { name: "Step 1 instruction" });
+			const textColumn = instruction.closest("article")?.querySelector("h3")?.parentElement;
+			if (!textColumn) throw new Error("Guide step text column is missing");
+			const columnWidth = textColumn.getBoundingClientRect().width;
+			expect(columnWidth).toBeGreaterThan(0);
+			expect(instruction.getBoundingClientRect().width).toBeGreaterThanOrEqual(columnWidth);
+			expect(instruction.tagName).toBe("TEXTAREA");
+
+			const lineHeight = Number.parseFloat(getComputedStyle(instruction).lineHeight);
+			expect(instruction.clientHeight).toBeGreaterThan(lineHeight);
+			expect(instruction.scrollHeight).toBeGreaterThan(instruction.clientHeight);
+			const fieldBottom = instruction.getBoundingClientRect().bottom;
+			for (const name of ["Save step", "Cancel"]) {
+				expect(
+					screen.getByRole("button", { name }).getBoundingClientRect().top,
+				).toBeGreaterThanOrEqual(fieldBottom);
+			}
+
+			await userEvent.keyboard("{Enter}");
+			await waitFor(() =>
+				expect(screen.queryByRole("textbox", { name: "Step 1 instruction" })).toBeNull(),
+			);
+			expect(updateWorkflowDocument).toHaveBeenCalledWith(entry.bundleDir, {
+				type: "step",
+				index: 0,
+				label: instructionText,
+			});
+
+			await userEvent.click(screen.getByRole("button", { name: "Edit step 1" }));
+			const reopenedInstruction = await screen.findByRole("textbox", {
+				name: "Step 1 instruction",
+			});
+			await userEvent.clear(reopenedInstruction);
+			await userEvent.type(reopenedInstruction, "Discard this edit");
+			await userEvent.keyboard("{Escape}");
+			await waitFor(() =>
+				expect(screen.queryByRole("textbox", { name: "Step 1 instruction" })).toBeNull(),
+			);
+			expect(updateWorkflowDocument).toHaveBeenCalledOnce();
+			expect(screen.getByText(instructionText)).toBeInTheDocument();
 		} finally {
 			unmount();
 			if (previousElectronApi) {
