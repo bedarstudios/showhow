@@ -229,7 +229,7 @@
     ],
     "icon": "icons/icons/png",
     "artifactName": "${productName}-Linux-${version}.${ext}",
-    "maintainer": "Bedar Studios <mohamed@bedarstudios.com>",
+    "maintainer": "Bedar Studios <noreply@bedarstudios.com>",
     "category": "AudioVideo",
     "extraResources": [
       {

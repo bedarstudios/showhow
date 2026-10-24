@@ -29,8 +29,8 @@ function productionError(): Error {
 	const error = new Error("Received empty response from chat model call.");
 	error.stack = [
 		"Error: Received empty response from chat model call.",
-		"    at D7._generateUncached (file:///Users/mohamedb/dev/projects/showhow/release/1.6.0/mac-arm64/Showhow.app/Contents/Resources/app.asar/dist-electron/update-settings-uYjC7FQn.js:45097:31)",
-		"    at async D7.invoke (file:///Users/mohamedb/dev/projects/showhow/release/1.6.0/mac-arm64/Showhow.app/Contents/Resources/app.asar/dist-electron/update-settings-uYjC7FQn.js:44917:13)",
+		"    at D7._generateUncached (file:///Users/me/dev/projects/showhow/release/1.6.0/mac-arm64/Showhow.app/Contents/Resources/app.asar/dist-electron/update-settings-uYjC7FQn.js:45097:31)",
+		"    at async D7.invoke (file:///Users/me/dev/projects/showhow/release/1.6.0/mac-arm64/Showhow.app/Contents/Resources/app.asar/dist-electron/update-settings-uYjC7FQn.js:44917:13)",
 	].join("\n");
 	return error;
 }

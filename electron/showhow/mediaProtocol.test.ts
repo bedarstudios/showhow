@@ -8,7 +8,7 @@ describe("createShowhowMediaUrl", () => {
 	it("creates a renderer-loadable URL scoped to one recording bundle artifact", () => {
 		expect(
 			createShowhowMediaUrl(
-				"/Users/mohamedb/Showhow/Recordings/2026-07-25_175438-recording",
+				"/Users/me/Showhow/Recordings/2026-07-25_175438-recording",
 				"screenshots/step-01.png",
 			),
 		).toBe("showhow-media://recordings/2026-07-25_175438-recording/screenshots/step-01.png");
@@ -17,7 +17,7 @@ describe("createShowhowMediaUrl", () => {
 	it("rejects media paths that escape the selected recording bundle", () => {
 		expect(() =>
 			createShowhowMediaUrl(
-				"/Users/mohamedb/Showhow/Recordings/2026-07-25_175438-recording",
+				"/Users/me/Showhow/Recordings/2026-07-25_175438-recording",
 				"../video.mp4",
 			),
 		).toThrow(/unsafe/i);

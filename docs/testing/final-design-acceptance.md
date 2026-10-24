@@ -10,7 +10,7 @@ receipt from lead, not a native-proof retry; exact commands and output are retai
 
 ## Evidence boundary and source binding
 
-External evidence root (`E148`): `/Users/mohamedb/dev/loop-evidence/showhow-148/`. Current authenticated receipts are under `refresh-20261023/issue-current.json`, `comments-current.json`, and `prs-current.json`; older issue/comments/dispatch/PR receipts are retained historical records. Current lane: workspace w79, fresh executor seat w79:p3, lead-owned review still pending. Fresh reviewer identity not attempted; feature/ui remains normal review with noGreptile and failed-review count 0.
+External evidence root (`E148`): `~/dev/loop-evidence/showhow-148/`. Current authenticated receipts are under `refresh-20261023/issue-current.json`, `comments-current.json`, and `prs-current.json`; older issue/comments/dispatch/PR receipts are retained historical records. Current lane: workspace w79, fresh executor seat w79:p3, lead-owned review still pending. Fresh reviewer identity not attempted; feature/ui remains normal review with noGreptile and failed-review count 0.
 
 `E148/build-20261021/before/` preserves the three owned files (or an ABSENT marker) as HISTORICAL snapshots. Current source anchors below were refreshed against e1fab904; current candidate bytes, hashes, diffs and frozen build binding are in `FINAL-SNAPSHOT-20261023.md` and `BUILD-RETURN-20261023.md`. Existing build-20261023 source/frame comparisons and artifact inventories are reused. Every PNG equals its manifest SHA256; this establishes design artifact integrity, not measured app appearance.
 
@@ -18,15 +18,15 @@ External evidence root (`E148`): `/Users/mohamedb/dev/loop-evidence/showhow-148/
 
 | Historical record | Reviewed revision | Exact range comparison: equal / changed-or-absent | Retained evidence and limits |
 |---|---|---|---|
-| E139: `/Users/mohamedb/dev/loop-evidence/showhow-139/` | `4a3ede60d6f64ef06691ae373225367ee6df9fa6` | **14 / 7** | HISTORICAL READY.md and visual/reference comparison; reduced-motion/theme fixtures; not full journeys |
-| E140: `/Users/mohamedb/dev/loop-evidence/showhow-140/` | `d3c22394d74279d695b01166c1abd55d063117f5` | **7 / 25** | HISTORICAL READY.md, frame-to-evidence and synthetic/fake-provider receipts |
-| E141: `/Users/mohamedb/dev/loop-evidence/showhow-141/` | `69aa68eb92a6f64d817381f0fd19480197099611` | **1 / 30** | HISTORICAL real picker/import/playback evidence; no bundled STT success |
-| E142: `/Users/mohamedb/dev/loop-evidence/showhow-142/` | `c7a3e9fe99127a18334220b50a1f2d2097299216` | **5 / 27** | HISTORICAL fake safeStorage/provider/clipboard receipts; later hardening changes source |
-| E143: `/Users/mohamedb/dev/loop-evidence/showhow-143/` | `3251bb41e2d644980b2fcf7acc1cdbb631ed7aa6` | **6 / 21** | HISTORICAL PDF renderer/save/Finder receipts |
-| E144: `/Users/mohamedb/dev/loop-evidence/showhow-144/` | `6dd3e8a17c022ec4c609d9252ad3215399b65380` | **0 / 27** | HISTORICAL settings receipts; second-window System bridge gap |
-| E145: `/Users/mohamedb/dev/loop-evidence/showhow-145/` | `5b871349e132da3c1b7386f858028499e43218d4` | **10 / 23** | HISTORICAL fake capture/permissions; no ScreenCaptureKit |
-| E146: `/Users/mohamedb/dev/loop-evidence/showhow-146/` | `f2d3443e635485897a56bc4a82610513d361dc34` | **15 / 28** | HISTORICAL playback/edit/save/reopen; recipe blocked |
-| E147: `/Users/mohamedb/dev/loop-evidence/showhow-147/` | `4402d25421f4765dec1f2a698483182cd4888a58` | **44 / 2** | HISTORICAL fake chat/status/save failure/export hold/picker and compositor receipts |
+| E139: `~/dev/loop-evidence/showhow-139/` | `4a3ede60d6f64ef06691ae373225367ee6df9fa6` | **14 / 7** | HISTORICAL READY.md and visual/reference comparison; reduced-motion/theme fixtures; not full journeys |
+| E140: `~/dev/loop-evidence/showhow-140/` | `d3c22394d74279d695b01166c1abd55d063117f5` | **7 / 25** | HISTORICAL READY.md, frame-to-evidence and synthetic/fake-provider receipts |
+| E141: `~/dev/loop-evidence/showhow-141/` | `69aa68eb92a6f64d817381f0fd19480197099611` | **1 / 30** | HISTORICAL real picker/import/playback evidence; no bundled STT success |
+| E142: `~/dev/loop-evidence/showhow-142/` | `c7a3e9fe99127a18334220b50a1f2d2097299216` | **5 / 27** | HISTORICAL fake safeStorage/provider/clipboard receipts; later hardening changes source |
+| E143: `~/dev/loop-evidence/showhow-143/` | `3251bb41e2d644980b2fcf7acc1cdbb631ed7aa6` | **6 / 21** | HISTORICAL PDF renderer/save/Finder receipts |
+| E144: `~/dev/loop-evidence/showhow-144/` | `6dd3e8a17c022ec4c609d9252ad3215399b65380` | **0 / 27** | HISTORICAL settings receipts; second-window System bridge gap |
+| E145: `~/dev/loop-evidence/showhow-145/` | `5b871349e132da3c1b7386f858028499e43218d4` | **10 / 23** | HISTORICAL fake capture/permissions; no ScreenCaptureKit |
+| E146: `~/dev/loop-evidence/showhow-146/` | `f2d3443e635485897a56bc4a82610513d361dc34` | **15 / 28** | HISTORICAL playback/edit/save/reopen; recipe blocked |
+| E147: `~/dev/loop-evidence/showhow-147/` | `4402d25421f4765dec1f2a698483182cd4888a58` | **44 / 2** | HISTORICAL fake chat/status/save failure/export hold/picker and compositor receipts |
 
 Counts cover each ticket's complete base→reviewed source/test range, not just its last fix commit. Per-path hashes and base/reviewed revisions are external. In particular #141 importer/sheet remain identical, while Library composition/IPC changed; #143 PDF modules remain identical but composition/IPC changed; #145 HUD files remain identical; #146 shell/inspector changed under #147; #147 has 44 equal paths and 2 changed-or-absent paths, not 46 equal paths. Equality does not prove native startup, packaged runtime or current integration. #142's original native brief run predates source hardening; use it as historical context only.
 

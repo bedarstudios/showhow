@@ -75,7 +75,7 @@
 Run:
 
 ```bash
-cd /Users/mohamedb/dev/OS/Projects/web/showhow/desktop
+cd ~/dev/OS/Projects/web/showhow/desktop
 git status --porcelain
 git rev-parse --abbrev-ref main@{upstream}
 git remote get-url origin
@@ -169,16 +169,16 @@ Expected: the staged diff contains only the listed migration files; commit succe
 ### Task 2: Retarget live Bedarstudios OS references
 
 **Files:**
-- Delete: `/Users/mohamedb/dev/OS/Projects/web/showhow/feature-backlog.md`
-- Modify: `/Users/mohamedb/dev/OS/.gitignore`
-- Modify: `/Users/mohamedb/dev/OS/AGENTS.md`
-- Modify: `/Users/mohamedb/dev/OS/context/current-priorities.md`
-- Modify: `/Users/mohamedb/dev/OS/Resources/AI/hygiene/local-runner/hygiene-prompt.md`
-- Modify: `/Users/mohamedb/dev/OS/Resources/AI/multi-model-loop/pr-triage-prompt.md`
-- Modify: `/Users/mohamedb/dev/OS/Resources/AI/multi-model-loop/review-agent-prompt.md`
-- Modify: `/Users/mohamedb/dev/OS/Resources/AI/multi-model-loop/LOOP.md`
-- Modify: `/Users/mohamedb/dev/OS/Resources/AI/oms-mission-control-setup.md`
-- Append: `/Users/mohamedb/dev/OS/decisions/log.md`
+- Delete: `~/dev/OS/Projects/web/showhow/feature-backlog.md`
+- Modify: `~/dev/OS/.gitignore`
+- Modify: `~/dev/OS/AGENTS.md`
+- Modify: `~/dev/OS/context/current-priorities.md`
+- Modify: `~/dev/OS/Resources/AI/hygiene/local-runner/hygiene-prompt.md`
+- Modify: `~/dev/OS/Resources/AI/multi-model-loop/pr-triage-prompt.md`
+- Modify: `~/dev/OS/Resources/AI/multi-model-loop/review-agent-prompt.md`
+- Modify: `~/dev/OS/Resources/AI/multi-model-loop/LOOP.md`
+- Modify: `~/dev/OS/Resources/AI/oms-mission-control-setup.md`
+- Append: `~/dev/OS/decisions/log.md`
 
 **Interfaces:**
 - Consumes: canonical local path `Projects/web/showhow/desktop`, canonical repository `bedarstudios/openscreen`, migrated spec path, and archive path.
@@ -189,7 +189,7 @@ Expected: the staged diff contains only the listed migration files; commit succe
 Run:
 
 ```bash
-cd /Users/mohamedb/dev/OS
+cd ~/dev/OS
 git status -sb
 git diff --name-only
 ```
@@ -232,7 +232,7 @@ Use `apply_patch` in `context/current-priorities.md` to replace its two extensio
 Use `apply_patch` to make these exact substitutions in current operational files:
 
 ```text
-/Users/mohamedb/dev/OS/Projects/web/showhow/app -> /Users/mohamedb/dev/OS/Projects/web/showhow/desktop
+~/dev/OS/Projects/web/showhow/app -> ~/dev/OS/Projects/web/showhow/desktop
 bedarstudios/showhow -> bedarstudios/openscreen
 showhow/app -> showhow/desktop
 ```
@@ -297,8 +297,8 @@ Expected: the cached name list is exactly the ten files above; unrelated pre-exi
 ### Task 3: Preserve the exact extension checkout in the OS archive
 
 **Files:**
-- Move: `/Users/mohamedb/dev/OS/Projects/web/showhow/app/`
-- Create: `/Users/mohamedb/dev/OS/Archive/Projects/web/showhow-extension-2026-07-16/`
+- Move: `~/dev/OS/Projects/web/showhow/app/`
+- Create: `~/dev/OS/Archive/Projects/web/showhow-extension-2026-07-16/`
 
 **Interfaces:**
 - Consumes: an ignored, nested Git checkout and its recorded branch/status/hash evidence.
@@ -309,7 +309,7 @@ Expected: the cached name list is exactly the ten files above; unrelated pre-exi
 Run:
 
 ```bash
-cd /Users/mohamedb/dev/OS
+cd ~/dev/OS
 test -d Projects/web/showhow/app/.git
 test ! -e Archive/Projects/web/showhow-extension-2026-07-16
 git -C Projects/web/showhow/app branch --show-current > /tmp/showhow-extension-branch.before
@@ -408,17 +408,17 @@ Expected: `bedarstudios/showhow` has `isArchived: true`; `bedarstudios/openscree
 Run:
 
 ```bash
-find /Users/mohamedb/dev/OS/Projects/web/showhow -maxdepth 1 -mindepth 1 -print | sort
+find ~/dev/OS/Projects/web/showhow -maxdepth 1 -mindepth 1 -print | sort
 ```
 
-Expected: exactly `/Users/mohamedb/dev/OS/Projects/web/showhow/desktop`.
+Expected: exactly `~/dev/OS/Projects/web/showhow/desktop`.
 
 - [ ] **Step 2: Verify desktop documentation and Git state**
 
 Run:
 
 ```bash
-cd /Users/mohamedb/dev/OS/Projects/web/showhow/desktop
+cd ~/dev/OS/Projects/web/showhow/desktop
 test -f docs/superpowers/specs/2026-07-11-showhow-desktop-design.md
 test -f docs/product/feature-backlog.md
 test -d docs/design/design
@@ -447,7 +447,7 @@ Expected: push succeeds; status is `## main...origin/main` with no ahead count o
 Run:
 
 ```bash
-cd /Users/mohamedb/dev/OS
+cd ~/dev/OS
 git status -sb
 git -C Archive/Projects/web/showhow-extension-2026-07-16 status -sb
 git -C Archive/Projects/web/showhow-extension-2026-07-16 remote -v

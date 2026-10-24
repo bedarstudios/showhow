@@ -85,18 +85,18 @@ still so its content does not get a narrow centre crop.
 ## Evidence and exact checks
 
 External evidence root:
-`/Users/mohamedb/dev/loop-evidence/showhow-134/executor/`.
+`~/dev/loop-evidence/showhow-134/executor/`.
 
 - `pencil-check.js` contains the exact repeatable MCP check and export input,
   with node IDs substituted for session variables.
 - `mcp-check-result.json` holds the final MCP response. The call was
-  `pencil.execute({filePath:"/Users/mohamedb/dev/projects/showhow-ticket-134-landing-design/design/landing.pen",input:<check script>})`.
+  `pencil.execute({filePath:"~/dev/projects/showhow-ticket-134-landing-design/design/landing.pen",input:<check script>})`.
 - The check uses Get with resolveInstances:true, GetVariables, and Export with
   scale:1. The result lists eleven components, eleven landing variables, the
   frame bounds, section order, colour/font walks, layout results, and FAQ copy.
 - `shader-text-bounds.json`, `contrast/Xse4s.png`, and `contrast/kztGq.png`
   support the raster contrast check. These probes are external evidence.
-- `python3 /Users/mohamedb/dev/loop-evidence/showhow-134/executor/verify-exports.py`
+- `python3 ~/dev/loop-evidence/showhow-134/executor/verify-exports.py`
   exits 0. It prints:
   `PASS: 11 components, 8 colour and 3 font variables, section order, token-only styles, dimensions, 5 exact PNG comparisons.`
   It then prints `Minimum sampled shader text contrast: 5.176`.

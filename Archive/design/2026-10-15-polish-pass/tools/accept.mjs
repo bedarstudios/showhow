@@ -1,5 +1,6 @@
-import {chromium} from '/Users/mohamedb/dev/projects/showhow/node_modules/playwright/index.mjs';
-const url='file:///Users/mohamedb/dev/projects/showhow/design/mocks/2026-10-15-polish-pass/index.html';
+const ROOT=new URL('../../../../',import.meta.url).pathname;
+const {chromium}=await import(ROOT+'node_modules/playwright/index.mjs');
+const url='file://'+ROOT+'design/mocks/2026-10-15-polish-pass/index.html';
 const res=[];const ok=(n,pass,info='')=>{res.push([n,pass]);console.log(pass?'PASS':'FAIL',n,info)};
 const b=await chromium.launch({channel:'chrome'});
 async function fresh(opts={}){const ctx=await b.newContext({viewport:{width:1440,height:900},...opts});const pg=await ctx.newPage();const errs=[];pg.on('console',m=>{if(m.type()==='error')errs.push(m.text())});pg.on('pageerror',e=>errs.push('PAGEERR '+e.message));await pg.goto(url);await pg.waitForTimeout(700);pg.errs=errs;return pg}

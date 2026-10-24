@@ -54,7 +54,7 @@ import { ChatStripPanel } from "./LeftPanel";
 const DIAGNOSTIC =
 	"Empty response from model (provider=openrouter, model=anthropic/claude-haiku-5.5, " +
 	"error=Error: Received empty response from chat model call. stack=Error: Received empty " +
-	"response from chat model call. | at D7._generateUncached (file:///Users/mohamedb/dev/" +
+	"response from chat model call. | at D7._generateUncached (file:///Users/me/dev/" +
 	"projects/showhow/release/1.6.0/mac-arm64/Showhow.app/Contents/Resources/app.asar/" +
 	"dist-electron/update-settings-uYjC7FQn.js:45097:31)). Last chunk: (no on_chat_model_stream events)";
 

@@ -138,7 +138,7 @@ completed migration or native acceptance.
 Method: read both immutable trees in an external scratch clone; compare the files supporting the
 five topics below. No current-main claims, remote added to Showhow, code import, model download,
 app build or native smoke test. Raw source/command receipts and file hashes are retained in
-`/Users/mohamedb/dev/loop-evidence/showhow-115/executor/` (`resume-topic-source-files.json`,
+`~/dev/loop-evidence/showhow-115/executor/` (`resume-topic-source-files.json`,
 `resume-topic-source-hashes.json`, `resume-extra-source-files.json`, `resume-relevant-pin-diff.json`).
 
 ### Runtime and compositor binding

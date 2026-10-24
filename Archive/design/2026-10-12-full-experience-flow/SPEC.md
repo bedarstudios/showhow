@@ -172,7 +172,7 @@ J. Settings (from "⚙ Settings") — replaces main panel, sidebar stays. Left s
 
 ## Acceptance checks (run them; report pass/fail for each)
 1. Open the file in a browser (use the project's Playwright: `npx playwright` from
-   /Users/mohamedb/dev/projects/showhow, or playwright-cli) at viewport 1440x900 with no console errors.
+   ~/dev/projects/showhow, or playwright-cli) at viewport 1440x900 with no console errors.
 2. Every Screen-select entry renders without layout breakage.
 3. Click-path: C → Make guide → F1 → Make guide → F2 → F3 completes on its own.
 4. Click-path: New recording → Start → wait 3s → timer shows 00:03 → Stop → new row "Untitled recording" selected.

@@ -1,7 +1,7 @@
 # Brief: final Showhow frames in the Pen file
 
 Task: build the owner-locked mock as final frames in
-`/Users/mohamedb/dev/projects/showhow/design/showhow.pen` through the Pen MCP. Read the pen-dev skill,
+`~/dev/projects/showhow/design/showhow.pen` through the Pen MCP. Read the pen-dev skill,
 `execute.md` and `pen-schema.md` first.
 
 ## Sources (in priority order)

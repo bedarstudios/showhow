@@ -1,7 +1,7 @@
 # Handoff: finish the Showhow Pen design pass
 
 From: Claude (coordinator, out of usage). To: Codex. Owner: Mohamed. Date: 2026-10-15.
-Repo: /Users/mohamedb/dev/projects/showhow, branch `design/full-experience` (local only; never push).
+Repo: ~/dev/projects/showhow, branch `design/full-experience` (local only; never push).
 
 ## Context (read first)
 - `AGENTS.md`, `.agents/decisions.md` (last four 2026-10-15 entries).

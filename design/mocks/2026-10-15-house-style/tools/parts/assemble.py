@@ -1,5 +1,6 @@
 import re
-P='/Users/mohamedb/dev/projects/showhow/design/mocks/2026-10-15-house-style/'
+import os
+P=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..')+'/'
 rd=lambda f:open(P+'tools/parts/'+f).read()
 old=open(P+'../2026-10-15-polish-pass/index.html').read()
 hi=rd('helpers_icons.js')
