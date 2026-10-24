@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Showhow social share image</title>
+		<style>
+			@font-face {
+				font-family: "Inter";
+				src: url("../../site/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
+					format("woff2");
+				font-style: normal;
+				font-weight: 100 900;
+			}
+
+			@font-face {
+				font-family: "Inter Tight";
+				src: url("../../site/node_modules/@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2")
+					format("woff2");
+				font-style: normal;
+				font-weight: 100 900;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				width: 1200px;
+				height: 630px;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			body {
+				position: relative;
+				background: #161616;
+				color: #fffcf7;
+				font-family: "Inter", sans-serif;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			body::after {
+				position: absolute;
+				z-index: 3;
+				inset: 0;
+				background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch' seed='17'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.18'/%3E%3C/svg%3E");
+				content: "";
+				mix-blend-mode: screen;
+				opacity: 0.14;
+				pointer-events: none;
+			}
+
+			.brand {
+				position: absolute;
+				top: 34px;
+				left: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 10px;
+				width: 100%;
+			}
+
+			.brand img {
+				display: block;
+				width: 36px;
+				height: 36px;
+			}
+
+			.brand span {
+				font-family: "Inter Tight", sans-serif;
+				font-size: 28px;
+				font-weight: 600;
+				letter-spacing: -0.02em;
+				line-height: 1;
+			}
+
+			.copy {
+				position: absolute;
+				z-index: 1;
+				top: 106px;
+				left: 0;
+				width: 100%;
+				text-align: center;
+			}
+
+			h1 {
+				margin: 0;
+				font-family: "Inter Tight", sans-serif;
+				font-size: 64px;
+				font-weight: 700;
+				letter-spacing: -0.03em;
+				line-height: 1.05;
+			}
+
+			h1 span {
+				color: #82b09a;
+			}
+
+			p {
+				margin: 12px 0 0;
+				color: #fffcf7b3;
+				font-size: 24px;
+				font-weight: 400;
+				line-height: 1.4;
+			}
+
+			.glow {
+				position: absolute;
+				z-index: 0;
+				top: 230px;
+				left: 50%;
+				width: 1100px;
+				height: 420px;
+				background: radial-gradient(ellipse, rgb(130 176 154 / 18%) 0%, transparent 68%);
+				transform: translateX(-50%);
+			}
+
+			.poster {
+				position: absolute;
+				z-index: 2;
+				top: 300px;
+				left: 50%;
+				width: 980px;
+				border: 1px solid rgb(255 252 247 / 16%);
+				border-radius: 14px 14px 0 0;
+				box-shadow: 0 40px 80px rgb(0 0 0 / 50%);
+				overflow: hidden;
+				transform: translateX(-50%);
+			}
+
+			.poster img {
+				display: block;
+				width: 100%;
+				height: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="brand">
+			<img src="../../site/public/favicon.svg" alt="" />
+			<span>Showhow</span>
+		</header>
+		<main class="copy">
+			<h1>Show how it’s done<span>.</span></h1>
+			<p>Record once. Get a step-by-step guide.</p>
+		</main>
+		<div class="glow" aria-hidden="true"></div>
+		<div class="poster">
+			<img src="../../site/public/assets/hero-make-guide-poster.png" alt="" />
+		</div>
+	</body>
+</html>

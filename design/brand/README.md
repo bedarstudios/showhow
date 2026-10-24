@@ -44,5 +44,14 @@ Run `npm run icons:generate` on macOS. It writes `icons/icons/png/*`, `icons/ico
 icon) and `public/trayTemplate*.png` / `public/tray-recording*.png`. These are generated artifacts:
 regenerate them from the SVGs rather than editing them by hand.
 
-The landing page favicon is `site/public/favicon.svg`, the logo artwork itself, with
-`site/public/assets/logo.png` as the PNG fallback and navigation logo.
+The landing page favicon is `site/public/favicon.svg`, the logo artwork itself. `npm run icons:generate`
+also writes `site/public/favicon.ico` (16, 32 and 48 px) and the opaque
+`site/public/apple-touch-icon.png` (180 × 180) from that SVG.
+
+The social share image is `site/public/og.png`, rendered offline from
+[`showhow-og.html`](./showhow-og.html) with `npm run og:render`. The HTML uses the installed site
+fonts and the committed hero poster; rerun the command when either source changes.
+
+If the Dock still shows an old app icon after installing a new build, quit Showhow, remove its old
+Dock icon, and add Showhow from Applications again. If it stays stale, run `killall Dock` in
+Terminal to restart the Dock and refresh its icon cache.

@@ -9,14 +9,19 @@ const scriptRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".
 const root = path.resolve(process.env.SHOWHOW_ICON_ROOT ?? scriptRoot);
 const platform = process.env.SHOWHOW_ICON_PLATFORM ?? process.platform;
 const source = path.join(root, "design/brand/showhow-app-icon.svg");
+const faviconSource = path.join(root, "site/public/favicon.svg");
 const pngDirectory = path.join(root, "icons/icons/png");
 const macDirectory = path.join(root, "icons/icons/mac");
 const windowsDirectory = path.join(root, "icons/icons/win");
 const publicDirectory = path.join(root, "public");
+const sitePublicDirectory = path.join(root, "site/public");
 const sizes = [16, 24, 32, 48, 64, 128, 256, 512, 1024];
 
 if (!fs.existsSync(source)) {
 	throw new Error(`Canonical Showhow icon is missing: ${source}`);
+}
+if (!fs.existsSync(faviconSource)) {
+	throw new Error(`Landing favicon is missing: ${faviconSource}`);
 }
 
 for (const directory of [pngDirectory, macDirectory, windowsDirectory, publicDirectory]) {
@@ -30,6 +35,7 @@ if (platform !== "darwin") {
 }
 
 const svg = fs.readFileSync(source);
+const faviconSvg = fs.readFileSync(faviconSource);
 for (const size of sizes) {
 	await sharp(svg, { density: 384 })
 		.resize(size, size, { fit: "fill" })
@@ -41,6 +47,21 @@ await sharp(svg, { density: 384 })
 	.resize(512, 512, { fit: "fill" })
 	.png({ compressionLevel: 9, adaptiveFiltering: false, palette: false })
 	.toFile(path.join(publicDirectory, "showhow.png"));
+
+const faviconPngs = await Promise.all(
+	[16, 32, 48].map((size) =>
+		sharp(faviconSvg, { density: 384 })
+			.resize(size, size, { fit: "fill" })
+			.png({ compressionLevel: 9, adaptiveFiltering: false, palette: false })
+			.toBuffer(),
+	),
+);
+fs.writeFileSync(path.join(sitePublicDirectory, "favicon.ico"), await pngToIco(faviconPngs));
+await sharp(faviconSvg, { density: 384 })
+	.resize(180, 180, { fit: "fill" })
+	.flatten({ background: "#FFFCF7" })
+	.png({ compressionLevel: 9, adaptiveFiltering: false, palette: false })
+	.toFile(path.join(sitePublicDirectory, "apple-touch-icon.png"));
 
 // macOS menu bar: a template image (black + alpha, 16 pt with @2x) and an orange recording state.
 for (const [svgName, baseName] of [

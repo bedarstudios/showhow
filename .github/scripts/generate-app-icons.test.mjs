@@ -19,6 +19,8 @@ const deterministicFiles = [
 	"public/trayTemplate@2x.png",
 	"public/tray-recording.png",
 	"public/tray-recording@2x.png",
+	"site/public/favicon.ico",
+	"site/public/apple-touch-icon.png",
 ];
 
 const hash = (file) => createHash("sha256").update(fs.readFileSync(file)).digest("hex");
@@ -46,13 +48,15 @@ const pngIcnsPixels = new Map([
 	["ic10", 1024],
 ]);
 
-function validateIco(buffer) {
+function validateIco(buffer, expectedSizes = [16, 24, 32, 48, 64, 128, 256]) {
 	if (buffer.length < 6) throw new Error("ICO header is truncated");
 	if (buffer.readUInt16LE(0) !== 0 || buffer.readUInt16LE(2) !== 1) {
 		throw new Error("Invalid ICO header");
 	}
 	const count = buffer.readUInt16LE(4);
-	if (count !== 7) throw new Error(`Expected 7 ICO entries, received ${count}`);
+	if (count !== expectedSizes.length) {
+		throw new Error(`Expected ${expectedSizes.length} ICO entries, received ${count}`);
+	}
 	const directoryEnd = 6 + count * 16;
 	if (directoryEnd > buffer.length) throw new Error("ICO directory is truncated");
 	const sizes = [];
@@ -162,6 +166,11 @@ function makeRoot() {
 			path.join(root, "design/brand", name),
 		);
 	}
+	fs.mkdirSync(path.join(root, "site/public"), { recursive: true });
+	fs.copyFileSync(
+		path.join(repoRoot, "site/public/favicon.svg"),
+		path.join(root, "site/public/favicon.svg"),
+	);
 	return root;
 }
 
@@ -282,6 +291,31 @@ describe("Showhow icon generation", () => {
 			expect(hash(path.join(root, "icons/icons/png/1024x1024.png"))).not.toBe(
 				first["icons/icons/png/1024x1024.png"],
 			);
+		},
+	);
+
+	it.runIf(process.platform === "darwin")(
+		"generates 16, 32 and 48 px landing ICO entries and an opaque 180 px touch icon",
+		async () => {
+			const root = makeRoot();
+			generate(root);
+
+			const ico = path.join(root, "site/public/favicon.ico");
+			expect(fs.existsSync(ico)).toBe(true);
+			expect(validateIco(fs.readFileSync(ico), [16, 32, 48]).sizes).toEqual([16, 32, 48]);
+
+			const touchIcon = path.join(root, "site/public/apple-touch-icon.png");
+			expect(fs.existsSync(touchIcon)).toBe(true);
+			const metadata = await sharp(touchIcon).metadata();
+			expect({
+				width: metadata.width,
+				height: metadata.height,
+				hasAlpha: metadata.hasAlpha,
+			}).toEqual({
+				width: 180,
+				height: 180,
+				hasAlpha: false,
+			});
 		},
 	);
 

@@ -132,6 +132,70 @@ test.describe("landing page", () => {
 		expect(await context.cookies()).toEqual([]);
 	});
 
+	test("publishes social metadata and the fallback favicon links", async ({ page }) => {
+		await page.goto("/");
+		const metadata = await page.evaluate(() => {
+			const meta = (selector: string) =>
+				document.querySelector<HTMLMetaElement>(selector)?.content ?? null;
+			const icon = (href: string) =>
+				document.querySelector<HTMLLinkElement>(`link[rel="icon"][href="${href}"]`)?.href ?? null;
+			return {
+				type: meta('meta[property="og:type"]'),
+				url: meta('meta[property="og:url"]'),
+				title: meta('meta[property="og:title"]'),
+				description: meta('meta[property="og:description"]'),
+				image: meta('meta[property="og:image"]'),
+				imageWidth: meta('meta[property="og:image:width"]'),
+				imageHeight: meta('meta[property="og:image:height"]'),
+				imageAlt: meta('meta[property="og:image:alt"]'),
+				twitterCard: meta('meta[name="twitter:card"]'),
+				twitterImage: meta('meta[name="twitter:image"]'),
+				appleTouchIcon:
+					document.querySelector<HTMLLinkElement>('link[rel="apple-touch-icon"]')?.href ?? null,
+				favicon: icon("/favicon.ico"),
+				svgIcon: icon("/favicon.svg"),
+				pngIcon: icon("/assets/logo.png"),
+			};
+		});
+		expect.soft(metadata).toEqual({
+			type: "website",
+			url: "https://showhow-agy.pages.dev/",
+			title: "Showhow — Show how it’s done",
+			description:
+				"Record your screen once, press one button, and Showhow turns it into a step-by-step guide. Free, local-first, for macOS.",
+			image: "https://showhow-agy.pages.dev/og.png",
+			imageWidth: "1200",
+			imageHeight: "630",
+			imageAlt: "Showhow’s step-by-step guide poster",
+			twitterCard: "summary_large_image",
+			twitterImage: "https://showhow-agy.pages.dev/og.png",
+			appleTouchIcon: "http://127.0.0.1:4321/apple-touch-icon.png",
+			favicon: "http://127.0.0.1:4321/favicon.ico",
+			svgIcon: "http://127.0.0.1:4321/favicon.svg",
+			pngIcon: "http://127.0.0.1:4321/assets/logo.png",
+		});
+	});
+
+	test("serves rendered share and fallback icons as images", async ({ request }) => {
+		const og = await request.get("/og.png");
+		await expect.soft(og.status()).toBe(200);
+		if (og.ok()) {
+			await expect.soft(og.headers()["content-type"] ?? "").toMatch(/^image\/png/);
+			const body = await og.body();
+			await expect.soft(body.subarray(1, 4).toString("ascii")).toBe("PNG");
+			await expect.soft(body.readUInt32BE(16)).toBe(1200);
+			await expect.soft(body.readUInt32BE(20)).toBe(630);
+		}
+
+		for (const file of ["/favicon.ico", "/apple-touch-icon.png"]) {
+			const response = await request.get(file);
+			await expect.soft(response.status(), file).toBe(200);
+			if (response.ok()) {
+				await expect.soft(response.headers()["content-type"] ?? "", file).toMatch(/^image\//);
+			}
+		}
+	});
+
 	test("reports no console errors", async ({ page }) => {
 		const errors: string[] = [];
 		page.on("pageerror", (error) => errors.push(error.message));
