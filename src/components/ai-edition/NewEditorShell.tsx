@@ -254,6 +254,10 @@ export function NewEditorShell() {
 	} | null>(null);
 	const [trashBusy, setTrashBusy] = useState(false);
 	const [trashAwaitingUnsaved, setTrashAwaitingUnsaved] = useState(false);
+	// The Trash sheet opens from the top bar's ⋯ menu and has no trigger of its own, so the
+	// request carries the button that takes focus back when the sheet closes. It stays set
+	// across the unsaved-changes prompt, which closes and reopens the sheet mid-flow.
+	const trashReturnFocus = useRef<HTMLElement | null>(null);
 	const pendingChatPrompt = useChatPromptBus((s) => s.pending);
 	useEffect(() => {
 		if (pendingChatPrompt && !chatOpen) {
@@ -1026,28 +1030,32 @@ export function NewEditorShell() {
 		}
 	}, [promptUnsaved]);
 
-	const handleRequestTrashRecording = useCallback(async () => {
-		const openDocument = useProjectStore.getState().document;
-		const projectId = openDocument?.project.id;
-		const bundleDir = recordingBundleDirForDocument(openDocument);
-		if (!projectId || !bundleDir) return;
-		try {
-			const entries = await window.electronAPI?.showhowListRecordings?.();
-			const target = { bundleDir, projectId };
-			if (!isCurrentRecordingTarget(useProjectStore.getState().document, target)) return;
-			const entry = entries?.find((candidate) => candidate.bundleDir === bundleDir);
-			if (!entry) {
-				toast.error(tc("showhowTrash.moveError"));
-				return;
+	const handleRequestTrashRecording = useCallback(
+		async (returnFocusTo: HTMLElement | null) => {
+			trashReturnFocus.current = returnFocusTo;
+			const openDocument = useProjectStore.getState().document;
+			const projectId = openDocument?.project.id;
+			const bundleDir = recordingBundleDirForDocument(openDocument);
+			if (!projectId || !bundleDir) return;
+			try {
+				const entries = await window.electronAPI?.showhowListRecordings?.();
+				const target = { bundleDir, projectId };
+				if (!isCurrentRecordingTarget(useProjectStore.getState().document, target)) return;
+				const entry = entries?.find((candidate) => candidate.bundleDir === bundleDir);
+				if (!entry) {
+					toast.error(tc("showhowTrash.moveError"));
+					return;
+				}
+				setTrashTarget({ projectId, bundleDir: entry.bundleDir, title: entry.title });
+			} catch (error) {
+				console.error("[editor] failed to find recording for Trash:", error);
+				toast.error(tc("showhowTrash.moveError"), {
+					description: error instanceof Error ? error.message : String(error),
+				});
 			}
-			setTrashTarget({ projectId, bundleDir: entry.bundleDir, title: entry.title });
-		} catch (error) {
-			console.error("[editor] failed to find recording for Trash:", error);
-			toast.error(tc("showhowTrash.moveError"), {
-				description: error instanceof Error ? error.message : String(error),
-			});
-		}
-	}, [tc]);
+		},
+		[tc],
+	);
 
 	const handleConfirmTrashRecording = useCallback(async () => {
 		if (!trashTarget || trashBusy) return;
@@ -1896,6 +1904,10 @@ export function NewEditorShell() {
 					if (!open) setTrashTarget(null);
 				}}
 				onConfirm={() => void handleConfirmTrashRecording()}
+				onCloseAutoFocus={(event) => {
+					event.preventDefault();
+					trashReturnFocus.current?.focus();
+				}}
 			/>
 			<AddAudioLayerDialog
 				open={voiceoverFlow !== null}

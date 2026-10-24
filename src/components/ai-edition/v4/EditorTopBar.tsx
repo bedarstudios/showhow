@@ -41,7 +41,8 @@ export interface TopBarActions {
 	checkForUpdates: () => void;
 	/** Back to the Library window (Editor-01 "Library"). */
 	openLibrary: () => void;
-	trashRecording?: () => void;
+	/** Asks to move the open recording to the Trash; `returnFocusTo` takes focus back after. */
+	trashRecording?: (returnFocusTo: HTMLElement | null) => void;
 	/** The editor's Record mode (Editor-01 "New recording"). */
 	newRecording: () => void;
 }
@@ -72,6 +73,8 @@ export function EditorTopBar({
 	const t = useScopedT("editor");
 	const tCommon = useScopedT("common");
 	const savedLabel = dirty ? t("topbar.unsaved") : t("topbar.saved");
+	// The Trash sheet has no trigger of its own, so this ⋯ button takes focus back on close.
+	const trashMenuButton = useRef<HTMLButtonElement>(null);
 
 	return (
 		<header className={styles.topbar}>
@@ -138,6 +141,7 @@ export function EditorTopBar({
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger asChild>
 							<button
+								ref={trashMenuButton}
 								type="button"
 								className={styles.navLink}
 								aria-label={tCommon("showhowTrash.moreActions")}
@@ -146,7 +150,10 @@ export function EditorTopBar({
 							</button>
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content align="end" sideOffset={6} className={styles.appMenu}>
-							<DropdownMenu.Item className={styles.appMenuRow} onSelect={actions.trashRecording}>
+							<DropdownMenu.Item
+								className={styles.appMenuRow}
+								onSelect={() => actions.trashRecording?.(trashMenuButton.current)}
+							>
 								<Trash2 size={15} aria-hidden />
 								{tCommon("showhowTrash.menuItem")}
 							</DropdownMenu.Item>
