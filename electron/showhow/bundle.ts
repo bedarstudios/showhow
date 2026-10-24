@@ -1,6 +1,6 @@
 import { execFile as execFileCallback } from "node:child_process";
-import { randomUUID } from "node:crypto";
-import { promises as fs, readFileSync } from "node:fs";
+import { createHash, randomUUID } from "node:crypto";
+import { createReadStream, promises as fs, readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -593,9 +593,27 @@ async function moveFile(src: string, dest: string): Promise<void> {
 		await fs.rename(src, dest);
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code !== "EXDEV") throw error;
-		await fs.copyFile(src, dest);
-		await fs.rm(src, { force: true });
+		const temporaryDest = `${dest}.${randomUUID()}.tmp`;
+		try {
+			await fs.copyFile(src, temporaryDest);
+			const [sourceStat, destStat] = await Promise.all([fs.stat(src), fs.stat(temporaryDest)]);
+			const [sourceHash, destHash] = await Promise.all([hashFile(src), hashFile(temporaryDest)]);
+			if (sourceStat.size !== destStat.size || sourceHash !== destHash) {
+				throw new Error("Cross-device recording copy verification failed");
+			}
+			await fs.rename(temporaryDest, dest);
+			await fs.rm(src, { force: true });
+		} catch (error) {
+			await fs.rm(temporaryDest, { force: true }).catch(() => undefined);
+			throw error;
+		}
 	}
+}
+
+async function hashFile(filePath: string): Promise<string> {
+	const hash = createHash("sha256");
+	for await (const chunk of createReadStream(filePath)) hash.update(chunk);
+	return hash.digest("hex");
 }
 
 async function fileExists(p: string): Promise<boolean> {

@@ -82,6 +82,38 @@ it("a bundle-root error before relocation keeps the original recording readable"
 	expect(await fs.readFile(result.screenVideoPath, "utf8")).toBe("another valid take");
 });
 
+it("returns the original recording when a cross-volume copy fails", async () => {
+	const video = path.join(fixture.root, "cross-volume.mp4");
+	const createdAt = 1792180802500;
+	const destination = path.join(
+		fixture.root,
+		"Showhow",
+		"Recordings",
+		bundleDirName(createdAt),
+		"video.mp4",
+	);
+	await fs.writeFile(video, "valid captured video");
+	const rename = fs.rename.bind(fs);
+	vi.spyOn(fs, "rename").mockImplementation(async (source, target) => {
+		if (String(source) === video && String(target) === destination) {
+			throw Object.assign(new Error("cross-device move"), { code: "EXDEV" });
+		}
+		return rename(source, target);
+	});
+	vi.spyOn(fs, "copyFile").mockImplementation(async (_source, target) => {
+		await fs.writeFile(target, "partial copy");
+		throw new Error("simulated copy interruption");
+	});
+	vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+	const result = await finishShowhowRecording({ screenVideoPath: video, createdAt });
+
+	expect(result.screenVideoPath).toBe(video);
+	expect(result.showhowBundleDir).toBeUndefined();
+	expect(await fs.readFile(video, "utf8")).toBe("valid captured video");
+	expect(await fs.readdir(path.dirname(destination))).toEqual(["screenshots"]);
+});
+
 it("uses the root captured before bundling for fail-open media lookup", async () => {
 	const settingsDir = path.join(fixture.root, "preferences");
 	const settingsFile = path.join(settingsDir, "showhow-settings.json");

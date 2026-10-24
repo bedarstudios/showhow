@@ -1,3 +1,4 @@
+import { promises as nodeFs } from "node:fs";
 import {
 	access,
 	mkdir,
@@ -12,7 +13,7 @@ import {
 import os from "node:os";
 import path from "node:path";
 import sharp from "sharp";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { formatTimestamp } from "@/lib/showhow/transcriptFormat";
 import {
 	buildMeta,
@@ -1904,5 +1905,128 @@ describe("import metadata compatibility", () => {
 		expect(meta.video).toBe("video.mp4");
 		expect(meta).not.toHaveProperty("cursorTelemetry");
 		expect(meta).not.toHaveProperty("webcam");
+	});
+});
+
+describe("createRecordingBundle cross-volume copies (issue #205)", () => {
+	const createdAt = new Date(2026, 9, 24, 12, 0, 0).getTime();
+	const videoBytes = Buffer.from("valid captured video");
+	let work: string | undefined;
+	let screenVideoPath: string;
+	let recordingsRoot: string;
+	let screenDest: string;
+
+	beforeEach(async () => {
+		work = await mkdtemp(path.join(os.tmpdir(), "showhow-cross-volume-"));
+		screenVideoPath = path.join(work, "capture.mp4");
+		recordingsRoot = path.join(work, "Recordings");
+		screenDest = path.join(recordingsRoot, bundleDirName(createdAt), "video.mp4");
+		await writeFile(screenVideoPath, videoBytes);
+	});
+
+	afterEach(async () => {
+		vi.restoreAllMocks();
+		if (work) await nodeFs.rm(work, { recursive: true, force: true });
+	});
+
+	function forceCrossDeviceRename(events?: string[]): void {
+		const rename = nodeFs.rename.bind(nodeFs);
+		vi.spyOn(nodeFs, "rename").mockImplementation(async (source, destination) => {
+			if (String(source) === screenVideoPath && String(destination) === screenDest) {
+				events?.push("rename-source");
+				throw Object.assign(new Error("cross-device move"), { code: "EXDEV" });
+			}
+			if (String(destination) === screenDest) {
+				events?.push("rename-destination");
+				expect(path.dirname(String(source))).toBe(path.dirname(screenDest));
+				expect(await nodeFs.readFile(String(source))).toEqual(videoBytes);
+				expect(await nodeFs.readFile(screenVideoPath)).toEqual(videoBytes);
+			}
+			return rename(source, destination);
+		});
+	}
+
+	async function bundle(): Promise<Awaited<ReturnType<typeof createRecordingBundle>>> {
+		return createRecordingBundle({ screenVideoPath, createdAt, recordingsRoot });
+	}
+
+	it("verifies a destination-side copy before installing it and removing the source", async () => {
+		const events: string[] = [];
+		forceCrossDeviceRename(events);
+		const copyFile = nodeFs.copyFile.bind(nodeFs);
+		vi.spyOn(nodeFs, "copyFile").mockImplementation(async (source, destination, flags) => {
+			expect(String(source)).toBe(screenVideoPath);
+			expect(String(destination)).not.toBe(screenDest);
+			expect(path.dirname(String(destination))).toBe(path.dirname(screenDest));
+			await copyFile(source, destination, flags);
+			events.push("copy-destination-temp");
+		});
+		const remove = nodeFs.rm.bind(nodeFs);
+		vi.spyOn(nodeFs, "rm").mockImplementation(async (target, options) => {
+			if (String(target) === screenVideoPath) {
+				events.push("remove-source");
+				expect(await nodeFs.readFile(screenDest)).toEqual(videoBytes);
+			}
+			return remove(target, options);
+		});
+
+		const result = await bundle();
+
+		expect(result.screenVideoPath).toBe(screenDest);
+		expect(await nodeFs.readFile(screenDest)).toEqual(videoBytes);
+		await expect(nodeFs.stat(screenVideoPath)).rejects.toMatchObject({ code: "ENOENT" });
+		expect(events).toEqual([
+			"rename-source",
+			"copy-destination-temp",
+			"rename-destination",
+			"remove-source",
+		]);
+	});
+
+	it("keeps the source and removes a partial destination when copy fails", async () => {
+		forceCrossDeviceRename();
+		vi.spyOn(nodeFs, "copyFile").mockImplementation(async (_source, destination) => {
+			await nodeFs.writeFile(destination, "partial copy");
+			throw new Error("simulated copy interruption");
+		});
+
+		await expect(bundle()).rejects.toThrow("simulated copy interruption");
+
+		expect(await nodeFs.readFile(screenVideoPath)).toEqual(videoBytes);
+		await expect(nodeFs.stat(screenDest)).rejects.toMatchObject({ code: "ENOENT" });
+		expect(await nodeFs.readdir(path.dirname(screenDest))).toEqual(["screenshots"]);
+	});
+
+	it("keeps the source and removes the temporary copy when copied size differs", async () => {
+		forceCrossDeviceRename();
+		const copyFile = nodeFs.copyFile.bind(nodeFs);
+		vi.spyOn(nodeFs, "copyFile").mockImplementation(async (source, destination, flags) => {
+			await copyFile(source, destination, flags);
+			await nodeFs.writeFile(destination, "short copy");
+		});
+
+		await expect(bundle()).rejects.toThrow(/verification/u);
+
+		expect(await nodeFs.readFile(screenVideoPath)).toEqual(videoBytes);
+		await expect(nodeFs.stat(screenDest)).rejects.toMatchObject({ code: "ENOENT" });
+		expect(await nodeFs.readdir(path.dirname(screenDest))).toEqual(["screenshots"]);
+	});
+
+	it("keeps the source and removes a same-size copy with a different hash", async () => {
+		forceCrossDeviceRename();
+		const copyFile = nodeFs.copyFile.bind(nodeFs);
+		vi.spyOn(nodeFs, "copyFile").mockImplementation(async (source, destination, flags) => {
+			await copyFile(source, destination, flags);
+			const corrupted = Buffer.from(videoBytes);
+			corrupted[0] ^= 1;
+			expect(corrupted.byteLength).toBe(videoBytes.byteLength);
+			await nodeFs.writeFile(destination, corrupted);
+		});
+
+		await expect(bundle()).rejects.toThrow(/verification/u);
+
+		expect(await nodeFs.readFile(screenVideoPath)).toEqual(videoBytes);
+		await expect(nodeFs.stat(screenDest)).rejects.toMatchObject({ code: "ENOENT" });
+		expect(await nodeFs.readdir(path.dirname(screenDest))).toEqual(["screenshots"]);
 	});
 });
