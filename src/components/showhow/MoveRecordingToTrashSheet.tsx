@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Button } from "@/components/showhow/Button";
 import { Sheet, type SheetProps } from "@/components/showhow/Sheet";
 import { useScopedT } from "@/contexts/I18nContext";
@@ -24,11 +25,19 @@ export function MoveRecordingToTrashSheet({
 	onCloseAutoFocus,
 }: MoveRecordingToTrashSheetProps) {
 	const t = useScopedT("common");
+	const cancelButton = useRef<HTMLButtonElement>(null);
 	return (
 		<Sheet
 			open={open}
 			onOpenChange={(nextOpen) => {
 				if (!busy) onOpenChange(nextOpen);
+			}}
+			// Focus starts on Cancel, the safe action. It goes through the focus trap's own hook
+			// rather than `autoFocus`, so the trap records it: the ⋯ menu that opened the sheet
+			// returns focus to its trigger a tick later, and the trap pulls focus back to Cancel.
+			onOpenAutoFocus={(event) => {
+				event.preventDefault();
+				cancelButton.current?.focus();
 			}}
 			onCloseAutoFocus={onCloseAutoFocus}
 			eyebrow={t("showhowTrash.eyebrow")}
@@ -36,14 +45,13 @@ export function MoveRecordingToTrashSheet({
 			description={t("showhowTrash.body", { title })}
 			footer={
 				<>
-					{/* Focus starts on Cancel, the safe action. The ring shows on plain :focus too: a
-					    sheet opened with the mouse would otherwise hide where focus starts. The style is
-					    an arbitrary property because tailwind-merge 3 drops Tailwind 3's `outline`
-					    utility beside `outline-2`. */}
+					{/* The ring shows on plain :focus too: a sheet opened with the mouse would otherwise
+					    hide where focus starts. The style is an arbitrary property because
+					    tailwind-merge 3 drops Tailwind 3's `outline` utility beside `outline-2`. */}
 					<Button
+						ref={cancelButton}
 						variant="secondary"
 						disabled={busy}
-						autoFocus
 						className="focus:[outline-style:solid] focus:outline-2 focus:outline-offset-2 focus:outline-ds-ink"
 						onClick={() => onOpenChange(false)}
 					>
