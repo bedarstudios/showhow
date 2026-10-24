@@ -601,7 +601,7 @@ export function AgentBriefPanel({ brief }: { brief: AgentBriefController }) {
 const TOAST_CLASS =
 	"fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-[6px] bg-ds-panel px-[18px] py-[11px] font-ds-label text-[11px] uppercase tracking-[0.8px] text-ds-on-panel shadow-[4px_4px_0_var(--ds-accent)]";
 const TOAST_ACTION_CLASS =
-	"-my-1 inline-flex h-6 items-center rounded-[4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ds-accent";
+	"-my-1 inline-flex h-6 items-center rounded-[4px] uppercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-ds-accent";
 
 /**
  * Sheets and copy feedback live outside the tabs so Copy for agent works from either tab.
@@ -652,7 +652,11 @@ export function AgentBriefSheets({
 							TOAST_ACTION_CLASS,
 							"-mr-2 w-6 justify-center text-ds-on-panel-muted transition-colors hover:text-ds-on-panel motion-reduce:transition-none",
 						)}
-						onClick={dismissFailure}
+						onClick={() => {
+							dismissFailure();
+							// The focused button is about to go; keep focus on the action that failed.
+							if (brief.invoker.current?.isConnected) brief.invoker.current.focus();
+						}}
 					>
 						<X aria-hidden="true" className="size-[14px]" />
 					</button>

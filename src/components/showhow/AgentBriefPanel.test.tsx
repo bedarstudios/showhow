@@ -364,6 +364,8 @@ describe("#202 failure feedback away from the Agent brief tab", () => {
 		expect(openBrief).toHaveBeenCalledTimes(1);
 		await userEvent.click(within(toast).getByRole("button", { name: "Close notification" }));
 		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+		// Closing removes the focused button; focus returns to Copy for agent, not the page.
+		expect(copyButton()).toHaveFocus();
 	});
 
 	it("toasts a consent that could not be saved from the review sheet", async () => {
