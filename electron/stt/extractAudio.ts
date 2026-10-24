@@ -66,6 +66,93 @@ export class MediaUnreadableError extends Error {
 /** What ffmpeg's stderr says when the OS refused to open the input. */
 const ACCESS_DENIED = /operation not permitted|permission denied/i;
 
+/** Count every input audio stream without decoding the media. */
+async function countAudioTracks(
+	ffmpeg: string,
+	filePath: string,
+	signal?: AbortSignal,
+): Promise<number> {
+	const child = spawn(
+		ffmpeg,
+		[
+			"-hide_banner",
+			"-loglevel",
+			"info",
+			"-i",
+			filePath,
+			"-map",
+			"0:a",
+			"-t",
+			"0",
+			"-f",
+			"null",
+			"-",
+		],
+		{ stdio: ["ignore", "ignore", "pipe"] },
+	);
+
+	return new Promise<number>((resolve, reject) => {
+		let audioTracks = 0;
+		let mappingStarted = false;
+		let partialLine = "";
+		let stderr = "";
+		let settled = false;
+
+		const finish = (fn: () => void) => {
+			if (settled) return;
+			settled = true;
+			clearTimeout(timer);
+			signal?.removeEventListener("abort", onAbort);
+			fn();
+		};
+
+		const readLine = (line: string) => {
+			if (line.trim().startsWith("Stream mapping:")) {
+				mappingStarted = true;
+			} else if (!mappingStarted && /^\s*Stream #0:\d+.*\bAudio:/i.test(line)) {
+				audioTracks++;
+			}
+		};
+
+		const timer = setTimeout(() => {
+			child.kill("SIGKILL");
+			finish(() =>
+				reject(
+					audioTracks === 0
+						? new MediaUnreadableError(filePath, `ffmpeg timed out after ${EXTRACT_TIMEOUT_MS}ms`)
+						: new Error(`ffmpeg timed out after ${EXTRACT_TIMEOUT_MS}ms on ${filePath}`),
+				),
+			);
+		}, EXTRACT_TIMEOUT_MS);
+
+		const onAbort = () => {
+			child.kill("SIGKILL");
+			finish(() => reject(new DOMException("Aborted", "AbortError")));
+		};
+		signal?.addEventListener("abort", onAbort, { once: true });
+
+		child.stderr.on("data", (c: Buffer) => {
+			const lines = `${partialLine}${c.toString()}`.split(/\r?\n/);
+			partialLine = lines.pop() ?? "";
+			for (const line of lines) readLine(line);
+			stderr = (stderr + c.toString()).slice(-2048);
+		});
+		child.once("error", (err) => finish(() => reject(err)));
+		child.once("close", () => {
+			if (partialLine) readLine(partialLine);
+			if (audioTracks > 0) {
+				finish(() => resolve(audioTracks));
+				return;
+			}
+
+			const error = ACCESS_DENIED.test(stderr)
+				? new MediaUnreadableError(filePath, stderr.trim())
+				: new NoAudioTrackError(filePath, stderr.trim());
+			finish(() => reject(error));
+		});
+	});
+}
+
 /**
  * Decode `filePath` to mono 16 kHz float samples.
  *
@@ -82,26 +169,25 @@ export async function extractMono16kPcm(
 	const ffmpeg = resolveFfmpeg();
 	if (!ffmpeg) throw new FfmpegUnavailableError();
 	if (options.signal?.aborted) throw new DOMException("Aborted", "AbortError");
+	const audioTracks = await countAudioTracks(ffmpeg, filePath, options.signal);
+	if (options.signal?.aborted) throw new DOMException("Aborted", "AbortError");
+	const args = ["-hide_banner", "-loglevel", "error"];
+	// FFmpeg 6.1.1 can truncate same-input amix at the shorter track, so keep one input per track.
+	for (let input = 0; input < audioTracks; input++) args.push("-i", filePath);
+	if (audioTracks > 1) {
+		const inputs = Array.from({ length: audioTracks }, (_, index) => `[${index}:a:${index}]`).join(
+			"",
+		);
+		args.push(
+			"-filter_complex",
+			`${inputs}amix=inputs=${audioTracks}:duration=longest:dropout_transition=0:normalize=0,aformat=channel_layouts=mono,alimiter=limit=0.95:level=0:latency=1[aout]`,
+			"-map",
+			"[aout]",
+		);
+	}
+	args.push("-vn", "-ac", "1", "-ar", String(SAMPLE_RATE), "-f", "f32le", "-");
 
-	const child = spawn(
-		ffmpeg,
-		[
-			"-hide_banner",
-			"-loglevel",
-			"error",
-			"-i",
-			filePath,
-			"-vn",
-			"-ac",
-			"1",
-			"-ar",
-			String(SAMPLE_RATE),
-			"-f",
-			"f32le",
-			"-",
-		],
-		{ stdio: ["ignore", "pipe", "pipe"] },
-	);
+	const child = spawn(ffmpeg, args, { stdio: ["ignore", "pipe", "pipe"] });
 
 	return new Promise<Float32Array>((resolve, reject) => {
 		const chunks: Float32Array[] = [];
