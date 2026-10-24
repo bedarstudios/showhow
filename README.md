@@ -67,8 +67,6 @@ npm run i18n:check
 npm run branding:check
 ```
 
-For pre-built OpenScreen binaries on macOS, Windows, or Linux, see the [upstream releases](https://github.com/getopenscreen/openscreen/releases).
-
 ## License
 
 MIT — see [LICENSE](./LICENSE). Inherited from OpenScreen and staying that way. Free for personal and commercial use, no paid tiers, nothing behind a paywall. Attribution and import policy: [NOTICE.md](./NOTICE.md), [UPSTREAM.md](./UPSTREAM.md).
