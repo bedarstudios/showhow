@@ -36,7 +36,7 @@ key parity remain in place; this is not a translation-quality claim.
 ### Build evidence and outstanding proof
 
 - The numbered executor receipts are retained under
-  `/Users/mohamedb/dev/loop-evidence/showhow-181/executor/` with the outer heavy-runner command,
+  `~/dev/loop-evidence/showhow-181/executor/` with the outer heavy-runner command,
   stdout, stderr and exit code recorded.
 - The initial baseline contract and settings REDs in `executor/01-red-baseline-contract` and
   `executor/02-red-settings-default` were direct `npm` invocations without the heavy runner. They
@@ -67,8 +67,8 @@ key parity remain in place; this is not a translation-quality claim.
   text removal, and strip sizing/animation values, but this local run is not behavioral evidence;
   the lead will rerun the browser suite.
 - BEFORE and the pre-edit IPC RED are retained separately at
-  `/Users/mohamedb/dev/loop-evidence/showhow-181/before-native-quwdzm` and
-  `/Users/mohamedb/dev/loop-evidence/showhow-181/red-native-qkFjZT`. The latter saved a synthetic
+  `~/dev/loop-evidence/showhow-181/before-native-quwdzm` and
+  `~/dev/loop-evidence/showhow-181/red-native-qkFjZT`. The latter saved a synthetic
   transcript with a fake key configured, then timed out with zero fake requests and no NAMING.
   This is baseline evidence only. The lead owns the final native build and paired after run, full
   suites, Biome, branding and final i18n/build checks. No live-key or owner-recording run was made.
@@ -107,7 +107,7 @@ renders the Library with production CSS and synthetic landscape, portrait and sq
 checks rendered geometry and control visibility at 800×600 and 1200×800, then exercises playback,
 seeking and source switching. At 800×600 the landscape preview fills 452×254 px and the control
 row ends at y=475; at 1200×800 it fills 792×446 px. BEFORE and AFTER screenshots, geometry and
-command receipts are private under `/Users/mohamedb/dev/loop-evidence/showhow-171/`. The lead owns
+command receipts are private under `~/dev/loop-evidence/showhow-171/`. The lead owns
 packaged macOS proof and fresh independent review.
 
 ## 21 October 2026 — macOS CI package signature repair
@@ -222,7 +222,7 @@ obsolete overnight verification calls and cloud-job reference.
 
 No scope deviations. This is bounded source removal and consumer repair: no new
 product behaviour or artificial prose-token RED tests. Executor source evidence
-and snapshots are under `/Users/mohamedb/dev/loop-evidence/showhow-108/executor/`.
+and snapshots are under `~/dev/loop-evidence/showhow-108/executor/`.
 The lead owns dependency setup, retained-suite proof and fresh independent
 review. Live workflow disablement and ledger history are lead-owned receipts;
 no cloud dispatch, settings change or ledger closure occurred in Build. Merge
@@ -234,7 +234,7 @@ Dependency setup used `HUSKY=0 npm ci` under the heavy lock and passed; the
 lane's dependencies are a real local directory. Initial runtime preflight failed
 because configured Git hooks were missing; the failed receipt is retained in
 `lead/runtime-preflight.json`. The lead ran
-`env GIT_CONFIG=/Users/mohamedb/dev/loop-evidence/showhow-108/lead/scratch-husky-config npm run prepare`,
+`env GIT_CONFIG=~/dev/loop-evidence/showhow-108/lead/scratch-husky-config npm run prepare`,
 generating only ticket-local `.husky/_` files and directing the Git configuration
 write to an external scratch file. Shared Git configuration was not changed.
 Fresh preflight is retained in `lead/runtime-preflight-after-hooks.json`.
@@ -246,7 +246,7 @@ reported a cross-workspace coordinator prompt wrapper refusal: exit 1,
 (`lead/coordinator-progress.json`). This is retained as an operational refusal,
 without changing shared resource or provider settings.
 All receipt paths in this section are relative to
-`/Users/mohamedb/dev/loop-evidence/showhow-108/`. These setup observations belong
+`~/dev/loop-evidence/showhow-108/`. These setup observations belong
 to the lead; the executor did not install dependencies or run heavy proof.
 
 ---
@@ -282,7 +282,7 @@ to the lead; the executor did not install dependencies or run heavy proof.
 ## Ownership and proof limits
 
 All command receipts and preserved builds live outside the worktree at
-`/Users/mohamedb/dev/loop-evidence/showhow-110`. Failed attempts remain intact.
+`~/dev/loop-evidence/showhow-110`. Failed attempts remain intact.
 The lead owns packaged R6 GUI/transcription proof, independent native review and
 Ship. No production main, renderer, assets, dependencies, `asarUnpack`, Whisper
 model or cursor packs were changed. Executor checks alone do not establish R6.
@@ -342,7 +342,7 @@ plus the default and checked-in notices versus generated npm licence texts. Thes
 corrections, not changes to the approved product choices. No concrete requirement conflict
 was found: adapting the fixed small-model manager to bundled base is already Task 3's work.
 
-Evidence remains external at `/Users/mohamedb/dev/loop-evidence/showhow-115/`. Reused BEFORE
+Evidence remains external at `~/dev/loop-evidence/showhow-115/`. Reused BEFORE
 and RED are `lead/before/`, `lead/before-manifest.json` and `lead/before.json`, captured by the
 lead before edits; they are not fresh executor observations. Original `STOP.md`, `BUILD-RETURN.md`
 and failed raw receipts are untouched. Resumed source/check receipts, diff and hashes are in
@@ -403,7 +403,7 @@ executor. Final upstream v2.1.0 and milestone release-tag gates remain unchanged
 
 ## 2026-10-16 — #116 upstream v2 Build (in progress)
 
-- Executor w66:p2, clean base `d2e3d72f12debbb31914bcbdb22b43ba434a22fb`, lead w66:p1. User explicitly authorised Build after authentic fixture capture. Evidence: `/Users/mohamedb/dev/loop-evidence/showhow-116/executor/`. No commit, push, publication, PR merge or release authority.
+- Executor w66:p2, clean base `d2e3d72f12debbb31914bcbdb22b43ba434a22fb`, lead w66:p1. User explicitly authorised Build after authentic fixture capture. Evidence: `~/dev/loop-evidence/showhow-116/executor/`. No commit, push, publication, PR merge or release authority.
 - Configured the permanent tags-only upstream remote and verified actual rc.3 commit `523a3e4c47cf7566cc5c759ad5275f7edcd3382e`. Real `git merge --no-commit --no-ff refs/tags/upstream/v2.1.0-rc.3` stopped with conflicts. Raw stdout/stderr/exit, index stages, staged and unstaged diffs are preserved before resolution/port. `MERGE_HEAD` must remain the actual pinned parent. Final-tag ancestry is not proved; the owner-authorised eventual PR landing must use a merge commit, not squash/rebase, to retain ancestry. Coordinator then verifies the final tag on origin/main. No merge consent is implied.
 - The read-first handoff's #115 next action is stale; left it and PLAN.md unchanged. The current dispatch and closed #115/#120 dependency are authoritative.
 - Raw upstream executable conflict choices were recorded separately from the Showhow-layer port. First compatibility attempt was a setup failure (`process.getSystemVersion` in non-Electron tests); not RED. The next test reached five intended assertion failures; adding the new-recording cursor case produced six intended failures in `raw-compat-RED.json`. L5 already read the flat sidecar correctly upstream but failed the bundled video location contract; no claim that the raw sidecar convention was broken. `compat-port-attempt-1.json` passed all six after port. This is source/OS-adapter proof, not native capture or packaged acceptance.
@@ -498,7 +498,7 @@ Pinned stable native unit proof: compositor full402 PASS and decoder3 PASS in ex
 
 Remaining exact external test/document disposition packet `aggregate-required-scope-v2/RETURN-SCOPE.md` preserves initial drafts. Helper arch selector read-contract correction is separate from target naming; independent external source cases: lead `helper-arch-contract/result.json`, baseline6/6, stable2/6, proposed6/6, including nullish empty-string semantics. Source not changed while native build freeze is active. `mp4BitrateScaling.test.ts` adds only required frameRate30 at four call sites under routine signature adaptation; all five assertions retained. No #117/#118 implementation or old web exporter restoration.
 
-All current stable evidence lives under `/Users/mohamedb/dev/loop-evidence/showhow-116/stable-build-20261016T232310Z/executor/`. RC/READY5 proof remains historical only. HEAD d2e3d72 and real pending stable merge parent eff86dcba remain; no commit/push/publication/PR/review or final acceptance claim. Failed-review count0; reviewer identity unattempted; Standards/Requirements no verdict.
+All current stable evidence lives under `~/dev/loop-evidence/showhow-116/stable-build-20261016T232310Z/executor/`. RC/READY5 proof remains historical only. HEAD d2e3d72 and real pending stable merge parent eff86dcba remain; no commit/push/publication/PR/review or final acceptance claim. Failed-review count0; reviewer identity unattempted; Standards/Requirements no verdict.
 
 
 ### 2026-10-17 stable final-toolchain Build / parallel Prove transfer
@@ -833,8 +833,8 @@ The four old-to-current log mappings are: `ci-attempt-01/02-npm-branding:check.t
 
 - 2026-10-17: Approved scope is the Showhow AI guide Plan in PLAN.md, R1–R7 / C1–C7. Executor w6K:p2, base 3e587dc9178d380ca402b77b5a8e38e026dfa68b. No commit, publication or review authority.
 - Read full saved issue (no comments) in build-entry.jsonl, project/Loop instructions, executor/TDD/codebase-design/better-ui skills, eight locked Library frames and renderer BEFORE. Lead also captured production Electron offline BEFORE before source edits.
-- Model lookup: unauthenticated GET https://openrouter.ai/api/v1/models on 2026-10-17. Raw response: /Users/mohamedb/dev/loop-evidence/showhow-122/executor/openrouter-models.json. Pin `google/gemini-3.8-flash`: current non-preview Flash model, text/image input, text output, response_format and structured_outputs supported. No inference request made.
-- RED/GREEN raw command, stdout, stderr and exits are under /Users/mohamedb/dev/loop-evidence/showhow-122/executor/. Tests use injected fake models only. Real-key macOS acceptance remains an owner gate handled by lead.
+- Model lookup: unauthenticated GET https://openrouter.ai/api/v1/models on 2026-10-17. Raw response: ~/dev/loop-evidence/showhow-122/executor/openrouter-models.json. Pin `google/gemini-3.8-flash`: current non-preview Flash model, text/image input, text output, response_format and structured_outputs supported. No inference request made.
+- RED/GREEN raw command, stdout, stderr and exits are under ~/dev/loop-evidence/showhow-122/executor/. Tests use injected fake models only. Real-key macOS acceptance remains an owner gate handled by lead.
 - Main-process security and payload coverage: registered handler callbacks enforce stored key + provider consent, sender/bundle-bound one-use preview tokens, canonical root and symlink checks, source signature comparison, and exact retained request payload. Real FFmpeg image proof covers JPEG conversion and 1024px bound; narration proof extracts actual local video frames at transcript starts. No network in tests.
 - The lead approved only the five necessary Showhow declarations in electron/electron-env.d.ts on 2026-10-17. This is documented in docs/architecture/upstream-touchpoints.md. No upstream editor/provider implementation changes.
 - New Showhow strings are present in all 15 locale common.json files. Non-English entries use English fallback copy in this ticket; no translated-language quality claim.
@@ -877,7 +877,7 @@ The four old-to-current log mappings are: `ci-attempt-01/02-npm-branding:check.t
 - Conditional ownership was reproduced before edits in external EXECUTOR-STATUS.md and pinned whisper-v1.9.1.cpp. Stable prepare ensured/downloaded small/VAD before paths and optional alignment acquisition belongs to SttManager: bundled mode verifies both local files before helper start, never invokes fixed-model downloading or optional CTC acquisition. Stable small/VAD/cache/CTC APIs and tests remain. Pinned API lines387/389 select BASE (layers3–5) vs SMALL (layers5–10); lines1191–1194 reject heads beyond decoder depth. Existing helper CLI now accepts bounded --dtw-model base|small, default small, no HTTP protocol/catalogue/glossary/native capture changes. Wrapper same-package RED lacked the flag for both modes, then GREEN; script accepts --model and --dtw-model for same-helper proofs.
 - Build fetch pins base revision `5359861c739e955e79d9a303bcbc70fb988958b1`, SHA256 `422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898`, 59707625bytes; VAD revision `9ffd54a1e1ee413ddf265af9913beaf518d1639b`, SHA256 `2aa269b785eeb53a82983a20501ddf7c1d9c48e33ab63a41391ac6c9f7fb6987`, 885098bytes. Download and digest-checked cache rerun pass. MIT sources/attribution recorded in THIRD-PARTY-NOTICES. Builder copies only these two assets; no118size trim.
 - Coordinator clearance in owner steering authorizes only matching package-lock dependency removal under R3.5. Regeneration removes22 entries, adds0, changes0 retained versions/integrities; remaining changes are npm dev-ownership metadata after Xenova removal. Baseline and regenerated npm ci both pass. No upgrades/audit fixes.
-- Exact commands/stdout/stderr/exits, meaningful RED assertions and retained setup failures are in `/Users/mohamedb/dev/loop-evidence/showhow-117/executor-command-receipts.jsonl`. Native save seam RED was pending vs `[0:02] Open settings`; offline manager RED was missing ensureBundledModels call; zero-audio RED resolved empty success instead of rejecting; wrapper RED omitted --dtw-model. Initial manager test setup errors are retained and are not claimed as meaningful RED. Focused95/source checks and full-suite totals are finalized in external EXECUTOR-TRANSFER.md.
+- Exact commands/stdout/stderr/exits, meaningful RED assertions and retained setup failures are in `~/dev/loop-evidence/showhow-117/executor-command-receipts.jsonl`. Native save seam RED was pending vs `[0:02] Open settings`; offline manager RED was missing ensureBundledModels call; zero-audio RED resolved empty success instead of rejecting; wrapper RED omitted --dtw-model. Initial manager test setup errors are retained and are not claimed as meaningful RED. Focused95/source checks and full-suite totals are finalized in external EXECUTOR-TRANSFER.md.
 - Lint initially scanned generated native `.cache` files and failed. A targeted formatter mistakenly included generated untracked TS/JSON paths; exact selection/failure is retained in EXECUTOR-FORMATTER-SCOPE-ERROR.json. No C++ or CMake definitions were selected, no unproven restoration attempted. Lead preserved/relocated the tree; actual-checkout lint then passes without config/ignore changes. Native-ready runtime source hashes remain unchanged; wrapper test formatting alone differs from the initial test freeze.
 - Native prerequisite correction: lead found retained CMake/Ninja and freshly verified hashes; owner did not install/supply new tools. Lead reports native-build-1 exit0 with sourceMismatches[] and staged fresh helper/dylibs. Executor runs no competing native/package build and claims no native runtime/package pass. Lead owns same-helper base/small/offline and package proofs, followed by fresh independent review; physical Wi-Fi-off/new-recording and missing-model acceptance remain owner-only. No Windows/Linux runtime acceptance is claimed.
 
@@ -887,7 +887,7 @@ The four old-to-current log mappings are: `ci-attempt-01/02-npm-branding:check.t
 
 ## Showhow #118 — bounded v2 package trim (executor Build, 2026-10-17)
 
-- Task4/R4.1–R4.5 only; feature, non-priority; failed-review count0. Lead released Build only after fresh exact-#117-merge `371d940d14d7392ae090b9bfc57b2cf311c6de78` arm64 DMG and installed-from-DMG measurements: 204930830 bytes / 195.43726921081543 MiB DMG; 383115264 allocated bytes / 365.3671875 MiB installed. Directory package was 371.77734375 MiB. Baseline was already below400; RED is content policy, never an oversize claim. BEFORE.json/BEFORE.md and all setup failures remain in `/Users/mohamedb/dev/loop-evidence/showhow-118/`.
+- Task4/R4.1–R4.5 only; feature, non-priority; failed-review count0. Lead released Build only after fresh exact-#117-merge `371d940d14d7392ae090b9bfc57b2cf311c6de78` arm64 DMG and installed-from-DMG measurements: 204930830 bytes / 195.43726921081543 MiB DMG; 383115264 allocated bytes / 365.3671875 MiB installed. Directory package was 371.77734375 MiB. Baseline was already below400; RED is content policy, never an oversize claim. BEFORE.json/BEFORE.md and all setup failures remain in `~/dev/loop-evidence/showhow-118/`.
 - Main/preload inventory covers six generated chunks, hashes, literal external loads, computed LangChain provider imports and native require aliases. The product passes constructed, statically bundled chat-model instances to its sole createAgent call; the universal string-model provider loader is not reached. Runtime npm allow-list is empty, with the reason recorded in the audit and external inventory/reachability receipts. Remove obsolete ws packaging only; dependency sections and lockfile stay unchanged. No Vite change.
 - Chromium retains the stable-derived15app locales plus required en/en-GB (16 macOS lproj identifiers, including cs/de and en_GB). Wallpaper audit matches the longest known relative suffix so 18originals and18same-named thumbnails remain distinct; both sets still ship exactly once. Retain referenced rec-button.png (recording tray) and showhow.png (default tray/favicon/logo); only existing unreferenced demo/preview images are excluded. The initial rec-button.png classification was wrong and is repaired after first review. Budget/default package command now explicitly uses400MiB.
 - Public CLI fixtures cover empty npm tree, forbidden archived/unpacked packages, required locales, duplicate/missing wallpapers and thumbnails, excluded images on disk and in ASAR, explicit/default budgets and native addon placement. Native fixture uses the real compositor_view.node filesystem path with structural placeholder bytes; it proves audit acceptance only, never native execution. Packed .node files fail while filesystem/unpacked addons remain accepted. No native npm dependency is invented.
@@ -915,7 +915,7 @@ The design has eleven reusable components, eight landing colour variables,
 three landing font variables, desktop TRpgX, mobile ma1pm, states J82Ol2, and
 component sheet Ro86s. Four scale-1 PNGs and REPORT.md are in design/landing-final/.
 The final check and probe files are external:
-`/Users/mohamedb/dev/loop-evidence/showhow-134/executor/`.
+`~/dev/loop-evidence/showhow-134/executor/`.
 The verification script exits 0. All five inherited PNG exports are byte-identical
 to the before/ files. The current palette/font walks are green. The only visible
 layout warning is the intended desktop hero image crop.
@@ -948,7 +948,7 @@ final frames before Task 2. No commit, push, PR, merge, tag, or Greptile run occ
 Hosted CI rejected the approved FAQ fork attribution at PR head
 `5c3d1ec7f85aa499843781b15e6fe1ff114809ff` (tree prefix `03991db`).
 The failed log remains at
-`/Users/mohamedb/dev/loop-evidence/showhow-134/ci-job-117690407133-failed.txt`.
+`~/dev/loop-evidence/showhow-134/ci-job-117690407133-failed.txt`.
 Its pen line numbers 5635, 6613, and 7130 are provenance, not policy selectors.
 
 Add one exact-text allowance with maximum count 3 for the required attribution
@@ -968,7 +968,7 @@ review count remains 0. No staging, commit, push, or native UI action occurred.
 ## Showhow #125 — executor setup, 2026-10-18
 
 - Approved external plan appended verbatim to PLAN.md. Base/head e54cc63e3d2cd72430588906d5550f7a968daf1a; executor w6X:p2, lead w6X:p1, failed-review count 0. Full issue/comments read from external ISSUE.json after role gh returned unauthenticated exit 4; no auth changes.
-- No reproduced playback RED and no product source/test changes. Scratch driver, source/dependency copies, native artifacts, package and receipts remain under /Users/mohamedb/dev/loop-evidence/showhow-125/. Lead owns native CUA and six-take Prove; executor performs no Play/Pause or UI automation.
+- No reproduced playback RED and no product source/test changes. Scratch driver, source/dependency copies, native artifacts, package and receipts remain under ~/dev/loop-evidence/showhow-125/. Lead owns native CUA and six-take Prove; executor performs no Play/Pause or UI automation.
 - Physical package copy manifest and archive hash match untouched #118 artifact built at b0e872f3. Full git comparison to current head changes only four documentation files, establishing relevant runtime source equivalence; reuse is explicit, not a fresh package build. Fresh dev renderer/main build under heavy scheduler exits 0 (executor/build2.json). First build wrapper failed after build on zsh readonly status; outputs retained. No shared dependency/cache mutation.
 - Lead first dev setup exposed Tailwind plugin resolution from lane process cwd. No recording/playback attempt occurred. Scratch driver now sets cwd to its source before Vite imports, uses empty envDir and checkout-local separate caches, and requires a rendered preload-capable page with no Vite error overlay before readiness. Use fresh c/d caches; retain failed a root.
 - Lead also exposed cleanup access to app.process() after app.close(). Scratch driver now freezes Electron PID, tracks owned children with birth times independently of Playwright lifecycle, closes Vite/esbuild and marks closed only after cleanup assertions. Old Electron 70639 is absent (ps exit1). Port5173 listener PID74728 belongs to the lead new dev-clean-c-warm-c driver, not the failed a run; no process was terminated. Exact ps/lsof outputs remain external receipts.
@@ -987,7 +987,7 @@ review count remains 0. No staging, commit, push, or native UI action occurred.
 
 ### Final executor return — #125, 2026-10-18
 
-- Lead final matrix: six takes attempted, saved and independently decoded. Under `/Users/mohamedb/dev/loop-evidence/showhow-125/runs/`: `packaged-1` PASS (0.5→4.3s, red9→green48); `dev-clean-f-warm-f` clean first Play RED (0.4→7.2s, native red3 frozen), unchanged replay PASS (green10→green47), warm PASS (0.5→4.9s, blue1556→red1599); `dev-clean-g-warm-g` clean bounded PASS (0.4→7.3s, red3→blue29, lag unquantified), warm unresolved RED (arrived playing, then ended11s; Play click/Return did not restart, unexpected annotation/inherited playback); `packaged-2` PASS (0.4→4.8s, green10→blue53). Native assertions/screenshots belong to the lead and remain unchanged. Four bounded PASS, two unresolved dev outcomes; one observed frozen first-play event. This is not non-reproduction or a green Prove.
+- Lead final matrix: six takes attempted, saved and independently decoded. Under `~/dev/loop-evidence/showhow-125/runs/`: `packaged-1` PASS (0.5→4.3s, red9→green48); `dev-clean-f-warm-f` clean first Play RED (0.4→7.2s, native red3 frozen), unchanged replay PASS (green10→green47), warm PASS (0.5→4.9s, blue1556→red1599); `dev-clean-g-warm-g` clean bounded PASS (0.4→7.3s, red3→blue29, lag unquantified), warm unresolved RED (arrived playing, then ended11s; Play click/Return did not restart, unexpected annotation/inherited playback); `packaged-2` PASS (0.4→4.8s, green10→blue53). Native assertions/screenshots belong to the lead and remain unchanged. Four bounded PASS, two unresolved dev outcomes; one observed frozen first-play event. This is not non-reproduction or a green Prove.
 - Both g editor snapshots timed out; other windows replied. Direct g CDP read was rejected because the owned process had already exited. No playing/ref state was captured during either dev failure. f end-state CDP showed healthy ended HTMLVideo/hardware backend, not the state during its freeze. Saved f source frames independently changed. Retained g logs show initial Vite connection and missing base-model transcript failure, without a recorded optimiser reload in that interval. Automatic model work/contention, stale UI/action/focus, initialization/transport/ref state and dev launch-boundary differences remain hypotheses. Historical transformers causation is unknown; no obsolete include or fix was added.
 - Read-only source inspection finds `PreviewCanvas.tsx` recreates its video-element relay on render; `VirtualPreview` depends on that callback and notifies null/current element on rebinding. The relay treats null as playing through `!el?.paused`. `NewEditorShell` already binds play/pause listeners and reconciles the bound element's paused state. Callback churn is a concrete integration pattern, but the current observations do not demonstrate it caused native freeze or failed restart. No correct failure-bound regression or smallest repair is established within the approved paths.
 - External `EXECUTOR-RETURN.md` proposes only a bounded integration amendment for `src/components/ai-edition/PreviewCanvas.tsx` and new same-package `src/components/ai-edition/PreviewCanvas.playback.test.tsx`; it is a proposal, not approval or a source change. R3 remains unresolved. Lead owns STOP, final candidate binding and owner scope routing; no green Prove, independent review or PR readiness. Failed-review count0; reviewer identity not observed. All app closes were requested by lead; final process/cleanup acceptance belongs to lead receipts. No further tests, source fix, commit, push or publication by executor.
@@ -1418,7 +1418,7 @@ is covered by the new tests.
 - The first production-CSS browser attempt failed because its fixture imported only the module CSS,
   omitting app `index.css` and Tailwind preflight. It measured 176 px (160 px content plus 16 px
   padding). The failure screenshot was copied before rerun to
-  `/Users/mohamedb/dev/loop-evidence/showhow-172/launcher-preview-browser-green-failure.png`
+  `~/dev/loop-evidence/showhow-172/launcher-preview-browser-green-failure.png`
   (SHA-256 `0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd`). The browser test
   now imports the existing production `@/index.css`; no production size was changed and the bound
   remains 160 px.
@@ -1436,7 +1436,7 @@ is covered by the new tests.
   final macOS package/signature checks and synthetic native-input proof. None of those are claimed
   complete here. The lead-owned generated compositor binary was preserved. The lead relocated this
   executor's BEFORE-generated `.vite-cache/` from the worktree to
-  `/Users/mohamedb/dev/loop-evidence/showhow-172/before-vite-cache`; `VITE-CACHE-MOVE.json` records
+  `~/dev/loop-evidence/showhow-172/before-vite-cache`; `VITE-CACHE-MOVE.json` records
   the move. Nothing was deleted, and the browser AFTER runner now uses an external cache. The move
   made no product or configuration changes.
 
@@ -1520,7 +1520,7 @@ canonical imported path under a symlinked root. Each read followed a synthetic s
 Outside-root IPC returned `{success:false}` on both root layouts. The symlink-root AFTER run replaced
 only one native file selection with the exact committed synthetic MP4 path; import, Copy Path and
 clipboard stayed real. No installer, physical capture, provider or other-platform acceptance is claimed.
-Evidence: `/Users/mohamedb/dev/loop-evidence/showhow-174/PROVE.md`.
+Evidence: `~/dev/loop-evidence/showhow-174/PROVE.md`.
 
 ## 22 October 2026 — Showhow #177 One-click navigation
 
@@ -1554,9 +1554,9 @@ the new assertion passed focused GREEN. The subsequent full unit run passed 4,94
 files with 2 skipped. Production/test TypeScript and lint passed. Include
 `NewEditorShell.finalShell.test.tsx` in future affected navigation coverage; no product code changed.
 
-The first native AFTER (`/Users/mohamedb/dev/loop-evidence/showhow-177/after-native-1792698332820/03-editor-0.png`)
+The first native AFTER (`~/dev/loop-evidence/showhow-177/after-native-1792698332820/03-editor-0.png`)
 failed to show the Library outline and is retained. The lead's final native observation is in
-`/Users/mohamedb/dev/loop-evidence/showhow-177/after-native-1792698702155`: see `01-library-0.png`,
+`~/dev/loop-evidence/showhow-177/after-native-1792698702155`: see `01-library-0.png`,
 `03-editor-0.png`, `05-hud-idle-0.png` and `06-hud-keyboard-tooltip-0.png`. The Library button
 measured solid 1px with `rgba(255,252,247,.12)`, its no-drag behavior held, the divider measured
 1x16px, and keyboard focus showed a 2px sage ring. The rendered order was Library then Edit video.
@@ -1564,8 +1564,8 @@ Tab 7 → Enter opened Editor from Library, Tab 2 → Enter returned to Library 
 Tab 1 → Enter opened Library from the idle HUD through production IPC.
 
 The decisive same-root comparison is documented in
-`/Users/mohamedb/dev/loop-evidence/showhow-177/MEDIA-COMPARISON.md` and
-`/Users/mohamedb/dev/loop-evidence/showhow-177/MEDIA-COMPARISON.json`. Baseline `4dd318ec0042015fb84b9e0f5899dcfbb4b1969c`
+`~/dev/loop-evidence/showhow-177/MEDIA-COMPARISON.md` and
+`~/dev/loop-evidence/showhow-177/MEDIA-COMPARISON.json`. Baseline `4dd318ec0042015fb84b9e0f5899dcfbb4b1969c`
 and candidate used the same Electron binary, runtime roots, synthetic fixture and Library → Editor
 → Library sequence. Both initial and returned videos had `error: null`, `readyState: 4`,
 `networkState: 1` and duration 2s. The media request returned 206 for the full 23,869 bytes, editor
@@ -1591,16 +1591,16 @@ context menu while idle and opens the stored menu on right-click; recording keep
 menu. Other platforms retain their existing tray routing.
 
 The lead's native AFTER at
-`/Users/mohamedb/dev/loop-evidence/showhow-175/after-native-1792707822314/result.json` confirmed
+`~/dev/loop-evidence/showhow-175/after-native-1792707822314/result.json` confirmed
 the tray event created a visible HUD, but settled snapshots showed it unfocused. Tray-created HUDs
 now focus after `ready-to-show`; non-tray creation keeps its prior behavior. The later minimized-HUD
 repeat attempts in that run did not reach the app. The subsequent native route and restore results
 are documented below.
 
 The initial three-case RED is in
-`/Users/mohamedb/dev/loop-evidence/showhow-175/lead-commands/20261022T221505.692806Z-executor-tray-red`;
+`~/dev/loop-evidence/showhow-175/lead-commands/20261022T221505.692806Z-executor-tray-red`;
 the initial six-case GREEN is in
-`/Users/mohamedb/dev/loop-evidence/showhow-175/lead-commands/20261022T222139.805451Z-executor-tray-green-caller`;
+`~/dev/loop-evidence/showhow-175/lead-commands/20261022T222139.805451Z-executor-tray-green-caller`;
 the follow-up focus RED/GREEN are in `executor-focus-red` and `executor-focus-green`. The post-focus
 full unit run, production and test TypeScript, full Biome check and `build-vite` receipts are in
 `executor-focus-unit-full`, `executor-focus-tsc-prod`, `executor-focus-tsc-test`,
@@ -1610,7 +1610,7 @@ documented below; no full installer or executor GUI check was run.
 ### Bounded macOS tray routing repair
 
 The lead's second native AFTER at
-`/Users/mohamedb/dev/loop-evidence/showhow-175/after-native-1792708215229/result.json`
+`~/dev/loop-evidence/showhow-175/after-native-1792708215229/result.json`
 captured a real status-item mouse-down at `1792708231046` and mouse-up at `1792708231130`,
 with `clicks: 0`, `rights: 0`, no double-click, and `menuAttached: false`. Library window 1
 remained visible and focused; the expected tray activation count was 1. This isolates the missed
@@ -1621,9 +1621,9 @@ same-package test exercises the registration seam that `createTray` calls, inclu
 of macOS click/double-click listeners, so a single native activation cannot be routed twice.
 
 The intended routing RED is recorded at
-`/Users/mohamedb/dev/loop-evidence/showhow-175/lead-commands/20261022T223218.466900Z-executor-routing-red`
+`~/dev/loop-evidence/showhow-175/lead-commands/20261022T223218.466900Z-executor-routing-red`
 (exit 1: macOS mouse-up listener expected 1, observed 0). GREEN is at
-`/Users/mohamedb/dev/loop-evidence/showhow-175/lead-commands/20261022T223317.591708Z-executor-routing-green`
+`~/dev/loop-evidence/showhow-175/lead-commands/20261022T223317.591708Z-executor-routing-green`
 (exit 0, 9/9 tests). The post-repair full checks are recorded as follows; each receipt directory
 contains the exact `command.json`, `stdout`, `stderr`, and `exit`:
 
@@ -1636,7 +1636,7 @@ contains the exact `command.json`, `stdout`, `stderr`, and `exit`:
   (exit 0; no installer).
 
 The lead's final native AFTER PASS is recorded at
-`/Users/mohamedb/dev/loop-evidence/showhow-175/after-native-1792708502565/result.json`. Real
+`~/dev/loop-evidence/showhow-175/after-native-1792708502565/result.json`. Real
 status-item left mouse-up from Library created a focused HUD; a minimized existing HUD restored and
 focused; and an absent HUD was recreated and focused. With synthetic recording state set through
 `setRecordingState(true, undefined, system)`, a real left-click kept existing HUD window 5 and
@@ -1657,17 +1657,17 @@ font shorthand resets line height uses `leading-[normal]`; help dividers start a
 The original 520x640 native window clipped scenario B: the captured viewport was 608 px high,
 `scrollHeight` was 631 px, and the disabled Get started button ended at y=630.89. The exact approved
 mock measured 664 px for B at both 520 and 540 px widths. The failed capture and metrics remain at
-`/Users/mohamedb/dev/loop-evidence/showhow-187/after-native-1792710532563/`; no permission state was
+`~/dev/loop-evidence/showhow-187/after-native-1792710532563/`; no permission state was
 changed. The baseline C footer also reported “Screen recording is needed to record” and was not
 treated as evidence of a ready state.
 
 Supervisor w5N:pX approved the bounded geometry exception in
-`/Users/mohamedb/dev/loop-evidence/showhow-187/SUPERVISOR-GEOMETRY-APPROVAL.txt`: permissions
+`~/dev/loop-evidence/showhow-187/SUPERVISOR-GEOMETRY-APPROVAL.txt`: permissions
 window 540x680, keep `resizable: false`, and keep every other window option unchanged apart from
 the previously approved theme-aware background. This is the only deviation from the original
 window-size boundary. The original `STOP.md` and failed native result remain unchanged; the approval
 supersedes the stop. The lead's rebuilt native AFTER PASS is recorded at
-`/Users/mohamedb/dev/loop-evidence/showhow-187/after-native-1792710807947/result.json`: required
+`~/dev/loop-evidence/showhow-187/after-native-1792710807947/result.json`: required
 E/B/C light and dark captures all measured a 540x648 viewport with scrollWidth/scrollHeight 540/648;
 footer buttons ended at y=624, leaving 24 px below. The real E snapshot reported Screen Recording,
 Accessibility, microphone, and camera granted, with system audio not requested. Additional A/D/F
@@ -1677,7 +1677,7 @@ opened the menu through CUA, and saw keyboard focus in
 remains preserved unchanged.
 
 Executor receipts are preserved under
-`/Users/mohamedb/dev/loop-evidence/showhow-187/executor/`: `RED-001` (exit 1, three intended
+`~/dev/loop-evidence/showhow-187/executor/`: `RED-001` (exit 1, three intended
 regression failures), `GREEN-003` (14/14), `TSC-003` (scheduler exit 75, command not started),
 `TSC-004` (exit 0), `LINT-002` (exit 0, 28 repository warnings, none in owned files),
 `I18N-002` (exit 0), and `BRANDING-002` (exit 0). `TSC-003` is retained as NOT RUN; `TSC-004` is
@@ -1691,15 +1691,15 @@ checks, followed by fresh independent review. No commit or push was made.
 
 Selecting a listed model or entering an Other model ID passes the exact slug through the existing `llmSetConfig` path. Unknown saved IDs appear under Other with their value retained. API-key save/removal still uses the existing OpenRouter bridge calls. The repeated own-key sentence was removed from `AiConnections`; callers provide it in their parent copy, and the standalone component keeps its OpenRouter heading.
 
-Four separately run RED cases and their GREEN counterparts are retained under `/Users/mohamedb/dev/loop-evidence/showhow-178/native-harness/red/` and `green-final2/`. The complete `AiConnections.test.tsx` suite and unchanged `electron/showhow/guideModel.test.ts` seam both passed under the heavy runtime wrapper; receipts are under `focused-final/`. Earlier test attempts are retained in their original `green/`, `green-retry/`, and `focused/` folders and are not the passing receipts. The first full proof run's exact locale parity failures and scoped Biome failures remain preserved under `/Users/mohamedb/dev/loop-evidence/showhow-178/prove/`.
+Four separately run RED cases and their GREEN counterparts are retained under `~/dev/loop-evidence/showhow-178/native-harness/red/` and `green-final2/`. The complete `AiConnections.test.tsx` suite and unchanged `electron/showhow/guideModel.test.ts` seam both passed under the heavy runtime wrapper; receipts are under `focused-final/`. Earlier test attempts are retained in their original `green/`, `green-retry/`, and `focused/` folders and are not the passing receipts. The first full proof run's exact locale parity failures and scoped Biome failures remain preserved under `~/dev/loop-evidence/showhow-178/prove/`.
 
-Supervisor w5N:pX approved the locale-scope exception recorded in `/Users/mohamedb/dev/loop-evidence/showhow-178/LOCALE-SCOPE-APPROVED.txt`: the four new `showhowGuide` keys use English placeholders in the other 14 `common.json` files. A search found no code reference to `showhowGuide.defaultModel`, so that obsolete key was removed from all 15 locale files. No parity checker or test was changed. The second full proof pass in `/Users/mohamedb/dev/loop-evidence/showhow-178/prove2/` passed all checks and the build for the locale-expanded candidate before the picker clipping repair.
+Supervisor w5N:pX approved the locale-scope exception recorded in `~/dev/loop-evidence/showhow-178/LOCALE-SCOPE-APPROVED.txt`: the four new `showhowGuide` keys use English placeholders in the other 14 `common.json` files. A search found no code reference to `showhowGuide.defaultModel`, so that obsolete key was removed from all 15 locale files. No parity checker or test was changed. The second full proof pass in `~/dev/loop-evidence/showhow-178/prove2/` passed all checks and the build for the locale-expanded candidate before the picker clipping repair.
 
-Native AFTER showed the original 288px menu cap clipped Gemini and Other; the preserved RED screenshot is `/Users/mohamedb/dev/loop-evidence/showhow-178/native-harness/after-native-WEVlxA/AFTER-open-list.png`. The picker now caps to Radix's available content height so the default window can show all six entries while Radix's viewport remains vertically scrollable when space is limited. After this repair, the focused component suite passed 5/5 and the focused Biome check passed; receipts are in `native-harness/focused-after-clip/`. The lead owns the final rebuild and native GREEN repeat with the all-six-bounds assertion.
+Native AFTER showed the original 288px menu cap clipped Gemini and Other; the preserved RED screenshot is `~/dev/loop-evidence/showhow-178/native-harness/after-native-WEVlxA/AFTER-open-list.png`. The picker now caps to Radix's available content height so the default window can show all six entries while Radix's viewport remains vertically scrollable when space is limited. After this repair, the focused component suite passed 5/5 and the focused Biome check passed; receipts are in `native-harness/focused-after-clip/`. The lead owns the final rebuild and native GREEN repeat with the all-six-bounds assertion.
 
-The lead's isolated native Settings-sheet follow-up found the Radix menu portal rendered at `z-index: 50` under the two Showhow sheets at `z-index: 10000`; `elementFromPoint` hit the overlay instead of the list, and the captured screenshot showed the menu invisible. The retained native RED evidence is `/Users/mohamedb/dev/loop-evidence/showhow-178/native-harness/sheet-native-QFdX53/result.json` and `SHEET-open-list.png`. `AiConnections` now layers its portal at `z-[10001]` so the model picker remains usable above the existing sheet layer. No sheet code or class-string test assertion was added; the lead owns the native hit-test GREEN proof and a fresh review of this source follow-up.
+The lead's isolated native Settings-sheet follow-up found the Radix menu portal rendered at `z-index: 50` under the two Showhow sheets at `z-index: 10000`; `elementFromPoint` hit the overlay instead of the list, and the captured screenshot showed the menu invisible. The retained native RED evidence is `~/dev/loop-evidence/showhow-178/native-harness/sheet-native-QFdX53/result.json` and `SHEET-open-list.png`. `AiConnections` now layers its portal at `z-[10001]` so the model picker remains usable above the existing sheet layer. No sheet code or class-string test assertion was added; the lead owns the native hit-test GREEN proof and a fresh review of this source follow-up.
 
-Supervisor w5N:pX approved a bounded Mock E deviation for PR #193 on 2026-10-23: replace only the OpenAI and Google picker entries with `openai/gpt-6.1-sol` (GPT-6.1 Sol) and `google/gemini-4-argon` (Gemini 4 Argon). Both exact IDs and catalogue names are present in the same captured primary OpenRouter catalogue recorded in `/Users/mohamedb/dev/loop-evidence/showhow-178/SUPERVISOR-MODEL-DELTA-VERIFICATION.json`; the raw response is `openrouter-models-20261023.json`. The three Claude entries and Haiku default remain unchanged. The earlier model-ID history and dated approval are preserved in `/Users/mohamedb/dev/loop-evidence/showhow-178/MODEL-IDS.md`.
+Supervisor w5N:pX approved a bounded Mock E deviation for PR #193 on 2026-10-23: replace only the OpenAI and Google picker entries with `openai/gpt-6.1-sol` (GPT-6.1 Sol) and `google/gemini-4-argon` (Gemini 4 Argon). Both exact IDs and catalogue names are present in the same captured primary OpenRouter catalogue recorded in `~/dev/loop-evidence/showhow-178/SUPERVISOR-MODEL-DELTA-VERIFICATION.json`; the raw response is `openrouter-models-20261023.json`. The three Claude entries and Haiku default remain unchanged. The earlier model-ID history and dated approval are preserved in `~/dev/loop-evidence/showhow-178/MODEL-IDS.md`.
 
 ## 23 October 2026 — Showhow #179 recording Trash
 
@@ -1715,7 +1715,7 @@ GREEN exercises expiry with no Sonner renderer mounted plus a stale action invoc
 
 Necessary caller alignment added src/components/showhow/LibraryRow.tsx, src/components/ai-edition/v4/EditorTopBar.tsx, and src/components/ai-edition/NewEditorShell.tsx, with focused tests in their owning packages. This is bounded to the four issue entry points. Supervisor w5N:pX approved the standing locale rule for this ticket: new showhowTrash keys use English placeholder values in all other 14 locale files, keeping all 15 structures aligned. No parity checker or test was weakened.
 
-RED evidence is preserved at /Users/mohamedb/dev/loop-evidence/showhow-179/red-renderer-baseline-20261023/, red-editor-topbar-20261023/, red-editor-shell-20261023/, and red-window-swap-expiry-20261023/. Some final interaction cases were added after the initial UI draft; the archived baseline runs exposed the missing entry/menu paths, and the final candidate focused run covers Save ordering/failure, Discard, Cancel, project switching, and deferred Trash IPC with new dirty work. The exact passing receipt is /Users/mohamedb/dev/loop-evidence/showhow-179/checks-20261023/focused-tests-final.json (4 files, 135 passed). Main filesystem behavior is exercised by electron/showhow/trashRecording.test.ts, not renderer-only mocks.
+RED evidence is preserved at ~/dev/loop-evidence/showhow-179/red-renderer-baseline-20261023/, red-editor-topbar-20261023/, red-editor-shell-20261023/, and red-window-swap-expiry-20261023/. Some final interaction cases were added after the initial UI draft; the archived baseline runs exposed the missing entry/menu paths, and the final candidate focused run covers Save ordering/failure, Discard, Cancel, project switching, and deferred Trash IPC with new dirty work. The exact passing receipt is ~/dev/loop-evidence/showhow-179/checks-20261023/focused-tests-final.json (4 files, 135 passed). Main filesystem behavior is exercised by electron/showhow/trashRecording.test.ts, not renderer-only mocks.
 
 Candidate checks: the current focused main Trash service, Library, editor topbar, and NewEditorShell suite passed 136/136 at checks-20261023/focused-tests-deadline-final.json; the earlier 135-test receipt is superseded. checks-20261023/tsc-deadline-final.json passed after the deadline timer change. checks-20261023/biome-deadline-final.json passed with three warnings (one missing openVoiceoverFlow dependency elsewhere in NewEditorShell and two empty-block warnings already present in the TopBar test). checks-20261023/i18n.json passed across all 15 locales. checks-20261023/build-vite.json passed before the final JSX containment cleanup and deadline timer, so lead owns the exact candidate rebuild. Formatting and import sorting for changed files are complete. The deadline seam's behavioral RED and GREEN, plus two preserved test-harness attempts and their classifications, are in checks-20261023/toast-deadline-*.json/log. The initial duplicate --run attempt and zsh receipt-variable error remain recorded as setup/capture failures, not product RED. The successful build-vite emitted the repository's existing stale Browserslist-data and dynamic-chunk warnings.
 
@@ -1724,31 +1724,31 @@ Lead-owned native product proof has not run. The prior isolated native environme
 ## 23 October 2026 — Showhow #179 final Prove and native proof
 
 This addendum supersedes the preceding status that native product proof had not run. Lead Prove
-`/Users/mohamedb/dev/loop-evidence/showhow-179/lead-prove-j0And4/CHECKS.json` records full unit
+`~/dev/loop-evidence/showhow-179/lead-prove-j0And4/CHECKS.json` records full unit
 tests passing (4,990 passed, 2 skipped), browser tests passing (29), full Biome exit 0 with 28
 warnings, and passing i18n, branding, and build-vite checks. Test TypeScript initially exited 2;
 the exact diagnostics remain in `typescript-tests.stdout`. The bounded repair changed only
 `electron/showhow/trashRecording.test.ts` and `src/components/library/RecordingLibrary.test.tsx`
 for type-safe assertions/narrowing. The repaired test-project typecheck and focused main/Library
 tests passed; their receipts and the candidate hash comparison are under
-`/Users/mohamedb/dev/loop-evidence/showhow-179/test-type-repair-20261023/`. All 24 runtime files
+`~/dev/loop-evidence/showhow-179/test-type-repair-20261023/`. All 24 runtime files
 remained byte-identical. This addendum's only repository change is documentation.
 
 Lead's macOS product proof passed at
-`/Users/mohamedb/dev/loop-evidence/showhow-179/after-native-5b7zV1/result.json`, with a steady
+`~/dev/loop-evidence/showhow-179/after-native-5b7zV1/result.json`, with a steady
 screenshot recapture at
-`/Users/mohamedb/dev/loop-evidence/showhow-179/after-native-EEgVSg/result.json`. All four real
+`~/dev/loop-evidence/showhow-179/after-native-EEgVSg/result.json`. All four real
 entry points opened the exact approved confirmation. Each run logged only two `shell.trashItem`
 calls for its known synthetic fixture. Library Undo and editor-to-Library Undo restored the bundle
 to its original path with its original inode identity and every content hash. The final audit at
-`/Users/mohamedb/dev/loop-evidence/showhow-179/FINAL-NATIVE-FIXTURE-AUDIT.json` confirms the two
+`~/dev/loop-evidence/showhow-179/FINAL-NATIVE-FIXTURE-AUDIT.json` confirms the two
 known Trash paths from each run are absent and both originals are restored. The lead inspected
 steady screenshots 01, 02, 03, 07, and 08 plus the restore-toast and restored-state captures. The
 steady recapture disabled screenshot animations for capture; earlier mid-animation screenshots
 remain preserved.
 
 The first native product attempt at
-`/Users/mohamedb/dev/loop-evidence/showhow-179/after-native-0nZSI5/result.json` failed on a harness
+`~/dev/loop-evidence/showhow-179/after-native-0nZSI5/result.json` failed on a harness
 locator before any Trash call; that receipt remains preserved. The passing runs used unpackaged
 Electron 41.2.1 on macOS and only harness-owned synthetic bundles and their exact known Trash paths.
 No Trash enumeration or owner recordings, auth, settings, or installed app state was touched.
@@ -1760,7 +1760,7 @@ push was made.
 Added `docs/design/2026-10-22-hover-and-transitions-audit.md` from source at actual base
 `f1a462c002bdcbf68c6ee3ad2d4899bb275753bc`. Scope and clean BEFORE state are backed by the current
 issue, dependency, PR, and BEFORE receipts plus the approved Task 9 extract under
-`/Users/mohamedb/dev/loop-evidence/showhow-182/`. The audit inventories the approved Library,
+`~/dev/loop-evidence/showhow-182/`. The audit inventories the approved Library,
 Editor, HUD, Settings, route, and progress surfaces, separates current source behavior from exact
 motion proposals, and records the native observation limit. Documentation only: no source,
 configuration, tests, build, native app, ticket, or commit was changed or run.

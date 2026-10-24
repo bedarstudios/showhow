@@ -5,11 +5,11 @@ One self-contained file. No backend, no real app code. Fake data only. Google Fo
 Inter Tight, JetBrains Mono. No other external assets. Light theme only.
 
 ## Reference to read first (visual match)
-- `/Users/mohamedb/dev/projects/showhow/design/mocks/2026-10-15-house-style/pen-final/Library-19-ai-not-connected.png`
+- `~/dev/projects/showhow/design/mocks/2026-10-15-house-style/pen-final/Library-19-ai-not-connected.png`
 - `.../pen-final/Library-08-review-before-ai.png`
 - `.../pen-final/Library-10-guide-failed.png`
 - Any `Settings-*.png` in the same folder (for the settings layout).
-- Tokens and components: `/Users/mohamedb/dev/projects/showhow/design/mocks/2026-10-15-house-style/SPEC.md`
+- Tokens and components: `~/dev/projects/showhow/design/mocks/2026-10-15-house-style/SPEC.md`
   ("Tokens", "Components" sections). Use the LIGHT values.
 
 Key tokens: surface #FFFCF7, surface-raised #F9F5EC, ink #2F2F2F, ink-soft #2F2F2FB3, muted #2F2F2F8C,

@@ -2,7 +2,7 @@
 
 Development parent: `refs/tags/upstream/v2.1.0-rc.3` = `523a3e4c47cf7566cc5c759ad5275f7edcd3382e`. This is an uncommitted real merge candidate, not final v2.1.0 ancestry or release acceptance. The final tag gate remains open. Eventual owner-authorised landing must retain upstream ancestry using a merge commit, never squash/rebase.
 
-The table inventories paths whose candidate contents differ from the actual parent, including preserved base policy and deleted upstream infrastructure. It does not imply all were newly edited in this ticket. New Showhow modules and moved native sources are listed separately. Exact dirty bytes, raw conflict index and attempt receipts live under `/Users/mohamedb/dev/loop-evidence/showhow-116/executor/`.
+The table inventories paths whose candidate contents differ from the actual parent, including preserved base policy and deleted upstream infrastructure. It does not imply all were newly edited in this ticket. New Showhow modules and moved native sources are listed separately. Exact dirty bytes, raw conflict index and attempt receipts live under `~/dev/loop-evidence/showhow-116/executor/`.
 
 | Upstream path | Identifier role | Adaptation / preservation |
 |---|---|---|

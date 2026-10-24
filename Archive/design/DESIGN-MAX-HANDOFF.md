@@ -31,7 +31,7 @@ The audience includes developers showing an agent a bug, designers explaining a 
 
 ## Read and inspect
 
-Workspace: `/Users/mohamedb/dev/projects/showhow`.
+Workspace: `~/dev/projects/showhow`.
 
 1. Read `AGENTS.md` and `docs/research/2026-10-12-ui-direction.md`. The latter records the latest owner decisions and separates proposals from approved behaviour. Older roadmap statements about local-only AI or narrower scope predate this conversation.
 2. Open **`design/showhow.pen` through the available Pencil/Pen tools**. Discover the current tool instructions and document structure first. `.pen` files must be accessed through those tools, not read or searched as text. Render actual frames at a readable size; a screenshot gallery alone is not the source of truth.

@@ -530,7 +530,7 @@ granted slot. Headless CLI inspection only so far.
 
 Dependency deviation: npm ci failed with ENOSPC before tests. Installer exited;
 removed only this lane's 43 MB partial node_modules with coordinator approval.
-Coordinator approved symlink to /Users/mohamedb/dev/projects/showhow/node_modules
+Coordinator approved symlink to ~/dev/projects/showhow/node_modules
 because manifests match. Never install into or mutate shared dependencies.
 Tests, builds and GUI wait for a coordinator slot while issue 66 verifies.
 
@@ -541,7 +541,7 @@ appears stuck, consistent with coordinator-owned mediaProtocol issue; excluded
 from MP4 changes and not represented as a passing playback check.
 
 Shared ENOSPC loop snare logged centrally by issue66 as BL-042 in
-/Users/mohamedb/dev/OS/references/bedar-loop-issues.md; coordinator confirmed
+~/dev/OS/references/bedar-loop-issues.md; coordinator confirmed
 no duplicate entry needed. First test slot released after actual encoder
 capability preflight while executor authors bounded benchmark.
 
@@ -1270,7 +1270,7 @@ OpenCode's final lint summary was not accepted as proof: the lead's direct wrapp
 
 - 2026-10-02: The owner authorized finishing the working review-ready PR with as many reviews as needed; the ordinary review/loop caps are waived for this task. Agents never merge. This executor makes no GitHub mutations.
 - API subagent mapping is used for the executor. The shell launch uses OS `roles/role-env.sh executor`, but no native `codex -p bedar-executor` session was launched. Setting shell role variables is not proof that this API worker runs the native Codex role profile. The driver records this limitation explicitly.
-- Actual shell provenance command: `PATH="$HOME/.nvm/versions/node/v22.22.1/bin:$HOME/.npm-global/bin:$PATH" bash -c 'role_exports="$(/Users/mohamedb/dev/OS/.agents/loop-config/roles/role-env.sh executor)" && eval "$role_exports" && { command -v node; node --version; command -v npm; npm --version; command -v codex; codex --version; printf "role=%s ZDOTDIR=%s\n" "$BEDAR_TICKET_ROLE" "$ZDOTDIR"; }'`. Observed exit 0; Node22.22.1/npm10.9.4/Codex0.160.0. Native recipe invocations use the exact PATH prefix and inherited API-shell role context, recorded in each result; they do not assert the role-shell probe was their parent process.
+- Actual shell provenance command: `PATH="$HOME/.nvm/versions/node/v22.22.1/bin:$HOME/.npm-global/bin:$PATH" bash -c 'role_exports="$(~/dev/OS/.agents/loop-config/roles/role-env.sh executor)" && eval "$role_exports" && { command -v node; node --version; command -v npm; npm --version; command -v codex; codex --version; printf "role=%s ZDOTDIR=%s\n" "$BEDAR_TICKET_ROLE" "$ZDOTDIR"; }'`. Observed exit 0; Node22.22.1/npm10.9.4/Codex0.160.0. Native recipe invocations use the exact PATH prefix and inherited API-shell role context, recorded in each result; they do not assert the role-shell probe was their parent process.
 - Prerequisite, evidence-collision, cleanup/fixture acceptance, corrupt GIF, and full decoder boundaries were implemented in five vertical assertion RED→GREEN slices. Missing imports were never counted as RED.
 - The existing e2e writer replacement is a baseline gap only. Production renderer, writer, native code, dependency versions and permissions remain outside this task's edit scope.
 - Native-01 (exit 1) exposed a harness limitation: dynamic imports inside Playwright main evaluation lack an import callback. Inspection moved into the generated isolated bootstrap; production code is unchanged. All four observed child PIDs and the root were cleaned; fixture unchanged.
@@ -1295,6 +1295,6 @@ OpenCode's final lint summary was not accepted as proof: the lead's direct wrapp
 - Baseline: HEAD and origin/main were 4c3ece03c1bca5a309cf11d7e18bb1ab244870e4; the worktree was clean. AGENTS.md was 7,800 bytes, SHA-256 217a5faed8bccc30aa5f553a6f5e82b386a63d2b1e9243d06e39de066e34da5f. CLAUDE.md was absent. implementation-notes.md was 113,349 bytes, SHA-256 3709bc3d89f7b20b84bd858c6f715d95b4ff461250bfbf51c9466f8561e9ff58.
 - Change: created root CLAUDE.md as exactly @AGENTS.md plus one newline (11 bytes). This entry is appended after the captured notes bytes.
 - Routing proof: unresolved scope routes to shape; an approved issue routes to ticket; an approved dependency-ordered milestone routes to milestone; the owner decides merge approval for each PR. Shared Loop policy says agents never merge and approval of another PR is not consent.
-- Source proof receipts are in /Users/mohamedb/dev/loop-evidence/showhow-106/: baseline-manifest.json, baseline-head.json, baseline-status.json, doc-red.json, executor-106-red-confirmation.json, and executor-106-green-import.json. The check is doc-proof.py. RED exited 1 on the intended missing Claude import assertion while all route checks passed. GREEN exited 0 with all 12 checks passing.
-- Lane creation deviation: the initial Herdr worktree create from linked main failed with linked_worktree_source (exit 1). Retrying from repo parent /Users/mohamedb/dev/projects/showhow succeeded without source edits between attempts. Receipts: lane-create.json and lane-create-parent.json.
+- Source proof receipts are in ~/dev/loop-evidence/showhow-106/: baseline-manifest.json, baseline-head.json, baseline-status.json, doc-red.json, executor-106-red-confirmation.json, and executor-106-green-import.json. The check is doc-proof.py. RED exited 1 on the intended missing Claude import assertion while all route checks passed. GREEN exited 0 with all 12 checks passing.
+- Lane creation deviation: the initial Herdr worktree create from linked main failed with linked_worktree_source (exit 1). Retrying from repo parent ~/dev/projects/showhow succeeded without source edits between attempts. Receipts: lane-create.json and lane-create-parent.json.
 - Limits: source proof only. No fresh Claude or project-session adoption, product behavior/build, or native proof was run. Independent review, PR delivery, and owner-approved merge remain later gates.

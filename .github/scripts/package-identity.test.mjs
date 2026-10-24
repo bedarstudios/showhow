@@ -47,7 +47,7 @@ describe("standalone package identity", () => {
 		expect(builder.linux.artifactName).toBe("${productName}-Linux-${version}.${ext}");
 		expect(builder.win.artifactName).toBe("${productName}.Setup.${version}.${ext}");
 		// deb/pacman Maintainer fields expect "Name <email>", not a bare name.
-		expect(builder.linux.maintainer).toBe("Bedar Studios <mohamed@bedarstudios.com>");
+		expect(builder.linux.maintainer).toBe("Bedar Studios <noreply@bedarstudios.com>");
 		for (const description of Object.values(builder.mac.extendInfo).filter(
 			(value) => typeof value === "string",
 		)) {

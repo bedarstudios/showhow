@@ -2,7 +2,7 @@
 
 The landing page in `site/` is a static Astro build hosted on **Cloudflare Pages**.
 
-- Project: `showhow` (classic Pages, not Workers), account `Mohamed@bedarstudios.com's Account`.
+- Project: `showhow` (classic Pages, not Workers). The Cloudflare account is the owner's; sign in with `npx wrangler@4 login`.
 - Production URL: <https://showhow-agy.pages.dev/>
 - Production branch: `main`.
 - Custom domain: none yet. Add one in the Cloudflare dashboard under Pages → showhow → Custom domains.

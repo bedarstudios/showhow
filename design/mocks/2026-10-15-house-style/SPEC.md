@@ -1,12 +1,12 @@
 # Spec: Showhow house-style mock (v2 of the polish pass; throwaway, one HTML file)
 
-MOCK = /Users/mohamedb/dev/projects/showhow/design/mocks/2026-10-15-house-style
+MOCK = ~/dev/projects/showhow/design/mocks/2026-10-15-house-style
 PREV = ../2026-10-15-polish-pass (your previous build; copy its index.html as the starting point)
 
 ## Owner direction (2026-10-15)
 - Visual base = the owner's Pen screens 23–46 (library, settings, HUD, editor). Their style and vibe
   win over the polish pass wherever they differ. Reference exports (look at every one before building):
-  /private/tmp/claude-501/-Users-mohamedb-dev-projects-showhow/85e93665-27f0-4e5c-bc75-0c80564cb414/scratchpad/pen/
+  <scratchpad>/pen/
   eNNeM (23 library launch), RsepI (24 just saved), rTUN6 (25 making guide), y4ipZ (26 guide ready),
   kiLdT (27 settings), D4LKh (28 empty), lfTGI (36 HUD idle), SkQcb (37 HUD recording), F78q2Q (38 source
   selector), k7v7J (39 countdown), Ot7mn (40 notes), hAXNg (41 editor background), WSh7g (42 export
@@ -104,7 +104,7 @@ wrong" etc.) and meta "DESKTOP · 2:14" / "BROWSER · 4:31" / "IMPORTED · 4:31"
 - Export PDF and Remake: as PREV, restyled.
 
 ## Dither (port design/mosaic.glsl)
-Port `/Users/mohamedb/dev/projects/showhow/design/mosaic.glsl` to the mock's WebGL helper (read the
+Port `~/dev/projects/showhow/design/mosaic.glsl` to the mock's WebGL helper (read the
 shader; it uses u_dir, u_block, u_dot, u_edge, u_soft, u_rough, u_lit, u_dark, u_dots, u_seed,
 u_alpha). Poster uniforms (from the Pen): u_dir 2, u_block 34, u_dot 4, u_edge 0.42, u_soft 0.5,
 u_rough 0.45, u_lit #82B09A, u_dark #242424, u_dots 0.45. Failure palette: u_lit #E3582D, u_dark #2A2420.

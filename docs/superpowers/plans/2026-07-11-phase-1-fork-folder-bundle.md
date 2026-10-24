@@ -45,7 +45,7 @@ diff and feeds PLAN-FEEDBACK.md.
 ### Task 1: Fork hygiene + baseline build and run
 
 **Files:**
-- No source changes. Repo at `/Users/mohamedb/dev/OS/Projects/web/showhow/desktop` (already cloned from upstream).
+- No source changes. Repo at `~/dev/OS/Projects/web/showhow/desktop` (already cloned from upstream).
 
 **Interfaces:**
 - Consumes: nothing.
@@ -54,7 +54,7 @@ diff and feeds PLAN-FEEDBACK.md.
 - [ ] **Step 1: Create the GitHub fork and set remotes**
 
 ```bash
-cd /Users/mohamedb/dev/OS/Projects/web/showhow/desktop
+cd ~/dev/OS/Projects/web/showhow/desktop
 git remote rename origin upstream
 gh repo fork getopenscreen/openscreen --remote --remote-name origin
 git remote -v

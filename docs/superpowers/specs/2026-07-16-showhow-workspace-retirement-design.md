@@ -66,7 +66,7 @@ Update current operational material that would otherwise keep targeting the reti
 
 Live references should use:
 
-- local checkout: `/Users/mohamedb/dev/OS/Projects/web/showhow/desktop`;
+- local checkout: `~/dev/OS/Projects/web/showhow/desktop`;
 - GitHub repository: `bedarstudios/openscreen`;
 - desktop-pivot spec: `Projects/web/showhow/desktop/docs/superpowers/specs/2026-07-11-showhow-desktop-design.md`.
 

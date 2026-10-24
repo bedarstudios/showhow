@@ -1,6 +1,6 @@
 # Spec: Showhow polish-pass mock (throwaway, one HTML file)
 
-MOCK = /Users/mohamedb/dev/projects/showhow/design/mocks/2026-10-15-polish-pass
+MOCK = ~/dev/projects/showhow/design/mocks/2026-10-15-polish-pass
 
 ## Purpose
 Revision of the 12 Oct flow mock. Same screens, flows and fake data; new visual structure, type,
@@ -213,7 +213,7 @@ UK English. Sentence case for buttons. Mono uppercase only for labels/captions/d
 UI copy (use · or a full stop).
 
 ## Acceptance checks (run them; report pass/fail for each)
-Use Playwright from /Users/mohamedb/dev/projects/showhow (`node` script importing
+Use Playwright from ~/dev/projects/showhow (`node` script importing
 `./node_modules/playwright/index.mjs`, `chromium.launch({ channel: "chrome" })`), viewport 1440x900.
 1. No console errors on load and on every Screen-select entry.
 2. All click-paths from the 12 Oct spec still pass.

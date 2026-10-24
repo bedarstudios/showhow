@@ -1,6 +1,6 @@
 # Hover and transition audit
 
-**Scope:** approved #182 / Task 9; source-only review of the Library sidebar/header, Editor topbar/rail, HUD bar, Settings tabs, the three requested navigation routes, and progress UIs relevant to #176/T2. Actual base and audit candidate start: `f1a462c002bdcbf68c6ee3ad2d4899bb275753bc` (HEAD equalled merge-base; clean worktree). Authority and starting-state receipts: `/Users/mohamedb/dev/loop-evidence/showhow-182/ISSUE-CURRENT-RECEIPT.json`, `ISSUE-CURRENT.json`, `DEPENDENCY-CURRENT.json`, `PR-CURRENT.json`, `BEFORE.json`, and `APPROVED-PLAN-EXTRACT.md`. #182 was open, #177 closed, no PR existed, and BEFORE recorded this audit as absent. Failed reviews: 0; there was no prior audit candidate.
+**Scope:** approved #182 / Task 9; source-only review of the Library sidebar/header, Editor topbar/rail, HUD bar, Settings tabs, the three requested navigation routes, and progress UIs relevant to #176/T2. Actual base and audit candidate start: `f1a462c002bdcbf68c6ee3ad2d4899bb275753bc` (HEAD equalled merge-base; clean worktree). Authority and starting-state receipts: `~/dev/loop-evidence/showhow-182/ISSUE-CURRENT-RECEIPT.json`, `ISSUE-CURRENT.json`, `DEPENDENCY-CURRENT.json`, `PR-CURRENT.json`, `BEFORE.json`, and `APPROVED-PLAN-EXTRACT.md`. #182 was open, #177 closed, no PR existed, and BEFORE recorded this audit as absent. Failed reviews: 0; there was no prior audit candidate.
 
 ## Motion basis
 
