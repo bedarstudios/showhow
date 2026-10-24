@@ -1,8 +1,17 @@
 # Project handoff
 
-Updated: 2026-10-24 (#215 close-out)
+Updated: 2026-10-24 09:50 (supervisor wrap-up)
 
 ## In flight
+
+### Supervisor session wrap-up — 2026-10-24 09:50
+
+- Merged this morning, each CLEAN at its passing head: #218 (#200), #219 (#201), #220 (#212), #221 (#211; one test-file conflict with #218 resolved by keeping both tests, CI rerun green), #224 (#203), #225 (#215), #222 and #226 (housekeeping). `main` is `46566135` or later.
+- Another session (Fable 5.1, Herdr workspace w8R) is on #202 with a reviewer pane running. Leave its worktree alone.
+- #223 (slow VAD, 600 s per pass on an 86 s clip) is unconfirmed outside the unpackaged test rig. Reproduce in the packaged app before anyone starts a fix.
+- #199 has the owner's decision and its `needs-human` label is removed; it is ready to dispatch with #213.
+- #217 (landing share image, favicons, Mac icon delivery) awaits owner approval; its plan is the uncommitted `PLAN.md` hunk, plus untracked `design/landing-export.html`. Both preserved.
+- Handoff commits to `main` bypass the branch rule because the owner account can; the owner has not asked to change this.
 
 #215 is merged and Done: PR #225, reviewed head `58076b5c2103dd2c5b2e0d08def1bf8aea596de8`, merge `297ea752cccabc306e111f6623ffc7151b021775` (owner/supervisor merge, 2026-10-24). Fresh Standards and Requirements review passed; all 10 CI checks passed. The initial CI duration failures were reproduced on FFmpeg 6.1.1 and repaired without weakening assertions. Evidence: `~/dev/loop-evidence/showhow-215/READY.md`, `PORTABLE-PROVE.md`, `COORDINATOR-PR-READY.json`.
 
@@ -56,159 +65,5 @@ The move onto upstream v2 is shaped and published: milestone "Move onto upstream
 
 ## Next action
 
-Prepare #199 together with #213 through the normal Loop route from current main, using the settled macOS window/menu-bar decisions. Coordinate with the supervisor before creating a lane so another session does not dispatch the same work. Keep slow VAD #223 separate; do not reopen #204.
-
-### Superseded next action (historical)
-
-The approved replacement pass is complete for this seat: w79:p3 used the exact private Electron runtime and documented native CUA, retained all earlier failures, and reconciled the three owned docs to e1fab904. Journey B, fixture-backed guide failure/Retry, import cancel, validated brief/copy through a private clipboard adapter, real GIF cancellation and independent 2-second GIF decode, independent 2-second MP4 decode, writable 2-page PDF decode, editor Undo, keyboard focus movement, and app-only Light→Dark pixel propagation are observed. Journey A remains blocked at corrected safe source selection: the exact readonly Alpha/Beta/Gamma TextEdit fixture was bound by unique file URL, all three helper/addon overrides were active, capture controls were OFF, but the selector never exposed that exact target and no safe Record/Stop action became available. Per supervisor authority this is an accepted owner-owed limitation; a missing Screen Recording grant is hypothesis only. Dependent completed-take/#175 rows, owner clipboard/provider, reduced-motion, reference, and minimum-size remain unverified. The fixture was closed normally with its hash unchanged; the private Showhow tree was empty after normal Quit. Next: lead performs one fresh independent review, then the conventional documentation PR if passed. No native/CUA retry, tool change, product fix, staging, commit, push or merge.
-
-Owed native checks:
-- The isolated GIF verification recipe (`docs/testing/verification-recipe.md`) for #146 and #147. Its doctor pins Codex 0.160.0/0.162.1 and this machine has 0.163.0. Do not "fix" it by changing tools.
-- #145's STOP-contrast decision and a real recording.
-- Stop on the HUD during a real macOS recording (#124).
-- A live OpenRouter key run for guide and brief.
-
-Keep #128 parked and the #134 worktree intact for pen.dev cache safety.
-
-## Open decisions
-
-- Cloudflare: add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` so `pages.yml` deploys `site/` changes; until then deploy manually (docs/landing/deploy.md).
-- Account-wide interaction limit needs the `user` gh token scope (`gh auth refresh -h github.com -s user`); Showhow's repo-level collaborators-only limit expires 2027-04-23.
-- Cursor packs: #116 removes the 17 Sweezy packs and takes upstream's seven original packs. #116 has merged; confirm the packs shipped as planned before a release tag.
-- Per-feature goals and milestone metrics (audit questions B1 and J2). Weekly use is the only metric for now.
-
-## Loop operations notes
-
-- Keep the main checkout on `main` while a ticket lane is open: lane verification fails ("Git branch differs") if the coordinator switches it. Write plans in a separate worktree.
-- Owner's Mac runs Vorssaint with Auto Quit; it sends Quit Apple Events to Showhow/Electron when only the HUD is left. The owner turned Auto Quit off on 2026-10-17. Not a product bug.
-- An unpackaged run needs an explicitly resolved STT helper and caption assets. Missing staging can leave transcription pending, but do not infer that cause without checking: the #215 private run had the verified helper/models and instead hit slow VAD/timeouts (#223).
-
-- In role panes, answer Codex hooks prompts with "Continue without trusting". "Trust all" writes hook trust into the role profile and breaks later launches (profile backup from 2026-10-16: `~/.local/share/bedar-loop/profile-fix-20261016/`).
-- A ticket lead cannot prompt the coordinator across Herdr workspaces. It writes `STOP.md` in `~/dev/loop-evidence/<repo>-<n>/`, so the coordinator or a supervisor must poll it.
-
-- Codex Computer Use clicks are not seen by Showhow's click capture; during a take, post real clicks with `~/dev/loop-evidence/showhow-e2e-20261023/realclick.swift`. Use GPT-6 Luna Extra High per session (`/model` → `s`, not Enter, which rewrites `~/.codex/config.toml`).
-- Test the packaged app on an isolated profile with `~/dev/loop-evidence/showhow-e2e-20261023/launch-isolated.mjs` (or `-fakeai.mjs` for a fake OpenRouter); never drive `/Applications/Showhow.app`. Screenshots must be window-only (`screencapture -x -o -l <windowId>`); full-screen captures leaked the owner's terminal.
-- On this Mac another app swallows the Escape key system-wide; Escape tests are unreliable here.
-- Packaging needs `npm run build:whisper-binaries` and a fresh `build:native:compositor:mac`; both dirty tracked/cache files, so restore `compositor_view.node` and delete `.cache/` after.
-
-## Rejected paths
-
-- Design Max layout directions (Document Desk, Evidence Bench), the serif display face, and the editorial polish-pass layout, all rejected by the owner. The base is the owner's Pen frames 23–46.
-- A permanent sidebar dither floor. Mosaic dither appears only where content is not real yet.
-- Merging or approving CI for outside-contributor PRs (#214 closed). Converting the landing site to Cloudflare Workers.
-
-## Test state
-
-2026-10-24, #215 reviewed head `58076b5c` / merge `297ea752`: 486 affected tests across 33 files, 22 focused tests, 9/9 real integration tests on FFmpeg 6.1.1 and 9/9 on 9.0.2, source/test TypeScript, Biome and build passed; hosted CI 10/10. The owner-live take has system mean/peak -91/-91 dBFS and Brio mic -44.8/-15.8 dBFS. Final mixed mono mean/peak -41.84/-13.84 dBFS; verified real helper text: "testing is this working? do you have anything?". Final owner/quiet text and VAD match their microphone-only controls; original media hashes unchanged. The app-managed job timed out separately (#223), explicitly accepted as nonblocking for #215. Windows/Linux native runtime, live provider and app-guide completion are unverified. Tests were not rerun solely for close-out documentation.
-
-### Historical test snapshot — 2026-10-23
-
-2026-10-23, packaged arm64 build of `001b202a` on isolated profiles (`launch-isolated*.mjs`, fake OpenRouter in main), native Computer Use, window-only evidence:
-- Four Codex passes plus supervisor runs: recording a TextEdit window with real clicks (`realclick.swift`), guide, brief, step edit, PDF export (options verified by file size/images), import, trim/Undo, MP4/GIF export, GIF cancel, Trash/Undo, keyboard Tab, Settings folder Move/Keep. All observed working except the filed findings.
-- Speech take: both audio tracks recorded; transcription read the silent first track (#215). System-audio track silent although `say` played (unverified cause).
-- Not run: real OpenRouter key, dark menu bar, screen reader, Windows/Linux/macOS 13, signed/installed build.
-- #208 (icons): generator test 7, trayIcon 3, package-contents 19/19, brand test 4 pass; all 10 CI checks on 5d7b0a82.
-
-### Earlier test state (historical)
-
-CURRENT 2026-10-23, #148 candidate `e1fab904`: frozen renderer/main/preload build binding PASS, 308/308 outputs, no rerun. Platform is macOS 26.6.2 build 25G83 arm64 (`PLATFORM-METADATA-20261023.json`). Helper/addon files exist and are hash-bound; external child-launch overrides correct the private `app.getAppPath()` discovery root. Journey B is the actual MP4 import → Library → editor path; Import Cancel returns unchanged Library; editor trim → Undo is observed; fixture fake-provider guide failure → Retry and actual validated #142 brief shape → native Copy for agent/Copy path through a private clipboard adapter are observed. Final unique-path outputs independently decode as PDF 2 pages, GIF 608×480/15 FPS/30 frames/2 s, and MP4 H.264/AAC 608×480/24 FPS/2 s; real GIF Cancel returned to the export sheet with no cancelled output. Journey A remains blocked: the exact readonly Alpha/Beta/Gamma TextEdit file was verified by AX/file URL, but native source selection did not expose that exact target, so Record/countdown, harmless click/selection, Stop/save-to-Library and all later guide/edit-step/brief/PDF/editor/export/return substeps are unverified as Journey A; separate fixtures are not substitutes. Per supervisor authority this is owner-owed and no retry is authorized. App-only Light→Dark pixel propagation and Tab focus movement were observed; reduced motion, reference/minimum, owner provider/clipboard, and #175 remain unverified. Carried followups are individually explicit: #175 completed take → last-window tray switch/countdown/window-all-closed without background harness unverified/blocked; #179 Trash-cancel focus for each Library/editor entry and context-menu opening/movement/activation/Escape/focus return unverified; #180 folder-sheet close/cancel → Recording CHANGE button focus unverified; #180 moveFile EXDEV copy/delete is source risk with runtime unverified and supervisor-owned filing; #181 delayed initial list → newer NAMING/title ordering unverified. Exact fixture hash and private-root cleanup receipts are under `~/dev/loop-evidence/showhow-148/`; the fixture hash was unchanged and no private Showhow processes remained after normal Quit. No current review or CI run; failed-review count 0; no broad suite or product/harness change.
-
-HISTORICAL 2026-10-21 baseline `498151af`: the package/tool STOP, exact-base DMG observations, recipe/tool mismatch, hosted build results and incomplete pre-launch cleanup remain below as retained evidence only; they do not describe the current candidate.
-
-2026-10-20, #147 at `4402d254`, each command run locally:
-- `npx tsc --noEmit` and `npx tsc -p tsconfig.test.json --noEmit`: exit 0.
-- `npx biome check .`: 0 errors, 27 warnings (the baseline).
-- `npm run i18n:check` and `npm run branding:check`: pass.
-- `npm run test`: 380 files, 4906 pass / 2 skip. `npm run test:browser`: 22 pass.
-- All 10 CI checks green on GitHub.
-- Native run (built app, isolated profile, macOS arm64). The harness faked chat.run, the provider status, save failure, an export hold and the save picker. The chat card's Undo and stale Undo, the export panel, sheet focus, the unsaved sheet keyboard and the shortcuts sheet were all shown.
-- Real GIF and MP4 exports through the compositor addon, loaded via `OPENSCREEN_COMPOSITOR_VIEW_NODE`, decoded with ffprobe (GIF 608x480, 30 frames at 15 fps; MP4 H.264 1368x1080, 120 frames at 60 fps; both 2.0 s).
-- Not tested natively: GIF cancel, a real export failure, Windows/Linux, packaged builds.
-- Evidence: `~/dev/loop-evidence/showhow-147/`.
-
-#145 and #146 evidence: `~/dev/loop-evidence/showhow-{145,146}/`.
-
-2026-10-19 merged heads, each with all 10 required CI checks green on GitHub:
-- **#142:** `c7a3e9fe`, unit 4734 pass / 2 skip.
-- **#156:** `f7129d91`.
-- **#143:** `3251bb41`, unit 4780 / 2.
-- **#144:** `6dd3e8a1`, unit 4796 / 2.
-- **#124:** reviewed code `a8bc0e28`, merged as `1c72f58f` after a notes-only conflict merge; unit 4787 / 2.
-- **#162:** `6d0f6936`, docs only.
-
-Browser tests passed 19/19 on each code head. Native proofs ran the built app with isolated synthetic roots on macOS 26 arm64, with harness fakes for safeStorage, the OpenRouter HTTP endpoint, clipboard writes, the save panel and Finder reveal.
-
-Not tested:
-- The real clipboard, save panel and Finder.
-- A live OpenRouter key.
-- Packaged or installed builds.
-- Windows and Linux.
-- A real recording for #124.
-- HUD System-theme following (the harness window had no preload).
-
-No tests were rerun for this handoff. Historical: the #122 real-key macOS smoke passed C1–C7 at `500cea16`, and the #110 packaged smoke passed at `fc50566a`.
-
-## Cloud blockers
-
-Native macOS proof (recording, menu bar, permissions) cannot run in the cloud. Real-provider checks need the owner's key. Codex weekly limit was ~13% at session end.
-
-### Earlier cloud blockers (historical)
-
-Historical #148 package/tool STOP is superseded by the 23 October supervisor-approved alternate route. Current Journey A limitation is owner-owed under `SUPERVISOR-JOURNEY-A-LIMIT-APPROVAL.txt`; do not rerun native/CUA/source selection, doctor or tools. Preserve `STOP.md` and all failed receipts. One fresh review then a conventional documentation PR is authorized; owner-only provider/clipboard and permission changes remain separate.
-
-### HISTORICAL pre-override checkpoint — #148 w79:p3 — 2026-10-23
-
-Fresh native CUA replacement is working and is bound only to the exact Electron.app path in the external checkpoint. The ambiguous `com.bedarstudios.showhow` bundle lookup was rejected. Helper presence was checked; the approved heavy macOS native helper build exited 0 and its exact hashes are in the external receipts.
-
-Historical pre-override observations: repository MP4 import → Library → editor, trim → Undo, no-credential connection sheet, and app-only Appearance/Recording settings were seen. The first synthetic-title attempt was absent from the 14-window selector and was cancelled without choosing an owner window; export was only opened in that run. This checkpoint is superseded by the later current continuation below; its failed records remain external and unchanged.
-
-
-### HISTORICAL pre-override #148 continuation — 2026-10-23 — w79:p3
-
-The source selector later showed the unique visible synthetic target `Showhow 148 Visible Synthetic Target 20261023`; AX confirmed system audio, microphone, and camera OFF before the recording attempt. The app reported `Native macOS capture helper is not available.` No recording, click-only guide, or Journey A completion is claimed. Picker images were returned transiently by CUA, but no picker or owner frame was exported into ticket evidence; no owner window was used and no #175 last-window/tray/all-closed assertion was run. A later external child-launch override receipt binds the helpers/addon to worktree files; the earlier private-root discovery failure remains harness-path-limited, while this run's native availability failure remains unpromoted.
-
-The seeded #142 fixture independently proved the actual PDF readonly-destination failure after prior bytes were seeded at the real PDF path: the app said the recording was unchanged and the prior-byte SHA-256 remained `24f89a977970dff5f7ae39ae4e0f3bc0fc148fa10711e067d1cb4bb016946041`. The real GIF editor route reached native export but reported the compositor cancellation unavailable; no GIF/export-cancel pass is claimed. The helper's save override is filter-scoped so the readonly PDF path cannot contaminate writable GIF/video outputs; this run logged the PDF call only.
-
-Six exact safe owned-app JPEGs were extracted from retained native CUA output without a new capture or image edit: `native-artifacts-20261023/01-safe-library.jpg` through `06-safe-recording-settings.jpg`. Their manifest and lead assertions are `native-artifacts-20261023/NATIVE-CUA-IMAGE-EXTRACTION.json` and `native-artifacts-20261023/LEAD-IMAGE-ASSERTIONS.md`. They do not replace 1200px/light/current-loaded-addon/minimum proof. Picker images existed transiently in tool output, but no picker or ambiguous-owner frame was exported into ticket evidence. Detailed receipts, source hashes, helper hashes, exact PID tree and cleanup are external under `~/dev/loop-evidence/showhow-148/`. The three approved repository docs are the only dirty paths; no product or harness source was changed.
-
-### HISTORICAL intermediate #148 corrected native continuation — 2026-10-23 — w79:p3
-
-The private child launch explicitly bound the existing worktree ScreenCaptureKit helper, cursor helper, and compositor addon by absolute path; their hashes and the Node 22 addon export probe are in `NATIVE-CONTINUATION-20261023.md`. The earlier private-root discovery failures remain harness-path-limited. The exact Electron executable was used; no ambiguous Showhow bundle, owner window, permission, or clipboard interaction was used.
-
-This intermediate record is superseded by the later corrected addon outputs and final TextEdit-host source-selection receipt below. Import Cancel, real GIF Cancel, separate decoded GIF/MP4/PDF outputs, keyboard focus and app-only theme propagation are current in the later receipts; the old zero-byte GIF and ret-22 attempt remain preserved historical failures. Journey A still has no take, and no #175 observation was run. No source, build, or tool change.
-
-### Session close-out: design delivery and bug #124 - 2026-10-19
-
-- Main is `986cf494`. Merged today: #155, #156, #158, #159, #160, #161 and #162. No release tag.
-- Ticket worktrees for #142, #143, #144 and #124 are removed; their evidence is under `~/dev/loop-evidence/showhow-{142,143,144,124}/`. Retained: #128 (parked), #134 (pen.dev cache), the historical #141 lane, the 2026-10-18 close-out docs worktree, and the `confident-noyce-988ce8` worktree of the merged #156 session (safe to remove when the owner archives that session).
-- The main checkout is clean on `main` at `c258f118`, behind origin.
-
-## History: owner stable retarget correction — 2026-10-17 Europe/London
-
-Superseded: #116 merged on stable `v2.0.0` (PR #121). Kept for context only.
-
-
-The previous Next action/final2.1wait is historical and superseded. #115 is closed/Done via #120. Owner chose stable2.0 (Yeah lets do it). #116 is at Creating plan/spec for the exact revised plan/publication gate; no implementation or publication yet. Use refs/tags/upstream/v2.0.0 at eff86dcba48fac490a0e153141bf8537df7ffc54 as proposed actual parent, preserving READY5/current2074dirty source/index/merge metadata/owner media before same-lane reconstruction. #117 native bundled base/offline/fail-open and #118≤400MB remain sequential and not dispatched. No priority;116ui. Refresh source/native/package/owner proof after retarget, then fresh review, one PR and separate ancestry-preserving exact-head owner merge gate. No Showhow release tag until milestone complete. This note describes the proposal, not a delivered stable migration.
-
-### #117 close-out verified 2026-10-17
-
-Main is `371d940d14d7392ae090b9bfc57b2cf311c6de78`. Reviewed head `cc318e87676078838e5df95ac1c5af2bbcc7c67e`: Standards PASS, Requirements PASS, all 11 CI checks pass. Local unit 4,626 pass/1 skip; hosted unit 4,625 pass/2 skip; browser 10 pass. No tests rerun for close-out. Unsigned macOS arm64 directory package only; Windows/Linux runtime, signing/installers and macOS13 hardware untested. Broad package audit remains RED on #118 policies (365.36 MiB). Physical Wi-Fi conditions are owner attestations. Second missing-model take preserves valid media and failure marker but effectively silent audio. Failed identity/CI receipts remain retained. Preserve untracked `design/landing-assets/` and `design/landing.pen`; no release tags.
-
-### #118 final proof and close-out — 2026-10-18
-
-Reviewed head `b0e872f3ca8bf9f1d59c13b1e3e817e536770d44`: fresh Standards PASS / Requirements PASS after one failed review and the tray-icon repair. All 11 CI checks pass. Installed arm64 365.37 → 365.77 MiB; DMG 195.44 → 195.61 MiB. Baseline already below budget; final contents audit passes. Unsigned macOS arm64 only; Windows/Linux runtime, signing and owner adoption untested. Protected originals/design unchanged. Evidence and failed receipts retained; clean w6T lane removed. No tests rerun for this documentation-only close-out.
-
-### Session close-out: playback and Final design delivery - 2026-10-18
-
-- Latest merged main: 01ba9eb2. #125, #139, #140 and #141 are completed; their source is committed, owner-merged and remotely verified. No agent merge or release tag.
-- #141 hosted proof: 4,679 unit passes / 2 skips, 19 browser passes, all ten checks successful at reviewed 69aa68eb. Native synthetic macOS arm64 import/cancel/failure/duplicate/editor playback and unchanged source-media hashes; not packaged/installed, other-platform, macOS13 hardware, successful STT/provider or owner clipboard acceptance. Evidence and earlier failures retained under ~/dev/loop-evidence/showhow-141/.
-- #140 accessible-name follow-up remains nonblocking: visible Edit video/Rename versus Open in editor/Edit title. Record and verify it when those controls are next changed. Its initial compiler raw-receipt overwrite remains disclosed; no reconstructed failure logs.
-- No active implementation worker. Clean historical #141 lane w74/worktree is retained. Parked #128 w6Q and #134 worktree remain untouched; #134 must stay while pen.dev caches its document. Earlier session worktrees that are absent were removed before this wrap-up; their committed source and external evidence remain.
-- Showhow main checkout remains at 9eb781dc, behind merged remote main; no switch or forced update. Initial audit was clean; the final audit found a concurrent unrelated design/landing.pen edit, which was preserved unstaged and untouched. Loop checkout is clean. External HANDOFF-INDEX.md is not in a Git repository. No tests rerun solely for wrap-up documentation.
-- Session journal uses only ~/Brain/logs/codex/ and logs/projects/showhow/. Never access private/ or run Git in the live vault.
-
-### Session close-out: Final HUD and editor delivery - 2026-10-20
-
-- Main is `cba41f83`. Merged in this session: #164 (#145), #165 (#146) and #166 (#147). No release tag.
-- Ticket worktrees `ticket-145`, `ticket-146` and `ticket-147` remain under `.claude/worktrees/`. Their branches are merged, so they are safe to remove when the owner archives the session. This note was committed from `ticket-147` on branch `claude/handoff-2026-10-20`.
-- No tests were rerun for this handoff.
+1. Reproduce #223 in the packaged Showhow app: record about 60 s while speaking, time how long "transcription pending" lasts. Under a minute: close #223 as a rig artefact. Minutes: #223 becomes the next ticket ahead of #199.
+2. Then dispatch #199 together with #213 through the normal Loop route from current main, using the settled macOS window/menu-bar decisions. Coordinate with the supervisor before creating a lane so another session does not dispatch the same work. Do not reopen #204.
