@@ -1,5 +1,5 @@
 import { Button } from "@/components/showhow/Button";
-import { Sheet } from "@/components/showhow/Sheet";
+import { Sheet, type SheetProps } from "@/components/showhow/Sheet";
 import { useScopedT } from "@/contexts/I18nContext";
 
 export interface MoveRecordingToTrashSheetProps {
@@ -8,6 +8,11 @@ export interface MoveRecordingToTrashSheetProps {
 	busy?: boolean;
 	onOpenChange: (open: boolean) => void;
 	onConfirm: () => void;
+	/**
+	 * The sheet opens from a menu item or a shortcut, never from a trigger of its own, so the
+	 * opener says where focus goes when it closes; without this, focus falls to the document.
+	 */
+	onCloseAutoFocus?: SheetProps["onCloseAutoFocus"];
 }
 
 export function MoveRecordingToTrashSheet({
@@ -16,6 +21,7 @@ export function MoveRecordingToTrashSheet({
 	busy = false,
 	onOpenChange,
 	onConfirm,
+	onCloseAutoFocus,
 }: MoveRecordingToTrashSheetProps) {
 	const t = useScopedT("common");
 	return (
@@ -24,6 +30,7 @@ export function MoveRecordingToTrashSheet({
 			onOpenChange={(nextOpen) => {
 				if (!busy) onOpenChange(nextOpen);
 			}}
+			onCloseAutoFocus={onCloseAutoFocus}
 			eyebrow={t("showhowTrash.eyebrow")}
 			title={t("showhowTrash.title")}
 			description={t("showhowTrash.body", { title })}

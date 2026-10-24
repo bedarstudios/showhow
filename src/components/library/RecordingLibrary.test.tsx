@@ -317,6 +317,44 @@ describe("RecordingLibrary", () => {
 		expect(await screen.findByRole("dialog", { name: "Move to Trash?" })).toBeVisible();
 	});
 
+	it("returns focus to the row after cancelling Move to Trash from the row context menu", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopEntry, browserEntry]);
+		render(<RecordingLibrary />);
+		await screen.findByRole("heading", { level: 1, name: desktopEntry.title });
+		const row = within(screen.getByRole("complementary"))
+			.getByText(browserEntry.title)
+			.closest("button");
+		if (!row) throw new Error("expected the recording sidebar row");
+		fireEvent.contextMenu(row, { clientX: 35, clientY: 48 });
+		await userEvent.click(await screen.findByRole("menuitem", { name: "Move to Trash…" }));
+		const dialog = await screen.findByRole("dialog", { name: "Move to Trash?" });
+		const cancel = within(dialog).getByRole("button", { name: "Cancel" });
+		await waitFor(() => expect(cancel).toHaveFocus());
+		await userEvent.click(cancel);
+		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+		await waitFor(() => expect(row).toHaveFocus());
+	});
+
+	it("returns focus to the selected row after closing Move to Trash opened with Cmd+Backspace", async () => {
+		mockShowhowListRecordings.mockResolvedValue([desktopEntry, browserEntry]);
+		render(<RecordingLibrary />);
+		await screen.findByRole("heading", { level: 1, name: desktopEntry.title });
+		const row = within(screen.getByRole("complementary"))
+			.getByText(desktopEntry.title)
+			.closest("button");
+		if (!row) throw new Error("expected the recording sidebar row");
+		// The shortcut acts on the selection, not on the focused control.
+		expect(row).not.toHaveFocus();
+		fireEvent.keyDown(window, { key: "Backspace", metaKey: true });
+		const dialog = await screen.findByRole("dialog", { name: "Move to Trash?" });
+		await waitFor(() =>
+			expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus(),
+		);
+		await userEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+		await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+		await waitFor(() => expect(row).toHaveFocus());
+	});
+
 	it("removes a recording only after success and restores it from the Undo toast", async () => {
 		mockShowhowListRecordings.mockResolvedValue([desktopEntry, browserEntry]);
 		mockShowhowTrashRecording.mockResolvedValue({
