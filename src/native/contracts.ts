@@ -380,6 +380,9 @@ export interface AiEditionChatMessage {
 	checkpointId?: string | null;
 }
 
+/** Why a chat turn failed, when the renderer can do better than echo `error` (#212). */
+export type AiEditionChatErrorCode = "empty-reply";
+
 export interface AiEditionChatResult {
 	success: boolean;
 	assistantMessage?: AiEditionChatMessage;
@@ -387,6 +390,8 @@ export interface AiEditionChatResult {
 	document?: unknown;
 	toolCalls?: AiEditionToolCallSummary[];
 	error?: string;
+	/** Set beside `error` for failures the renderer localises and offers a next step for. */
+	errorCode?: AiEditionChatErrorCode;
 	/** Document checkpoint id recorded for the user message that triggered this turn (axcut parity). */
 	userMessageCheckpointId?: string;
 }

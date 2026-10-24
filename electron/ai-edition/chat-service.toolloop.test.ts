@@ -288,8 +288,8 @@ describe("runChat tool loop", () => {
 		});
 
 		// ponytail: empty-result path. When the deep agent returns no text,
-		// runChat surfaces "Empty response from model." — this is the second
-		// major behavior we want a regression test for.
+		// runChat fails the turn with the empty-reply code and sentence (#212)
+		// — this is the second major behavior we want a regression test for.
 		fixture.events.length = 0;
 		invokeMock.mockReset();
 		invokeMock.mockImplementationOnce(async (args) => {
@@ -314,7 +314,8 @@ describe("runChat tool loop", () => {
 			sinkErr,
 		);
 		expect(errResult.success).toBe(false);
-		expect(errResult.error).toMatch(/Empty response/);
+		expect(errResult.error).toMatch(/didn't send a reply/);
+		expect(errResult.errorCode).toBe("empty-reply");
 		expect(fixture.events.map((e) => e.kind)).toEqual(["error"]);
 		expect(fixture.events[0].payload).toMatch(/Upstream 404/);
 
@@ -390,5 +391,36 @@ describe("allowAgentEdits reaches the agent", () => {
 			fixtureDocument(),
 		);
 		expect(result.document).toBeDefined();
+	});
+});
+
+// #212: the agent's empty-reply verdict crosses to the renderer as a code it can act on
+// (localised copy, a Try again action), never as the diagnostic text.
+describe("runChat when the agent produced no text", () => {
+	it("returns the empty-reply code and the plain sentence, not the diagnostic", async () => {
+		const { EMPTY_REPLY_MESSAGE } = await import("./deep-agent/empty-reply");
+		invokeMock.mockImplementationOnce(async (args) => ({
+			text: "",
+			document: args.document,
+			mutated: false,
+			reason: EMPTY_REPLY_MESSAGE,
+			code: "empty-reply",
+		}));
+
+		const session = createSession("proj_empty_reply");
+		const result = await runChat(
+			"proj_empty_reply",
+			session.id,
+			"add a title card",
+			stubConfig(),
+			fixtureDocument(),
+		);
+
+		expect(result).toMatchObject({
+			success: false,
+			errorCode: "empty-reply",
+			error: EMPTY_REPLY_MESSAGE,
+		});
+		expect(result.error).not.toMatch(/provider=|stack=|app\.asar/);
 	});
 });

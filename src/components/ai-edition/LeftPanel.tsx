@@ -772,6 +772,16 @@ export function ChatStripPanel() {
 					},
 				]);
 				void refreshSessions(projectId);
+			} else if (result.errorCode === "empty-reply") {
+				// The main process keeps the why (provider, model, stack, chunk sample) in its
+				// log and in Save Diagnostics; here the person gets what happened and a way
+				// back (#212). No description with the raw error: it was the stack trace.
+				// No auto-dismiss: the next step is the point, and the close button is there.
+				toast.error(t("chat.emptyReply"), {
+					description: t("chat.emptyReplyNextStep"),
+					duration: Number.POSITIVE_INFINITY,
+					action: { label: t("chat.tryAgain"), onClick: () => void sendRef.current(text) },
+				});
 			} else {
 				toast.error(result.error ?? t("chat.chatFailed"));
 			}
@@ -789,6 +799,13 @@ export function ChatStripPanel() {
 			setThinkingExpanded(false);
 		}
 	};
+
+	// Try again on the empty-reply toast fires long after the turn's closure went stale (its
+	// session id, its busy flag); the ref always points at the send() of the latest render.
+	const sendRef = useRef(send);
+	useEffect(() => {
+		sendRef.current = send;
+	});
 
 	const setApplied = (key: string, state: AppliedTurn["state"], revision?: number) =>
 		setMessages((prev) =>
