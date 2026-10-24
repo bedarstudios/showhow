@@ -171,11 +171,16 @@ export async function extractMono16kPcm(
 	if (options.signal?.aborted) throw new DOMException("Aborted", "AbortError");
 	const audioTracks = await countAudioTracks(ffmpeg, filePath, options.signal);
 	if (options.signal?.aborted) throw new DOMException("Aborted", "AbortError");
-	const args = ["-hide_banner", "-loglevel", "error", "-i", filePath];
+	const args = ["-hide_banner", "-loglevel", "error"];
+	// FFmpeg 6.1.1 can truncate same-input amix at the shorter track, so keep one input per track.
+	for (let input = 0; input < audioTracks; input++) args.push("-i", filePath);
 	if (audioTracks > 1) {
+		const inputs = Array.from({ length: audioTracks }, (_, index) => `[${index}:a:${index}]`).join(
+			"",
+		);
 		args.push(
 			"-filter_complex",
-			`[0:a]amix=inputs=${audioTracks}:duration=longest:dropout_transition=0:normalize=0,aformat=channel_layouts=mono,alimiter=limit=0.95:level=0:latency=1[aout]`,
+			`${inputs}amix=inputs=${audioTracks}:duration=longest:dropout_transition=0:normalize=0,aformat=channel_layouts=mono,alimiter=limit=0.95:level=0:latency=1[aout]`,
 			"-map",
 			"[aout]",
 		);

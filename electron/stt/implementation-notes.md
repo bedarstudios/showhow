@@ -8,12 +8,13 @@ The extractor now uses the already resolved FFmpeg binary for a bounded stream
 count probe (`-map 0:a -t 0 -f null -`); this reads FFmpeg's input stream listing
 without decoding the media. The count determines the `amix` input count, so this
 handles any number of audio streams without adding an `ffprobe` dependency. A
-single-track input keeps the existing direct decode path. Multi-track audio is
-mixed for the longest input duration with normalization disabled, then limited to
-0.95 peak with auto-leveling disabled. Disabling `amix` normalization preserves a
-quiet speech track when a companion track is silent. The mix is downmixed to mono
-before limiting so stereo channel summing cannot raise the final STT samples above
-the 0.95 peak bound; limiter auto-leveling stays disabled.
+single-track input keeps the direct decode path. For multiple tracks, the extractor
+opens the source once per track and maps one audio stream from each input. Ubuntu's
+FFmpeg 6.1.1 truncates same-container `amix` output to the shorter stream even with
+`duration=longest`; decoding each stream alone confirmed their full durations, and
+repeated inputs preserve the longest duration. The mix keeps normalization disabled
+to preserve quiet speech beside a silent track, then downmixes to mono before
+limiting to 0.95 peak with limiter auto-leveling disabled.
 
 The regression evidence is in `/Users/mohamedb/dev/loop-evidence/showhow-215`:
 

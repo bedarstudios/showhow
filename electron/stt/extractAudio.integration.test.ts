@@ -21,6 +21,7 @@ let oneTrack = "";
 let silentThenTone = "";
 let toneThenSilent = "";
 let bothTones = "";
+let threeTones = "";
 let loudTones = "";
 let stereoHotMix = "";
 let noAudio = "";
@@ -35,6 +36,7 @@ describe.runIf(ffmpeg !== null)("extracting real multi-track media", () => {
 		silentThenTone = path.join(scratch, "silent-first-tone-second.m4a");
 		toneThenSilent = path.join(scratch, "tone-first-silent-second.m4a");
 		bothTones = path.join(scratch, "both-tones.m4a");
+		threeTones = path.join(scratch, "three-tones.m4a");
 		loudTones = path.join(scratch, "loud-tones.m4a");
 		stereoHotMix = path.join(scratch, "stereo-hot-mix.mka");
 		noAudio = path.join(scratch, "no-audio.mp4");
@@ -50,6 +52,11 @@ describe.runIf(ffmpeg !== null)("extracting real multi-track media", () => {
 		await createAudioFixture(bothTones, [
 			"sine=frequency=440:sample_rate=48000:duration=1.25",
 			"sine=frequency=880:sample_rate=48000:duration=0.75",
+		]);
+		await createAudioFixture(threeTones, [
+			"sine=frequency=440:sample_rate=48000:duration=0.5",
+			"sine=frequency=880:sample_rate=48000:duration=1.25",
+			"sine=frequency=1320:sample_rate=48000:duration=0.75",
 		]);
 		await createAudioFixture(loudTones, [
 			"sine=frequency=440:sample_rate=48000:duration=0.75,volume=8",
@@ -115,6 +122,15 @@ describe.runIf(ffmpeg !== null)("extracting real multi-track media", () => {
 
 		expect(toneAmplitude(samples, 440)).toBeGreaterThan(0.01);
 		expect(toneAmplitude(samples, 880)).toBeGreaterThan(0.01);
+		expect(samples.length / 16_000).toBeGreaterThan(1.2);
+	});
+
+	it("mixes every track when the input file has three audio streams", async () => {
+		const samples = await extractMono16kPcm(threeTones);
+
+		expect(toneAmplitude(samples, 440)).toBeGreaterThan(0.01);
+		expect(toneAmplitude(samples, 880)).toBeGreaterThan(0.01);
+		expect(toneAmplitude(samples, 1320)).toBeGreaterThan(0.01);
 		expect(samples.length / 16_000).toBeGreaterThan(1.2);
 	});
 
