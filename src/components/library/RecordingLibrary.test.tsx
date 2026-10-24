@@ -502,6 +502,102 @@ describe("RecordingLibrary", () => {
 		expect(briefStatus).toHaveBeenCalledWith(desktopDocEntry.bundleDir);
 	});
 
+	it("shows a failed Make brief and copy on the Walkthrough tab, linked to the Agent brief tab (#202)", async () => {
+		const briefCopy = vi.fn();
+		Object.assign(window.electronAPI, {
+			showhowAgentBriefStatus: vi.fn(async () => ({
+				connected: true,
+				model: "fake/model",
+				reviewed: false,
+				alwaysSend: false,
+				options: { transcript: true, frames: true },
+				state: "none" as const,
+			})),
+			showhowAgentBriefPreview: vi.fn(async () => ({
+				token: "brief-token",
+				provider: "openrouter",
+				model: "fake/model",
+				wordCount: 4,
+				transcript: [{ startMs: 0, text: "Publish does nothing" }],
+				frames: [],
+				steps: [{ sourceId: "1", ts: 0, label: "Open the products page" }],
+				options: { transcript: true, frames: true },
+			})),
+			showhowAgentBriefConsent: vi.fn(async () => ({ success: true })),
+			showhowAgentBriefRun: vi.fn(async () => ({ success: false, error: "invalid" })),
+			showhowAgentBriefCopy: briefCopy,
+			showhowOnAgentBriefProgress: () => () => undefined,
+		});
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		render(<RecordingLibrary />);
+		await screen.findByRole("heading", { level: 1, name: desktopEntry.title });
+		const guide = screen.getByRole("region", { name: "AI guide" });
+		await userEvent.click(within(guide).getByRole("button", { name: "Copy for agent" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Make brief and copy" }));
+
+		const toast = await screen.findByRole("alert");
+		expect(toast).toHaveTextContent("Couldn't make the brief");
+		expect(screen.getByRole("tab", { name: "01 / Walkthrough guide" })).toHaveAttribute(
+			"aria-selected",
+			"true",
+		);
+		expect(briefCopy).not.toHaveBeenCalled();
+
+		await userEvent.click(within(toast).getByRole("button", { name: "Open Agent brief" }));
+		const briefTab = screen.getByRole("tab", { name: "02 / Agent brief" });
+		expect(briefTab).toHaveAttribute("aria-selected", "true");
+		expect(briefTab).toHaveFocus();
+		const brief = screen.getByRole("region", { name: "Agent brief" });
+		expect(within(brief).getByRole("heading", { name: "Couldn't make the brief" })).toBeVisible();
+		expect(screen.queryByRole("button", { name: "Open Agent brief" })).not.toBeInTheDocument();
+
+		// Seen once on the Agent brief tab, the failure does not toast again on the way back.
+		await userEvent.click(screen.getByRole("tab", { name: "01 / Walkthrough guide" }));
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+	});
+
+	it("does not toast a Make brief and copy failure that lands on the Agent brief tab (#202)", async () => {
+		const briefRun = deferred<{ success: false; error: string }>();
+		Object.assign(window.electronAPI, {
+			showhowAgentBriefStatus: vi.fn(async () => ({
+				connected: true,
+				model: "fake/model",
+				reviewed: true,
+				alwaysSend: true,
+				options: { transcript: true, frames: true },
+				state: "none" as const,
+			})),
+			showhowAgentBriefPreview: vi.fn(async () => ({
+				token: "brief-token",
+				provider: "openrouter",
+				model: "fake/model",
+				wordCount: 4,
+				transcript: [{ startMs: 0, text: "Publish does nothing" }],
+				frames: [],
+				steps: [{ sourceId: "1", ts: 0, label: "Open the products page" }],
+				options: { transcript: true, frames: true },
+			})),
+			showhowAgentBriefRun: vi.fn(() => briefRun.promise),
+			showhowAgentBriefCopy: vi.fn(),
+			showhowOnAgentBriefProgress: () => () => undefined,
+		});
+		mockShowhowListRecordings.mockResolvedValue([desktopDocEntry]);
+		render(<RecordingLibrary />);
+		await screen.findByRole("heading", { level: 1, name: desktopEntry.title });
+		const guide = screen.getByRole("region", { name: "AI guide" });
+		await userEvent.click(within(guide).getByRole("button", { name: "Copy for agent" }));
+		await userEvent.click(screen.getByRole("tab", { name: "02 / Agent brief" }));
+		expect(await screen.findByRole("heading", { name: "Making your brief" })).toBeVisible();
+
+		await act(async () => briefRun.resolve({ success: false, error: "provider" }));
+		const brief = screen.getByRole("region", { name: "Agent brief" });
+		expect(within(brief).getByRole("heading", { name: "Couldn't make the brief" })).toBeVisible();
+		expect(screen.queryByRole("button", { name: "Open Agent brief" })).not.toBeInTheDocument();
+
+		await userEvent.click(screen.getByRole("tab", { name: "01 / Walkthrough guide" }));
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+	});
+
 	it("shows Settings in the main pane with no recording selected, and leaves it on row click", async () => {
 		Object.assign(window.electronAPI, {
 			showhowAiGuideStatus: vi.fn(async () => ({ connected: false, model: "m" })),

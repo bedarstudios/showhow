@@ -6,6 +6,7 @@ import {
 	LoaderCircle,
 	RefreshCw,
 	Sparkles,
+	X,
 } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { useScopedT } from "@/contexts/I18nContext";
@@ -43,7 +44,8 @@ export function useAgentBrief(bundleDir: string) {
 	const [error, setError] = useState<string>();
 	// A failed re-preview in the review sheet; Make stays off until a retry succeeds.
 	const [previewFailed, setPreviewFailed] = useState(false);
-	const [copy, setCopy] = useState<"idle" | "copied" | "failed">("idle");
+	// "briefFailed": Copy for agent stopped because the brief could not be made.
+	const [copy, setCopy] = useState<"idle" | "copied" | "failed" | "briefFailed">("idle");
 	const [settings, setSettings] = useState(false);
 	const active = useRef(true);
 	const copyTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -138,7 +140,10 @@ export function useAgentBrief(bundleDir: string) {
 			if (!active.current) return;
 			dispatch({ type: "result", result });
 			if (!result.success) {
-				if (!result.cancelled) setError(result.error ?? "provider");
+				if (!result.cancelled) {
+					setError(result.error ?? "provider");
+					if (copyAfter) setCopy("briefFailed");
+				}
 				return;
 			}
 			await loadStatus();
@@ -146,6 +151,7 @@ export function useAgentBrief(bundleDir: string) {
 		} catch {
 			if (active.current) {
 				setError("prepare");
+				if (copyAfter) setCopy("briefFailed");
 				dispatch({ type: "result", result: { success: false } });
 			}
 		} finally {
@@ -185,6 +191,7 @@ export function useAgentBrief(bundleDir: string) {
 		} catch {
 			if (active.current) {
 				setError("prepare");
+				if (copyAfter) setCopy("briefFailed");
 				dispatch({ type: "result", result: { success: false } });
 			}
 		} finally {
@@ -205,6 +212,11 @@ export function useAgentBrief(bundleDir: string) {
 			if (active.current && request === previewRequest.current) setPreviewFailed(true);
 		}
 	};
+	// The failure is now on the Agent brief tab, or the user closed its toast.
+	const dismissFailure = useCallback(
+		() => setCopy((value) => (value === "briefFailed" ? "idle" : value)),
+		[],
+	);
 	const cancel = async () => {
 		if (ownRun.current && !runSent.current) {
 			cancelQueued.current = true;
@@ -230,6 +242,7 @@ export function useAgentBrief(bundleDir: string) {
 		noInput: Boolean(status?.noInput || error === "noInput") && !state.hasBrief,
 		setAlwaysSend,
 		setSettings,
+		dismissFailure,
 		begin,
 		run,
 		changeOptions,
@@ -585,22 +598,64 @@ export function AgentBriefPanel({ brief }: { brief: AgentBriefController }) {
 	);
 }
 
-/** Sheets and copy feedback live outside the tabs so Copy for agent works from either tab. */
-export function AgentBriefSheets({ brief }: { brief: AgentBriefController }) {
+const TOAST_CLASS =
+	"fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-[6px] bg-ds-panel px-[18px] py-[11px] font-ds-label text-[11px] uppercase tracking-[0.8px] text-ds-on-panel shadow-[4px_4px_0_var(--ds-accent)]";
+const TOAST_ACTION_CLASS =
+	"-my-1 inline-flex h-6 items-center rounded-[4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ds-accent";
+
+/**
+ * Sheets and copy feedback live outside the tabs so Copy for agent works from either tab.
+ * A failed Make brief and copy toasts until the Agent brief tab shows the failure.
+ */
+export function AgentBriefSheets({
+	brief,
+	briefShown,
+	onOpenBrief,
+}: {
+	brief: AgentBriefController;
+	/** The Agent brief tab is selected, so its failed view is already on screen. */
+	briefShown: boolean;
+	onOpenBrief: () => void;
+}) {
 	const t = useScopedT("common");
 	const { view, copyAfter } = brief.state;
+	const { copy, dismissFailure } = brief;
 	const preview = brief.preview;
 	// A reviewed payload with no steps carries no words and no frames either.
 	const nothingToSend = preview !== undefined && preview.steps.length === 0;
+	useEffect(() => {
+		if (briefShown && copy === "briefFailed") dismissFailure();
+	}, [briefShown, copy, dismissFailure]);
 	return (
 		<>
-			{brief.copy === "copied" && (
-				<div
-					role="status"
-					className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-[6px] bg-ds-panel px-[18px] py-[11px] font-ds-label text-[11px] uppercase tracking-[0.8px] text-ds-on-panel shadow-[4px_4px_0_var(--ds-accent)]"
-				>
+			{copy === "copied" && (
+				<div role="status" className={TOAST_CLASS}>
 					<CircleCheck aria-hidden="true" className="size-[14px] text-ds-accent" />
 					{t("showhowBrief.copiedToast")}
+				</div>
+			)}
+			{copy === "briefFailed" && !briefShown && (
+				<div role="alert" className={TOAST_CLASS}>
+					<CircleAlert aria-hidden="true" className="size-[14px] text-ds-rec-soft" />
+					{t("showhowBrief.failed")}
+					<button
+						type="button"
+						className={cn(TOAST_ACTION_CLASS, "ml-2 px-1 underline underline-offset-4")}
+						onClick={onOpenBrief}
+					>
+						{t("showhowBrief.openBrief")}
+					</button>
+					<button
+						type="button"
+						aria-label={t("actions.closeNotification")}
+						className={cn(
+							TOAST_ACTION_CLASS,
+							"-mr-2 w-6 justify-center text-ds-on-panel-muted transition-colors hover:text-ds-on-panel motion-reduce:transition-none",
+						)}
+						onClick={dismissFailure}
+					>
+						<X aria-hidden="true" className="size-[14px]" />
+					</button>
 				</div>
 			)}
 			{brief.copy === "failed" && (

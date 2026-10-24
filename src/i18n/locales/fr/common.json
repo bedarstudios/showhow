@@ -221,7 +221,8 @@
 		"reviewTitle": "Check what's sent",
 		"reviewBody": "Sent to OpenRouter only when you continue. The brief is saved in this recording's folder.",
 		"always": "Send briefs without asking next time",
-		"makeAndCopy": "Make brief and copy"
+		"makeAndCopy": "Make brief and copy",
+		"openBrief": "Open Agent brief"
 	},
 	"showhowPdf": {
 		"eyebrow": "Guide",

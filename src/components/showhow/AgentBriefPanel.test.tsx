@@ -26,7 +26,18 @@ function Harness({ bundleDir }: { bundleDir: string }) {
 		<>
 			<CopyForAgentButton brief={brief} />
 			<AgentBriefPanel brief={brief} />
-			<AgentBriefSheets brief={brief} />
+			<AgentBriefSheets brief={brief} briefShown onOpenBrief={() => undefined} />
+		</>
+	);
+}
+
+/** Copy for agent on the Walkthrough tab: the Agent brief panel is not on screen. */
+function WalkthroughHarness({ onOpenBrief }: { onOpenBrief: () => void }) {
+	const brief = useAgentBrief("/scratch/one");
+	return (
+		<>
+			<CopyForAgentButton brief={brief} />
+			<AgentBriefSheets brief={brief} briefShown={false} onOpenBrief={onOpenBrief} />
 		</>
 	);
 }
@@ -335,6 +346,54 @@ describe("Copy for agent", () => {
 		expect(await screen.findByRole("heading", { name: "Couldn't make the brief" })).toBeVisible();
 		expect(screen.getByText("Your previous brief is unchanged.")).toBeVisible();
 		expect(screen.getByText("Clicking Publish leaves status at Draft")).toBeVisible();
+	});
+});
+
+describe("#202 failure feedback away from the Agent brief tab", () => {
+	it("toasts a brief that could not be prepared, links to the tab and closes on request", async () => {
+		const openBrief = vi.fn();
+		preview.mockRejectedValueOnce(new Error("folder unreadable"));
+		render(<WalkthroughHarness onOpenBrief={openBrief} />);
+		await userEvent.click(await screen.findByRole("button", { name: "Copy for agent" }));
+		const toast = await screen.findByRole("alert");
+		expect(toast).toHaveTextContent("Couldn't make the brief");
+		expect(copyButton()).toHaveAccessibleName("Copy for agent");
+		expect(copy).not.toHaveBeenCalled();
+
+		await userEvent.click(within(toast).getByRole("button", { name: "Open Agent brief" }));
+		expect(openBrief).toHaveBeenCalledTimes(1);
+		await userEvent.click(within(toast).getByRole("button", { name: "Close notification" }));
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+	});
+
+	it("toasts a consent that could not be saved from the review sheet", async () => {
+		current = { ...base, reviewed: false, alwaysSend: false };
+		consent.mockResolvedValueOnce({ success: false });
+		render(<WalkthroughHarness onOpenBrief={() => undefined} />);
+		await userEvent.click(await screen.findByRole("button", { name: "Copy for agent" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Make brief and copy" }));
+		expect(await screen.findByRole("alert")).toHaveTextContent("Couldn't make the brief");
+		expect(run).not.toHaveBeenCalled();
+	});
+
+	it("does not toast a cancelled run", async () => {
+		run.mockResolvedValueOnce({ success: false, cancelled: true });
+		render(<WalkthroughHarness onOpenBrief={() => undefined} />);
+		await userEvent.click(await screen.findByRole("button", { name: "Copy for agent" }));
+		await waitFor(() => expect(run).toHaveBeenCalled());
+		await waitFor(() => expect(copyButton()).toHaveAccessibleName("Copy for agent"));
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+	});
+
+	it("clears the toast when Copy for agent is pressed again", async () => {
+		run.mockResolvedValueOnce({ success: false, error: "provider" });
+		render(<WalkthroughHarness onOpenBrief={() => undefined} />);
+		await userEvent.click(await screen.findByRole("button", { name: "Copy for agent" }));
+		expect(await screen.findByRole("alert")).toHaveTextContent("Couldn't make the brief");
+		await userEvent.click(copyButton());
+		await screen.findByRole("button", { name: "Copied ✓" });
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+		expect(screen.getByText("Brief + path on your clipboard")).toBeInTheDocument();
 	});
 });
 
