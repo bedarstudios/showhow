@@ -563,7 +563,7 @@ function clickSamplesFromTelemetry(raw: string): ClickSample[] {
 function markerFilter(cx: number, cy: number): string {
 	const x = Math.min(1, Math.max(0, cx)).toFixed(6);
 	const y = Math.min(1, Math.max(0, cy)).toFixed(6);
-	return `drawbox=x=iw*${x}-16:y=ih*${y}-16:w=32:h=32:color=red@0.9:t=fill,drawbox=x=iw*${x}-20:y=ih*${y}-20:w=40:h=40:color=white@0.9:t=4`;
+	return `drawbox=x=iw*${x}-20:y=ih*${y}-20:w=40:h=40:color=0xE4572E:t=4`;
 }
 
 export const extractDesktopStepFrames: FrameExtractor = async ({
