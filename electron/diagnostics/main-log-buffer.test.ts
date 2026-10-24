@@ -80,3 +80,56 @@ describe("MainLogBuffer", () => {
 		expect(snap.map((e) => e.text)).toEqual(["once"]);
 	});
 });
+
+// #212: a diagnostic the product wants in Save Diagnostics regardless of OPENSCREEN_DIAGNOSTIC
+// is recorded directly, and still reaches the console exactly once.
+describe("MainLogBuffer.record", () => {
+	const buffers: MainLogBuffer[] = [];
+
+	function make(capacity: number) {
+		const b = new MainLogBuffer(capacity);
+		buffers.push(b);
+		return b;
+	}
+
+	afterEach(() => {
+		for (const b of buffers) b.uninstall();
+		buffers.length = 0;
+	});
+
+	it("keeps the entry when the console hooks are not installed", () => {
+		const buf = make(5);
+		const captured: string[] = [];
+		const original = console.error;
+		console.error = (...args: unknown[]) => {
+			captured.push(args.join(","));
+		};
+		try {
+			buf.record("error", "[ai-edit] empty reply (provider=x)");
+		} finally {
+			console.error = original;
+		}
+		expect(buf.snapshot().map((e) => [e.level, e.text])).toEqual([
+			["error", "[ai-edit] empty reply (provider=x)"],
+		]);
+		expect(captured).toEqual(["[ai-edit] empty reply (provider=x)"]);
+	});
+
+	it("does not double-record when the console hooks are installed", () => {
+		const buf = make(5);
+		const captured: string[] = [];
+		const original = console.error;
+		console.error = (...args: unknown[]) => {
+			captured.push(args.join(","));
+		};
+		try {
+			buf.install();
+			buf.record("error", "once");
+		} finally {
+			buf.uninstall();
+			console.error = original;
+		}
+		expect(buf.snapshot().map((e) => e.text)).toEqual(["once"]);
+		expect(captured).toEqual(["once"]);
+	});
+});

@@ -70,6 +70,22 @@ export class MainLogBuffer {
 		return this.entries.slice();
 	}
 
+	/**
+	 * Appends one entry whether or not the console hooks are installed, and writes it to the
+	 * console once. For a diagnostic the product wants in every Save Diagnostics export, not only
+	 * under OPENSCREEN_DIAGNOSTIC — the Edit with AI empty-reply payload (#212) is the first.
+	 */
+	record(level: MainLogEntry["level"], text: string): void {
+		this.push(level, [text]);
+		const console_ = console as unknown as Record<
+			"log" | "info" | "warn" | "error",
+			(...args: unknown[]) => void
+		>;
+		// Installed, console[level] is our hook and would push a second copy.
+		const write = this.installed ? this.originals[level] : console_[level];
+		write?.(text);
+	}
+
 	clear(): void {
 		this.entries.length = 0;
 	}
