@@ -371,32 +371,44 @@ function RecordingDetail({
 										}
 									>
 										{editingStepIndex === index && (
-											<div className="flex flex-wrap items-end gap-2">
-												<Field
-													label={`Step ${index + 1} instruction`}
-													value={instructionDraft}
-													disabled={stepBusy}
-													onChange={(event) => setInstructionDraft(event.target.value)}
-													onKeyDown={(event) => {
-														if (event.key === "Enter" && !stepBusy) void saveStep(index);
-														if (event.key === "Escape" && !stepBusy) setEditingStepIndex(null);
-													}}
-													autoFocus
-												/>
-												<Button
-													variant="secondary"
-													disabled={stepBusy || !instructionDraft.trim()}
-													onClick={() => void saveStep(index)}
-												>
-													Save step
-												</Button>
-												<Button
-													variant="ghost"
-													disabled={stepBusy}
-													onClick={() => setEditingStepIndex(null)}
-												>
-													Cancel
-												</Button>
+											<div className="flex w-full flex-col gap-2">
+												<label className="flex w-full flex-col gap-2 font-ds-body text-ds-ink">
+													<span className="font-ds-label text-[10px] uppercase tracking-[1px] text-ds-ink-soft">
+														Step {index + 1} instruction
+													</span>
+													<textarea
+														value={instructionDraft}
+														disabled={stepBusy}
+														onChange={(event) => setInstructionDraft(event.target.value)}
+														onKeyDown={(event) => {
+															if (event.key === "Enter" && !stepBusy) {
+																event.preventDefault();
+																void saveStep(index);
+															} else if (event.key === "Escape" && !stepBusy) {
+																setEditingStepIndex(null);
+															}
+														}}
+														autoFocus
+														rows={2}
+														className="w-full resize-y rounded-[4px] border border-ds-line bg-ds-surface px-3 py-[10px] text-[14px] leading-[1.5] placeholder:text-ds-ink-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-ds-ink disabled:opacity-50"
+													/>
+												</label>
+												<div className="flex flex-wrap items-center gap-2">
+													<Button
+														variant="secondary"
+														disabled={stepBusy || !instructionDraft.trim()}
+														onClick={() => void saveStep(index)}
+													>
+														Save step
+													</Button>
+													<Button
+														variant="ghost"
+														disabled={stepBusy}
+														onClick={() => setEditingStepIndex(null)}
+													>
+														Cancel
+													</Button>
+												</div>
 											</div>
 										)}
 										{step.redaction && !hidden && (
