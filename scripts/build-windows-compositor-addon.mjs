@@ -19,6 +19,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { findVcVarsAll, run as spawnStep } from "./msvcEnv.mjs";
+import { resolveRustTool, windowsCargoBuildCommand } from "./rustToolchain.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
@@ -30,7 +31,7 @@ const BUILD_OUT_DIR = path.join(ROOT, "electron", "native", "compositor-view", "
 const run = (command, args, options = {}) =>
 	spawnStep(command, args, { cwd: CRATES_DIR, ...options });
 
-async function runInVsEnv(command) {
+async function runInVsEnv(cargoExe) {
 	const vcvarsAll = findVcVarsAll();
 	if (!vcvarsAll) {
 		throw new Error(
@@ -38,10 +39,10 @@ async function runInVsEnv(command) {
 		);
 	}
 
-	const cargoExe = path.join(process.env.USERPROFILE ?? "", ".cargo", "bin", "cargo.exe");
-	if (!fs.existsSync(cargoExe)) {
-		throw new Error(`cargo not found at ${cargoExe}. Install Rust (rustup) first.`);
+	if (!cargoExe) {
+		throw new Error("cargo not found on PATH or in ~/.cargo/bin. Install Rust (rustup) first.");
 	}
+	const command = windowsCargoBuildCommand(cargoExe);
 
 	const cmdPath = path.join(
 		fs.mkdtempSync(path.join(process.env.TEMP ?? ROOT, "openscreen-build-compositor-")),
@@ -83,8 +84,7 @@ if (pinMatch) {
 	}
 }
 
-const cargoExeQuoted = `"%USERPROFILE%\\.cargo\\bin\\cargo.exe"`;
-await runInVsEnv(`${cargoExeQuoted} build -p compositor-view-napi --release`);
+await runInVsEnv(resolveRustTool("cargo"));
 
 const builtDll = path.join(CRATES_DIR, "target", "release", "compositor_view.dll");
 if (!fs.existsSync(builtDll)) {
